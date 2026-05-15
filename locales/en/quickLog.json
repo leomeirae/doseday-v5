@@ -1,0 +1,22 @@
+{
+  "title": "How are you feeling?",
+  "subtitle": "Tap to log",
+  "nausea": "Nausea",
+  "constipation": "Constipation",
+  "fatigue": "Fatigue",
+  "feelingGood": "Good!",
+  "alcohol": "Alcohol",
+  "headache": "Headache",
+  "heartburn": "Heartburn",
+  "diarrhea": "Diarrhea",
+  "injectionPain": "Injection pain",
+  "other": "Other",
+  "error": "Error",
+  "errorMessage": "Could not log. Please try again.",
+  "intensityTitle": "Intensity",
+  "intensityMessage": "How strong is the symptom?",
+  "mild": "Mild",
+  "moderate": "Moderate",
+  "severe": "Severe",
+  "cancel": "Cancel"
+}

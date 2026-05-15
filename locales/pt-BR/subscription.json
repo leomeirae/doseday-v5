@@ -1,0 +1,79 @@
+{
+    "paywall": {
+        "hero": "Acompanhamento Inteligente do Seu Tratamento",
+        "subtitle": "Transforme registros diários em insights clínicos para você e seu médico.",
+        "features": {
+            "ai": {
+                "title": "🧠 IA aplicada à saúde, não achismo",
+                "description": "A inteligência artificial analisa seus registros para identificar padrões reais entre sintomas, hábitos e doses. Exemplo: \"Sua náusea tem sido mais frequente nos dias seguintes ao consumo de álcool.\""
+            },
+            "report": {
+                "title": "🩺 Relatório clínico pronto para o seu médico",
+                "description": "Gere relatórios organizados com frequência de sintomas, correlação com doses e evolução semanal. Seu médico entende o que está acontecendo sem depender da memória."
+            },
+            "goal": {
+                "title": "📊 Acompanhamento de progresso, não promessas",
+                "description": "Visualize sua evolução baseada em dados reais, semana após semana."
+            }
+        },
+        "comparison": {
+            "title": "💰 Custa menos de 1% do seu tratamento",
+            "description": "Menos do que um erro de ajuste de dose ou uma consulta sem dados claros."
+        },
+        "plans": {
+            "yearly": "Dose Day Anual",
+            "monthly": "Dose Day Mensal",
+            "bestOffer": "MELHOR OFERTA -40%",
+            "perMonth": "/mês",
+            "perYear": "/ano"
+        },
+        "cta": {
+            "startTrial": "Começar acompanhamento com 14 dias grátis",
+            "cancelAnytime": "Cancele quando quiser",
+            "restorePurchases": "Restaurar Compras"
+        },
+        "success": {
+            "welcomePremium": "Bem-vindo ao Premium! 🎉",
+            "subscriptionActivated": "Sua assinatura foi ativada com sucesso. Aproveite todos os recursos!",
+            "startButton": "Começar",
+            "alreadyPremium": "Você já é Premium!",
+            "enjoyFeatures": "Aproveite todos os recursos ilimitados",
+            "goToDashboard": "Ir para Dashboard"
+        },
+        "restore": {
+            "successTitle": "Compras Restauradas! ✅",
+            "successMessage": "Sua assinatura foi restaurada com sucesso.",
+            "notFoundTitle": "Nenhuma compra encontrada",
+            "notFoundMessage": "Não encontramos compras anteriores nesta conta."
+        },
+        "errors": {
+            "purchaseFailed": "Não foi possível processar a compra. Tente novamente.",
+            "restoreFailed": "Não foi possível restaurar as compras."
+        }
+    },
+    "blocker": {
+        "trialExpired": "Desbloqueie o DoseDay",
+        "subscribePremium": "Começar 14 dias grátis →",
+        "back": "Voltar",
+        "dataSafe": "🔒 R$0 hoje · Cancele a qualquer momento nas configurações do app · Aviso 1 dia antes da cobrança",
+        "actions": {
+            "dose": {
+                "title": "Registrar suas doses",
+                "description": "Acompanhe seu tratamento com precisão — sem cobrança por 14 dias"
+            },
+            "weight": {
+                "title": "Registrar seu peso",
+                "description": "Veja sua evolução com gráficos detalhados — teste grátis por 14 dias"
+            },
+            "purchase": {
+                "title": "Registrar suas compras",
+                "description": "Controle seus gastos no tratamento — experimente grátis por 14 dias"
+            }
+        }
+    },
+    "subscribe": {
+        "title": "Comece seu tratamento agora",
+        "subtitle": "Teste grátis por 14 dias. Cancele quando quiser.",
+        "cta": "Experimentar Grátis"
+    }
+}

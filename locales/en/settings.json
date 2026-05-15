@@ -1,0 +1,109 @@
+{
+    "header": {
+        "title": "Settings"
+    },
+    "sections": {
+        "healthProfile": "HEALTH PROFILE",
+        "preferences": "PREFERENCES",
+        "subscription": "SUBSCRIPTION",
+        "privacy": "PRIVACY",
+        "data": "DATA",
+        "support": "SUPPORT",
+        "about": "ABOUT",
+        "account": "ACCOUNT"
+    },
+    "healthProfile": {
+        "healthData": "Health Data"
+    },
+    "preferences": {
+        "notifications": "Notifications",
+        "notificationsDisabled": "Disabled"
+    },
+    "language": {
+        "title": "Language",
+        "selectLanguage": "Select Language"
+    },
+    "theme": {
+        "darkMode": "Dark Mode",
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+    },
+    "subscription": {
+        "status": "Status",
+        "loading": "Loading...",
+        "notSubscriber": "Not Subscribed",
+        "trialActive": "Trial Active",
+        "premiumActive": "Premium Active",
+        "renewsOn": "Renews on",
+        "manageSubscription": "Manage Subscription",
+        "subscribePremium": "Subscribe Premium"
+    },
+    "privacy": {
+        "termsOfUse": "Terms of Use",
+        "privacyPolicy": "Privacy Policy",
+        "medicalReferences": "Medical Sources & References"
+    },
+    "data": {
+        "exportPDF": "Export PDF Report"
+    },
+    "support": {
+        "faq": "FAQ",
+        "reportBug": "Report Bug",
+        "contact": "Contact"
+    },
+    "about": {
+        "version": "Version",
+        "build": "Build"
+    },
+    "account": {
+        "accountSettings": "Account Settings",
+        "headerTitle": "Account Settings",
+        "sections": {
+            "info": "ACCOUNT INFORMATION",
+            "actions": "ACTIONS"
+        },
+        "email": "Email",
+        "signOut": {
+            "button": "Sign Out",
+            "title": "Sign Out",
+            "message": "Are you sure you want to sign out?",
+            "cancel": "Cancel",
+            "confirm": "Sign Out",
+            "error": "Could not sign out."
+        },
+        "deleteAccount": {
+            "button": "Delete Account Permanently",
+            "deleting": "Deleting...",
+            "warning": "⚠️ By deleting your account, all your data will be permanently removed and cannot be recovered.",
+            "firstAlert": {
+                "title": "Delete Account",
+                "message": "This action is IRREVERSIBLE. All your data will be permanently deleted:\n\n• Weight history\n• Dose records\n• Medication purchases\n• Preferences and settings\n\nDo you want to continue?",
+                "continue": "Continue"
+            },
+            "secondAlert": {
+                "title": "Final Confirmation",
+                "message": "Are you absolutely sure you want to delete your account?\n\nThis action CANNOT be undone.",
+                "confirm": "Delete Permanently"
+            },
+            "success": {
+                "title": "Account Deleted",
+                "message": "Your account has been permanently deleted. We hope to see you again in the future."
+            },
+            "error": "An error occurred while deleting the account. Please try again."
+        }
+    },
+    "alerts": {
+        "success": "Success",
+        "error": "Error",
+        "healthDataUpdated": "Health data updated successfully!",
+        "updateFailed": "Could not update data.",
+        "noData": "No Data",
+        "noDataMessage": "You don't have any records to export yet. Add some data first!",
+        "pdfGenerated": "PDF generated successfully!",
+        "pdfFailed": "Could not generate PDF. Please try again.",
+        "linkFailed": "Could not open link."
+    },
+    "bugReport": {
+        "subject": "Report Bug - Dose Day"
+    }
+}

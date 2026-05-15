@@ -1,0 +1,65 @@
+{
+  "card": {
+    "title": "Última Compra",
+    "emptyText": "No hay compras registradas",
+    "hintAdd": "Usa el botón + para registrar compras",
+    "viewHistory": "Ver historial"
+  },
+  "addModal": {
+    "titleAdd": "Registrar Compra",
+    "titleEdit": "Editar Compra",
+    "medicationLabel": "Medicamento",
+    "quantityShort": "Cant",
+    "priceLabel": "Precio",
+    "pricePlaceholder": "0,00",
+    "quantityLabel": "Cantidad",
+    "typeLabel": "Tipo",
+    "types": {
+      "caneta": "Pluma",
+      "frasco": "Vial",
+      "outro": "Otro"
+    },
+    "customTypeLabel": "Especificar tipo",
+    "customTypePlaceholder": "Ej: Pastilla, Manipulado, etc",
+    "dateLabel": "Fecha de Compra",
+    "datePrompt": "Ingrese la fecha de compra",
+    "locationLabel": "Ubicación",
+    "locationPlaceholder": "Ubicación o vendedor",
+    "notesLabel": "Notas (opcional)",
+    "notesPlaceholder": "Observaciones...",
+    "saveButton": "Guardar",
+    "savingButton": "Guardando...",
+    "cancelButton": "Cancelar",
+    "confirmButton": "Confirmar",
+    "selectDate": "Seleccionar Fecha",
+    "errors": {
+      "title": "Error",
+      "invalidPrice": "Por favor ingrese un precio válido.",
+      "priceRange": "El precio debe estar entre $1,00 y $50.000,00.",
+      "invalidQuantity": "Por favor ingrese una cantidad válida.",
+      "quantityRange": "La cantidad debe estar entre 1 y 100.",
+      "customTypeRequired": "Por favor especifique el tipo.",
+      "notesMaxLength": "Las notas deben tener como máximo 200 caracteres.",
+      "saveFailed": "No se pudo guardar la compra."
+    },
+    "success": {
+      "title": "Éxito",
+      "saved": "¡Compra registrada con éxito!"
+    }
+  },
+  "historyModal": {
+    "title": "Historial de Compras",
+    "editAction": "Editar",
+    "deleteAction": "Eliminar",
+    "empty": "No hay compras registradas.",
+    "deleteConfirm": {
+      "title": "Eliminar Compra",
+      "message": "¿Estás seguro de que quieres eliminar esta compra?",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
+    },
+    "errors": {
+      "deleteFailed": "No se pudo eliminar la compra."
+    }
+  }
+}

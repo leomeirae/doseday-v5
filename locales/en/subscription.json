@@ -1,0 +1,73 @@
+{
+    "paywall": {
+        "hero": "14 DAYS FREE",
+        "subtitle": "Track your GLP-1 treatment simply and completely",
+        "title": "Track your GLP-1 treatment with total clarity",
+        "features": {
+            "unlimitedRecords": "Unlimited weight, dose, and expense records",
+            "progressCharts": "Progress charts that show your evolution",
+            "pdfReports": "PDF reports for your doctor",
+            "smartReminders": "Smart reminders so you never forget",
+            "investmentTracking": "Track your treatment investment",
+            "fullHistory": "Complete history always available"
+        },
+        "plans": {
+            "yearly": "Dose Day Yearly",
+            "monthly": "Dose Day Monthly",
+            "months12": "1 year",
+            "month1": "1 month",
+            "bestOffer": "BEST VALUE -40%",
+            "perMonth": "/mo",
+            "perYear": "/yr"
+        },
+        "cta": {
+            "subscribeNow": "Subscribe Now",
+            "startTrial": "Start Free Trial",
+            "cancelAnytime": "Cancel anytime",
+            "restorePurchases": "Restore Purchases"
+        },
+        "success": {
+            "welcomePremium": "Welcome to Premium! 🎉",
+            "subscriptionActivated": "Your subscription has been activated successfully. Enjoy all features!",
+            "startButton": "Get Started",
+            "alreadyPremium": "You're Already Premium!",
+            "enjoyFeatures": "Enjoy all unlimited features",
+            "goToDashboard": "Go to Dashboard"
+        },
+        "restore": {
+            "successTitle": "Purchases Restored! ✅",
+            "successMessage": "Your subscription has been restored successfully.",
+            "notFoundTitle": "No purchases found",
+            "notFoundMessage": "We couldn't find any previous purchases on this account."
+        },
+        "errors": {
+            "purchaseFailed": "Could not process the purchase. Please try again.",
+            "restoreFailed": "Could not restore purchases."
+        }
+    },
+    "blocker": {
+        "trialExpired": "Start your free trial",
+        "subscribePremium": "Subscribe to DoseDay Premium",
+        "back": "Go Back",
+        "dataSafe": "Your data is safe and you'll get 14 days free to try.",
+        "actions": {
+            "dose": {
+                "title": "Record your doses",
+                "description": "Subscribe and record your doses to track your treatment precisely"
+            },
+            "weight": {
+                "title": "Record your weight",
+                "description": "Subscribe and track your progress with detailed charts"
+            },
+            "purchase": {
+                "title": "Record your purchases",
+                "description": "Subscribe and track your expenses and treatment investment"
+            }
+        }
+    },
+    "subscribe": {
+        "title": "Start your treatment now",
+        "subtitle": "14 days free trial. Cancel anytime.",
+        "cta": "Try for Free"
+    }
+}

@@ -1,0 +1,83 @@
+{
+  "title": "Check-in Diário",
+  "steps": {
+    "triage": {
+      "question": "Teve alguma reação adversa?",
+      "actions": {
+        "yes": "Sim, tive desconforto",
+        "yes_desc": "Náusea, dor de cabeça, etc.",
+        "no": "Não, tudo tranquilo"
+      }
+    },
+    "symptoms": {
+      "title": "Sintomas",
+      "question": "O que você sentiu?",
+      "nausea": "Náusea",
+      "constipation": "Constipação",
+      "diarrhea": "Diarreia",
+      "fatigue": "Fadiga",
+      "headache": "Dor de Cabeça",
+      "heartburn": "Azia",
+      "dizziness": "Tontura",
+      "injection_pain": "Dor no Local",
+      "vomiting": "Vômito"
+    },
+    "details": {
+      "progress": "Sintoma {{current}} de {{total}}",
+      "intensity_label": "Intensidade",
+      "timing_label": "Período"
+    },
+    "triggers": {
+      "title": "Fatores",
+      "question": "O que pode ter influenciado?"
+    },
+    "medication": {
+      "title": "Aplicação",
+      "question": "Você aplicou sua dose hoje?",
+      "injectionSite": {
+        "title": "Local da Injeção",
+        "abdomen": "Abdômen",
+        "thigh": "Coxa",
+        "arm": "Braço",
+        "left": "Esquerdo",
+        "right": "Direito"
+      }
+    },
+    "intensity": {
+      "question": "Como foi a {{symptom}}?",
+      "MILD": "Leve",
+      "MODERATE": "Moderada",
+      "SEVERE": "Intensa"
+    },
+    "timing": {
+      "question": "Quando começou?",
+      "MORNING": "Manhã",
+      "AFTERNOON": "Tarde",
+      "NIGHT": "Noite",
+      "ALL_DAY": "O dia todo"
+    },
+    "impact": {
+      "question": "Atrapalhou sua rotina?",
+      "none": "Não",
+      "severe": "Sim, bastante"
+    }
+  },
+  "actions": {
+    "confirm": "Confirmar Registro",
+    "next": "Próximo",
+    "finish": "Salvar Check-in",
+    "back": "Voltar",
+    "continue": "Continuar",
+    "saveDetails": "Salvar Detalhes",
+    "nextSymptom": "Próximo Sintoma",
+    "no_symptoms": "Sem Sintomas",
+    "skip_details": "Pular Detalhes (Salvar Rápido)"
+  },
+  "alerts": {
+    "error": "Erro"
+  },
+  "notes": {
+    "label": "Observações (Opcional)",
+    "placeholder": "Ex: Enjoo passou após tomar chá..."
+  }
+}

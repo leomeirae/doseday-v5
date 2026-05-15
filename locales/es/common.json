@@ -1,3 +1,85 @@
 {
-  "hello": "Hola, DoseDay"
+  "buttons": {
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "continue": "Continuar",
+    "back": "Volver",
+    "close": "Cerrar",
+    "ok": "OK"
+  },
+  "errors": {
+    "generic": "Ocurrió un error. Inténtalo de nuevo.",
+    "networkError": "Error de conexión. Verifica tu internet.",
+    "saveFailed": "No se pudo guardar.",
+    "loadFailed": "No se pudieron cargar los datos."
+  },
+  "loading": "Cargando...",
+  "or": "o",
+  "date": {
+    "today": "Hoy",
+    "otherDate": "Otra Fecha",
+    "selectDate": "Seleccionar Fecha",
+    "days": {
+      "sun": "Dom",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb"
+    }
+  },
+  "reminder": {
+    "remindOnDay": "Recordar el día",
+    "remindWeekly": "Recordar semanalmente",
+    "at": "a las"
+  },
+  "trial": {
+    "daysRemaining": "{{days}} días restantes",
+    "lastDay": "¡Último día de tu prueba!",
+    "expiresIn": "¡Tu prueba expira en {{days}} días!",
+    "subscribe": "Suscribir"
+  },
+  "time": {
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "daysLate": "{{days}}d atrasada",
+    "inDays": "en {{days}}d",
+    "next": "Próxima"
+  },
+  "legal": {
+    "termsOfUse": "Términos de Uso",
+    "privacyPolicy": "Política de Privacidad"
+  },
+  "splash": {
+    "tagline": "Dosis, peso y compras — todo en un solo lugar."
+  },
+  "presentation": {
+    "slides": {
+      "slide1": {
+        "title": "Semaglutida, Tirzepatida, Retatrutida...",
+        "subtitle": "¿Está funcionando tu tratamiento? Míralo en datos."
+      },
+      "slide2": {
+        "title": "Registrar es más rápido que aplicar la dosis.",
+        "subtitle": "Selecciona dosis. Confirma fecha. Listo."
+      },
+      "slide3": {
+        "title": "En tu próxima cita, lleva datos — no solo recuerdos.",
+        "subtitle": "Informes en PDF listos para tu médico."
+      }
+    },
+    "buttons": {
+      "next": "Siguiente",
+      "startFree": "Comenzar Gratis",
+      "alreadyHaveAccount": "Ya tengo cuenta"
+    }
+  },
+  "update": {
+    "title": "¡Nueva Versión Disponible!",
+    "subtitle": "La versión {{version}} trae mejoras y novedades.",
+    "updateNow": "Actualizar Ahora",
+    "later": "Después"
+  }
 }

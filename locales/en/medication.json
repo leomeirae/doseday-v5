@@ -1,0 +1,87 @@
+{
+  "card": {
+    "title": "Next Dose",
+    "emptyTitle": "No doses recorded",
+    "emptySubtitle": "Use the + button to record your first dose",
+    "configure": "Set your preferred day",
+    "today": "Today!",
+    "tomorrow": "Tomorrow",
+    "inDays": "In {{days}} days",
+    "overdue_one": "{{count}} day overdue",
+    "overdue_other": "{{count}} days overdue",
+    "lastDose": "Last:",
+    "streak_one": "{{count}} consecutive week of treatment",
+    "streak_other": "{{count}} consecutive weeks of treatment"
+  },
+  "addModal": {
+    "titleAdd": "Record Dose",
+    "titleEdit": "Edit Dose",
+    "heroLabel": "Enter or select dose",
+    "heroHint": "Between 2.5 and 15 mg",
+    "medicationLabel": "Medication",
+    "dateLabel": "Application Date",
+    "intervalLabel": "Next dose in",
+    "intervalDays": "{{days}} days",
+    "sideEffectsLabel": "Side Effects",
+    "sideEffectsCount": "Side Effects ({{count}})",
+    "sideEffects": {
+      "nausea": "Nausea",
+      "headache": "Headache",
+      "fatigue": "Fatigue",
+      "diarrhea": "Diarrhea",
+      "constipation": "Constipation",
+      "injectionPain": "Injection site pain"
+    },
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "Observations...",
+    "saveButton": "Save",
+    "savingButton": "Saving...",
+    "cancelButton": "Cancel",
+    "reminderTime": "Reminder time",
+    "errors": {
+      "title": "Error",
+      "invalidDose": "Please enter a valid dose.",
+      "doseRange": "Dose must be between 2.5mg and 15mg.",
+      "invalidDate": "Please enter a valid date",
+      "dateInvalid": "Invalid date",
+      "futureDate": "Date cannot be in the future",
+      "invalidInterval": "Please enter a valid interval.",
+      "intervalRange": "Interval must be between 1 and 49 days.",
+      "saveFailed": "Could not save. Please try again."
+    },
+    "success": {
+      "title": "Success",
+      "saved": "Dose recorded successfully!"
+    }
+  },
+  "historyModal": {
+    "title": "Dose History",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "empty": "No doses recorded.",
+    "deleteConfirm": {
+      "title": "Delete Dose",
+      "message": "Are you sure you want to delete this dose?",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "errors": {
+      "deleteFailed": "Could not delete dose."
+    }
+  },
+  "screen": {
+    "title": "Dose History",
+    "subtitle": "Track your treatment",
+    "emptyTitle": "No doses recorded",
+    "emptySubtitle": "Start recording your doses to track your treatment",
+    "emptyButton": "Record First Dose",
+    "totalDoses": "Total Doses",
+    "streak": "Streak",
+    "nextDose": "Next",
+    "daysLate": "{{days}}d late",
+    "deleteTitle": "Delete Dose",
+    "deleteMessage": "Do you want to delete the {{dose}}mg of {{medication}} record?",
+    "deleteError": "Could not delete the record.",
+    "loadError": "Error loading data"
+  }
+}

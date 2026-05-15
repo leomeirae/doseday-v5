@@ -1,0 +1,51 @@
+{
+    "cardTitle": "Insight da IA",
+    "observations": {
+        "weightTrend": "Perda média de {{rate}}kg/semana nos últimos 14 dias de registros.",
+        "coldStart": "🚀 Dia {{days}} de 7! Mais {{remaining}} dias e sua IA personalizada será ativada.",
+        "coldStartDay1": "🎉 Primeiro dia! Bem-vindo(a)! 6 dias de dados e seus insights personalizados serão desbloqueados.",
+        "coldStartDay3": "💪 Dia 3! Você está no caminho certo — mais 4 dias para ativar sua IA.",
+        "coldStartDay5": "🔥 Dia 5! Quase lá — só mais 2 dias para insights personalizados!",
+        "coldStartDay6": "⚡ Último dia! Amanhã sua análise de IA estará pronta!",
+        "goalReached": "Você atingiu sua meta de peso inicial! Indicadores excelentes.",
+        "symptomPattern": "Pico da dose está correlacionado com sintomas leves (24-36h pós-aplicação)."
+    },
+
+    "report": {
+        "requirements": {
+            "checkins": "Histórico de Check-ins",
+            "weights": "Registros de Peso",
+            "doses": "Doses Registradas"
+        }
+    },
+    "header": {
+        "title": "Métricas",
+        "subtitle": "Acompanhe seu progresso e receba insights semanais."
+    },
+    "weekly_summary": {
+        "title": "✨ Seu Resumo Semanal",
+        "subtitle": "Insights gerados por IA",
+        "analyzing": "Analisando seus dados...",
+        "error": "Não foi possível gerar seu resumo.",
+        "retry": "Tentar novamente",
+        "overview": "Visão Geral",
+        "highlights": "Destaques",
+        "next_week": "Próximos Dias",
+        "motivation": "Motivação",
+        "consult_ready": "Pronto para Consulta",
+        "consult_desc": "Seus dados indicam tópicos importantes para discutir com seu médico.",
+        "cached": "Atualizado em"
+    },
+    "rings": {
+        "routine": "ROTINA",
+        "doses": "DOSES",
+        "goal": "META",
+        "days": "/30 DIAS",
+        "weeks": "/4 SEM"
+    },
+    "empty": {
+        "title": "Comece a registrar",
+        "body": "Registre seu peso, doses e compras para ver suas métricas aqui."
+    },
+    "footnote": "Métricas baseadas nos últimos 30 dias de atividade."
+}

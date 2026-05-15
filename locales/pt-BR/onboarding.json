@@ -1,0 +1,34 @@
+{
+  "consent": {
+    "title": "Antes de começar",
+    "subtitle": "Para usar o Dose Day, precisamos do seu consentimento para processar seus dados de saúde de acordo com a LGPD.",
+    "terms": {
+      "label": "Aceito os",
+      "termsLink": "Termos de Uso",
+      "and": "e a",
+      "privacyLink": "Política de Privacidade",
+      "required": "Obrigatório para usar o app"
+    },
+    "dataCollection": {
+      "label": "Compartilhar dados anônimos de uso",
+      "optional": "Opcional - ajuda a melhorar o app"
+    },
+    "security": "🔒 Seus dados de saúde são criptografados e nunca serão compartilhados sem seu consentimento explícito.",
+    "button": "Aceitar e Continuar",
+    "buttonLoading": "Salvando..."
+  },
+  "termsDialog": {
+    "title": "Termos de Uso",
+    "comingSoon": "Os Termos de Uso completos estarão disponíveis em breve."
+  },
+  "privacyDialog": {
+    "title": "Política de Privacidade",
+    "comingSoon": "A Política de Privacidade completa estará disponível em breve."
+  },
+  "errors": {
+    "userNotFound": "Usuário não encontrado. Faça login novamente.",
+    "termsRequired": "Você precisa aceitar os Termos de Uso para continuar.",
+    "saveFailed": "Não foi possível salvar seus dados. Tente novamente.",
+    "registrationFailed": "Falha ao registrar consentimento de termos"
+  }
+}

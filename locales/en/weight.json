@@ -1,0 +1,47 @@
+{
+  "card": {
+    "title": "Your Progress",
+    "lost": "lost",
+    "labelInitial": "INITIAL",
+    "labelCurrent": "CURRENT",
+    "labelGoal": "GOAL",
+    "hintAdd": "Use the + button to record your weight",
+    "remaining": "<highlight>{{kg}} kg</highlight> remaining to your goal",
+    "goalReached": "Goal reached! 🎉"
+  },
+  "addModal": {
+    "titleAdd": "Record your weight",
+    "titleEdit": "Edit Weight",
+    "weightHint": "Between 30 and 300 kg",
+    "dateLabel": "Date",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "How are you feeling?",
+    "reminderTitle": "When to remind?",
+    "saveButton": "Save",
+    "savingButton": "Saving...",
+    "cancelButton": "Cancel",
+    "errors": {
+      "title": "Error",
+      "invalidWeight": "Please enter a valid weight.",
+      "weightRange": "Weight must be between 30kg and 300kg.",
+      "invalidDate": "Please enter a valid date",
+      "selectDate": "Please select a valid date.",
+      "saveFailed": "Could not save weight."
+    }
+  },
+  "historyModal": {
+    "title": "Weight History",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "empty": "No records found.",
+    "deleteConfirm": {
+      "title": "Delete Record",
+      "message": "Are you sure you want to delete this weight?",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "errors": {
+      "deleteFailed": "Could not delete record."
+    }
+  }
+}
