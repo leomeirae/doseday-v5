@@ -48,3 +48,5 @@ yarn-error.*
 # Pasta nativa gerada por expo run:ios (builds de producao via EAS)
 ios/
 android/
+# macOS
+.DS_Store
