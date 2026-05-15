@@ -18,15 +18,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: colors.bgBase,
   },
   text: {
-    color: colors.text,
+    color: colors.textPrimary,
     fontSize: 18,
     marginBottom: 16,
   },
   link: {
-    color: colors.primary,
+    color: colors.brand,
     fontSize: 16,
   },
 })
