@@ -44,3 +44,7 @@ yarn-error.*
 .env
 .env.local
 .env.*.local
+
+# Pasta nativa gerada por expo run:ios (builds de producao via EAS)
+ios/
+android/
