@@ -1,0 +1,655 @@
+# DoseDay V5 — Arquitetura
+
+**Data:** 14 de maio de 2026
+**Local canônico:** `/Users/leofrancaia/Desktop/dose-day-v5/docs/architecture.md`
+**Status:** referência técnica do repo. Atualizar antes de mudanças estruturais.
+
+---
+
+## 1. Visão geral
+
+DoseDay V5 é um app mobile iOS-first construído em React Native + Expo, com backend Supabase (mantido da V4), pagamento via RevenueCat (trial 14d configurado em produção) e IA via Anthropic SDK em Edge Functions.
+
+A V5 é **refatoração completa do código** mas mantém **infraestrutura, marca e distribuição**. Bundle ID, App Store listing, Supabase project, RevenueCat project — tudo preservado.
+
+---
+
+## 2. Stack de runtime
+
+| Camada | Tecnologia | Versão alvo |
+|---|---|---|
+| App | React Native + Expo | Expo SDK 54+ |
+| Linguagem | TypeScript estrito | 5.x |
+| Routing | Expo Router (file-based) | última |
+| UI nativa iOS | `@expo/ui` + Liquid Glass | iOS 26+ |
+| Estado de servidor | React Query (`@tanstack/react-query`) | 5.x |
+| Estado de cliente | Context API + hooks | nativo |
+| Validação de schema | Zod | última |
+| Backend | Supabase (mantido) | Postgres 15 + Edge Functions Deno |
+| IA | Anthropic SDK (Claude) via Edge Function | última |
+| Pagamento | RevenueCat SDK | última |
+| Push | Expo Notifications | nativo Expo |
+| i18n | i18next + react-i18next | última |
+| Analytics | PostHog + eventos custom Supabase | última |
+| Crash reporting | Sentry React Native | última (entra antes do beta) |
+| CI/CD | EAS Build + GitHub Actions | hospedado Expo |
+| Date | date-fns + date-fns-tz | última |
+| Storage seguro | expo-secure-store | nativo Expo |
+| Háptica | expo-haptics | nativo Expo |
+
+### O que **NÃO** vai no projeto
+
+| Não usar | Por quê |
+|---|---|
+| Tailwind / NativeWind | V5 usa StyleSheet nativo + Liquid Glass |
+| Redux / Zustand global | React Query + Context bastam |
+| NativeBase / RN Paper / Tamagui | Componentes nascem do Impeccable |
+| Lottie | Animações via Reanimated 4 / Skia / native |
+| Moment.js | date-fns é mais leve e tree-shakeable |
+| Axios | fetch nativo + helper tipado |
+
+---
+
+## 3. Estrutura de pastas (canônica)
+
+```
+/Users/leofrancaia/Desktop/dose-day-v5/
+├── app/                              # Expo Router (file-based)
+│   ├── _layout.tsx                   # Root layout (providers, theme, i18n)
+│   ├── index.tsx                     # Splash → redirect
+│   ├── (auth)/                       # Grupo de rotas: não-autenticado
+│   │   ├── _layout.tsx
+│   │   ├── welcome.tsx               # Hero / 1º insight pré-cadastro
+│   │   ├── sign-in.tsx
+│   │   ├── sign-up.tsx
+│   │   └── recover.tsx
+│   ├── (onboarding)/                 # Grupo: onboarding pré-autenticação
+│   │   ├── _layout.tsx
+│   │   ├── personal-info.tsx
+│   │   ├── medication.tsx
+│   │   ├── dose.tsx
+│   │   ├── weight.tsx
+│   │   ├── goal.tsx
+│   │   ├── medical-support.tsx
+│   │   ├── consent.tsx               # LGPD Art. 11
+│   │   ├── first-insight.tsx         # Aha-moment IA (Movimento 1)
+│   │   └── result.tsx
+│   ├── (app)/                        # Grupo: autenticado
+│   │   ├── _layout.tsx               # Tab bar (5 abas, Liquid Glass)
+│   │   ├── (tabs)/
+│   │   │   ├── _layout.tsx
+│   │   │   ├── index.tsx             # Início (dashboard)
+│   │   │   ├── doses.tsx             # Doses (com sub-seção Custos)
+│   │   │   ├── diario.tsx            # Diário (sintomas + perguntas)
+│   │   │   ├── relatorios.tsx        # Relatórios
+│   │   │   └── perfil.tsx            # Perfil
+│   │   ├── doses/
+│   │   │   ├── new.tsx
+│   │   │   └── [id].tsx
+│   │   ├── diario/
+│   │   │   ├── new-symptom.tsx
+│   │   │   └── new-question.tsx
+│   │   ├── relatorios/
+│   │   │   ├── new.tsx
+│   │   │   └── [id].tsx
+│   │   └── perfil/
+│   │       ├── account.tsx
+│   │       ├── doctor.tsx
+│   │       ├── subscription.tsx
+│   │       ├── notifications.tsx
+│   │       └── support.tsx
+│   ├── (paywall)/
+│   │   ├── _layout.tsx
+│   │   └── paywall.tsx
+│   ├── (modals)/
+│   │   ├── _layout.tsx
+│   │   ├── consent.tsx               # Modal LGPD reaberto
+│   │   └── share.tsx
+│   └── +not-found.tsx
+│
+├── components/                       # Componentes reutilizáveis
+│   ├── ui/                           # Primitivos (gerados pelo Impeccable)
+│   │   ├── Button.tsx
+│   │   ├── Card.tsx
+│   │   ├── GlassBar.tsx              # Liquid Glass APENAS aqui (navegação)
+│   │   ├── Input.tsx
+│   │   ├── Skeleton.tsx
+│   │   ├── EmptyState.tsx
+│   │   └── ErrorState.tsx
+│   ├── home/                         # Componentes da tela Início
+│   │   ├── QuickMoodCheckin.tsx
+│   │   ├── NextDoseCard.tsx
+│   │   ├── WeightProgressBlock.tsx
+│   │   ├── DailyInsightCard.tsx
+│   │   ├── NextReportCard.tsx
+│   │   └── AIProactiveQuestion.tsx
+│   ├── doses/
+│   ├── diario/
+│   ├── relatorios/
+│   ├── paywall/
+│   └── shared/                       # Atomicos cross-tela
+│
+├── hooks/                            # React hooks customizados
+│   ├── useAuth.ts
+│   ├── useProfile.ts
+│   ├── useTodayCheckin.ts
+│   ├── useReportHistory.ts
+│   ├── useSubscription.ts
+│   ├── useAIInsight.ts
+│   └── useTreatmentWeek.ts
+│
+├── lib/                              # Clients, utilitários
+│   ├── supabase/
+│   │   ├── client.ts                 # Cliente tipado
+│   │   ├── types.ts                  # Tipos gerados via supabase-js
+│   │   └── queries/                  # Queries reutilizáveis
+│   ├── revenuecat/
+│   │   └── client.ts
+│   ├── ai/
+│   │   ├── client.ts                 # Chamadas pra Edge Functions
+│   │   └── prompts.ts                # System prompts dos 3 movimentos
+│   ├── analytics/
+│   │   └── client.ts                 # PostHog wrapper
+│   ├── i18n/
+│   │   └── index.ts
+│   ├── theme/
+│   │   ├── tokens.ts                 # Cores, spacing, radius — referencia DESIGN.md
+│   │   ├── typography.ts
+│   │   └── elevation.ts
+│   ├── notifications/
+│   │   └── index.ts                  # Expo Notifications setup
+│   └── utils/
+│       ├── treatmentWeek.ts
+│       ├── doseSchedule.ts
+│       ├── currency.ts
+│       └── date.ts
+│
+├── types/                            # Tipos TypeScript compartilhados
+│   ├── database.ts                   # Espelha schema Supabase
+│   ├── domain.ts                     # Tipos de domínio (Dose, Symptom, etc.)
+│   └── api.ts                        # Tipos de payload das Edge Functions
+│
+├── locales/                          # i18n
+│   ├── pt-BR/
+│   │   ├── common.json
+│   │   ├── onboarding.json
+│   │   ├── dashboard.json
+│   │   ├── doses.json
+│   │   ├── diario.json
+│   │   ├── relatorios.json
+│   │   ├── paywall.json
+│   │   ├── perfil.json
+│   │   └── ai.json                   # Strings dos disclaimers IA
+│   ├── en/
+│   └── es/
+│
+├── assets/                           # Imagens, fontes, ícones
+│   ├── icon.png
+│   ├── adaptive-icon.png
+│   ├── splash.png
+│   ├── notification-icon.png
+│   ├── favicon.png
+│   ├── images/
+│   └── fonts/                        # Se não usar SF Pro nativo
+│
+├── supabase/                         # Migrations + Edge Functions
+│   ├── migrations/                   # SQL versionado
+│   ├── functions/                    # Edge Functions Deno
+│   │   ├── insight-do-dia/
+│   │   ├── memoria-perguntas/
+│   │   └── relatorio-bilingue/
+│   ├── seed.sql
+│   └── config.toml
+│
+├── e2e/                              # Detox E2E (entra fase pre-ship)
+│
+├── CONTEXT.md                        # Glossário do domínio (Matt Pocock) — lazy, mantido por grill-with-docs
+├── docs/                             # Documentação (NÃO TOCAR via prompts)
+│   ├── plano-estrategico-v5.md
+│   ├── skills-stack.md
+│   ├── architecture.md               # Este arquivo
+│   ├── design-system-preview.md
+│   ├── PRODUCT.md                    # Criado via /impeccable teach
+│   ├── DESIGN.md                     # Criado via /impeccable teach
+│   ├── adr/                          # ADRs (Matt Pocock format) — criados sob demanda
+│   ├── handoff/                      # Snapshots de sessão (mantido por skill /handoff)
+│   │   └── HANDOFF.md                # Última sessão sempre aqui
+│   └── prompts/                      # Prompts versionados
+│
+├── .github/
+│   └── workflows/                    # GitHub Actions (lint, type-check)
+│
+├── .easignore
+├── .gitignore
+├── .env.example
+├── .eslintrc.js                      # Lint Expo + TypeScript
+├── .prettierrc
+├── app.json                          # Config Expo (bundle id, plugins, splash)
+├── eas.json                          # EAS Build config
+├── babel.config.js
+├── metro.config.js
+├── tsconfig.json                     # Strict mode
+├── package.json
+├── CLAUDE.md                         # Working memory pro Claude Code
+└── README.md
+```
+
+---
+
+## 4. Configuração crítica
+
+### 4.1 `app.json` — campos não-negociáveis
+
+```json
+{
+  "expo": {
+    "name": "DoseDay",
+    "slug": "doseday",
+    "version": "5.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "doseday",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "bundleIdentifier": "com.doseday.premium",
+      "supportsTablet": false,
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "DoseDay lê peso e atividade do Apple Saúde para ajudar a entender seu tratamento.",
+        "NSHealthUpdateUsageDescription": "DoseDay pode salvar peso e doses no Apple Saúde se você autorizar.",
+        "NSMicrophoneUsageDescription": "DoseDay grava perguntas para sua consulta apenas se você autorizar (feature opcional).",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "associatedDomains": ["applinks:getdoseday.com"]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-notifications",
+      "expo-font",
+      ["@expo/ui", { "ios": { "deploymentTarget": "26.0" } }]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": { "projectId": "<preencher com EAS init>" }
+    },
+    "runtimeVersion": "5.0.0"
+  }
+}
+```
+
+### 4.2 `tsconfig.json` — estrito
+
+```json
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@hooks/*": ["./hooks/*"],
+      "@lib/*": ["./lib/*"],
+      "@types/*": ["./types/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+}
+```
+
+### 4.3 Variáveis de ambiente (`.env.example`)
+
+```bash
+# Supabase (mesmo projeto da V4)
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+
+# RevenueCat (mesmo projeto, app "Dose Day App" produção)
+EXPO_PUBLIC_REVENUECAT_IOS_KEY=
+
+# PostHog
+EXPO_PUBLIC_POSTHOG_KEY=
+EXPO_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+
+# Sentry (entra antes do beta)
+EXPO_PUBLIC_SENTRY_DSN=
+
+# Anthropic / OpenAI — APENAS no backend (Edge Functions). NUNCA no app
+ANTHROPIC_API_KEY=
+OPENAI_API_KEY=
+```
+
+**Regra de segurança:** chaves de IA são exclusivamente server-side (Edge Functions Supabase). Nunca chegam no app. Se aparecerem em `EXPO_PUBLIC_*`, o `security-review` deve barrar.
+
+---
+
+## 5. Schema Supabase — tabelas core (mantidas da V4)
+
+Schemas existentes que serão preservados:
+
+| Tabela | Função | Comentário |
+|---|---|---|
+| `auth.users` | Auth Supabase | Padrão |
+| `profiles` | Dados do usuário | Espelha `auth.users` com extras |
+| `medications` | Catálogo de medicamentos GLP-1 | Estático/seed |
+| `user_medications` | Medicamento ativo do usuário | FK pra `profiles` e `medications` |
+| `doses` | Registro de cada dose aplicada | timestamp, local da aplicação, mg |
+| `weights` | Registros de peso | timestamp, valor |
+| `daily_checkins` | Check-in 1-tap diário | emotional_state, data |
+| `symptom_logs` | Sintomas registrados | intensidade, contexto, FK pra checkin |
+| `pending_ai_questions` | Perguntas que a IA quer fazer ao usuário | criada na V4.5 |
+| `ai_insights` | Insights gerados pela IA (cache) | NOVO na V5 |
+| `consultation_questions` | Perguntas do usuário pra próxima consulta | NOVO na V5 (Movimento 2) |
+| `clinical_reports` | Relatórios bilíngues gerados | NOVO na V5 (Movimento 3) |
+| `subscriptions` | Espelho do RevenueCat | webhook-fed |
+| `user_settings` | Notificações, preferências | |
+| `audit_logs` | LGPD — quem acessou o quê | NOVO na V5, obrigatório |
+
+### Migrations novas necessárias na V5
+
+| Migration | Função |
+|---|---|
+| `5xxxx_create_ai_insights.sql` | Cache dos insights gerados |
+| `5xxxx_create_consultation_questions.sql` | Perguntas pra próxima consulta (Movimento 2) |
+| `5xxxx_create_clinical_reports.sql` | Relatórios gerados (Movimento 3) |
+| `5xxxx_create_audit_logs.sql` | Log LGPD obrigatório |
+| `5xxxx_strengthen_rls_policies.sql` | RLS reforçada, FORCE ROW LEVEL SECURITY em todas as tabelas com PHI |
+
+**Regra:** toda migration aplicada via MCP `apply_migration`, nunca via `supabase db push`. (Aprendizado da V4.5: divergência de migrations virou problema.)
+
+---
+
+## 6. Edge Functions — núcleo da IA
+
+### 6.1 `insight-do-dia` (Movimento 1)
+
+| | |
+|---|---|
+| Entrada | `user_id`, `checkin_id` (opcional) |
+| Lê | `profiles`, `user_medications`, `doses`, `daily_checkins`, `symptom_logs` |
+| Chama | Anthropic SDK com system prompt em `lib/ai/prompts.ts` |
+| Devolve | `{ text, severity: 'normal'|'attention', disclaimer }` |
+| Cacheia | em `ai_insights` por 24h |
+| LGPD | log em `audit_logs` |
+
+### 6.2 `memoria-perguntas` (Movimento 2)
+
+| | |
+|---|---|
+| Entrada | `user_id` |
+| Lê | `consultation_questions` (status='pending') |
+| Faz | agrupa, prioriza, deduplica via Claude |
+| Devolve | checklist estruturado + PDF |
+
+### 6.3 `relatorio-bilingue` (Movimento 3)
+
+| | |
+|---|---|
+| Entrada | `user_id`, `start_date`, `end_date` |
+| Lê | `doses`, `weights`, `daily_checkins`, `symptom_logs`, `consultation_questions` |
+| Faz | gera 2 versões (paciente + médico) via Claude |
+| Devolve | PDF binário + JSON com dados |
+| Salva | em `clinical_reports` |
+| LGPD | log em `audit_logs` |
+
+---
+
+## 7. RevenueCat — configuração existente
+
+App "Dose Day App" (produção):
+
+| Item | Valor |
+|---|---|
+| Project ID | `proj521a5bc0` |
+| Bundle ID | `com.doseday.premium` |
+| Trial | 14 dias (P2W) |
+| Produto mensal | `prodc19fd7f81e` (mensal_premium) |
+| Produto anual | `prodedac9c7fe2` (anual_premium) |
+| Webhook → Supabase | configurar pra alimentar `subscriptions` |
+
+**Dívida técnica conhecida:** 3 apps misturados no project (legado + test store + produção). Limpar quando der tempo, não bloqueia V5.
+
+---
+
+## 8. LGPD — checklist arquitetural
+
+| Item | Implementação |
+|---|---|
+| Consentimento explícito Art. 11 | Tela `consent.tsx` no onboarding, guardada em `profiles.consent_v5_at` |
+| Base legal | "Consentimento" + "Execução de contrato" documentadas em `/docs/decisions/lgpd-base-legal.md` |
+| Criptografia em repouso | nativa Supabase (AES-256) |
+| Criptografia em trânsito | TLS 1.3 (default Supabase) |
+| Acesso ao próprio dado | Tela "Meus Dados" em Perfil → export JSON |
+| Direito ao esquecimento | Edge Function `delete-my-data` com confirmação dupla |
+| Log de acesso | tabela `audit_logs`, escrita em toda leitura de PHI fora do dono |
+| DPO / contato | E-mail dpo@getdoseday.com em Política de Privacidade |
+| Política de Privacidade | versão V5 publicada em getdoseday.com/privacy |
+| Termos de Uso | versão V5 publicada em getdoseday.com/terms |
+
+---
+
+## 9. Migração da V4 → V5 — checklist de transição
+
+### O que migrar (manual ou via prompt)
+
+- [ ] `app.json` com bundle ID `com.doseday.premium`
+- [ ] `GoogleService-Info.plist` (Firebase ou só placeholder?)
+- [ ] Variáveis de ambiente do `.env` (URLs Supabase + keys RevenueCat)
+- [ ] Conteúdo dos `locales/` (pt-BR, en, es) — strings curadas
+- [ ] Schema Supabase (já está no projeto remoto)
+- [ ] Migrations relevantes da V4.5 (`pending_ai_questions`, drop `emotional_state` check)
+- [ ] Apple keys da App Store Connect (mantém)
+
+### O que NÃO migrar
+
+- ❌ Componentes da V4 (refazer com Impeccable)
+- ❌ Hooks legados (refazer)
+- ❌ Edge Functions antigas (refazer)
+- ❌ Screenshots da App Store (refazer com `appstore-creative-designer`)
+- ❌ Migrations legacy com divergência (não tocar)
+
+### Próxima versão na App Store
+
+- Nome do app: DoseDay (mantém)
+- Versão: **5.0.0**
+- Build number: incrementa
+- "What's New": copy a ser escrita via `/design:ux-copy` e `appstore-creative-designer`
+
+---
+
+## 10. Decisões arquiteturais registradas
+
+ADRs (Architecture Decision Records) ficam em `/docs/decisions/`. Lista inicial:
+
+| # | Decisão |
+|---|---|
+| 001 | Manter Supabase + RevenueCat existentes (não migrar provedores) |
+| 002 | Bundle ID mantido — não criar app novo na Apple |
+| 003 | StyleSheet nativo + Liquid Glass — sem Tailwind/NativeWind |
+| 004 | Estado: React Query (servidor) + Context (cliente). Sem Redux |
+| 005 | IA exclusivamente server-side via Edge Functions Supabase |
+| 006 | Migrations sempre via MCP `apply_migration` (lição da V4.5) |
+| 007 | Glass restrito à camada de navegação (regra liquid-glass) |
+| 008 | TypeScript estrito — sem `as any`, sem `// @ts-ignore` |
+| 009 | i18n carrega pt-BR sempre, en/es como opt-in |
+| 010 | Sentry entra antes do beta, não no MVP do dia 1 |
+
+Cada decisão tem doc em `/docs/decisions/NNN-titulo.md` com contexto, alternativas consideradas, escolha e consequências.
+
+---
+
+## 11. Padrões de código
+
+### Imports
+- Path aliases (`@/`, `@components/`, etc.) — não relativo profundo
+- Ordenação: react → expo → third-party → @/ → relativo
+
+### Naming
+- Componentes: PascalCase
+- Hooks: `useNomeCamelCase`
+- Tipos: PascalCase + sufixo descritivo (`DoseEntry`, `CheckinPayload`)
+- Constantes: SCREAMING_SNAKE_CASE
+- Arquivos de rota Expo: kebab-case (Expo Router obriga)
+- Arquivos de componente: PascalCase
+
+### Componentes
+- Functional only, com tipo de props inline ou `type Props = { ... }`
+- Sem `React.FC`
+- Estilo via `StyleSheet.create()` ao final do arquivo
+- Tokens vêm de `lib/theme/tokens.ts`, nunca hardcoded
+
+### Estado
+- Server state → React Query (`useQuery`, `useMutation`)
+- Client state local → `useState`
+- Client state compartilhado → Context dedicado por feature
+
+### Erros
+- Try/catch nas calls async com mensagem traduzida (i18n)
+- Logging via Sentry (production) e console (dev)
+- Nunca silenciar erro sem log
+
+---
+
+## 11.0 Múltiplas instâncias do Claude Code
+
+DoseDay V5 usa **até 3 instâncias paralelas** do Claude Code, cada uma especializada em um nível de complexidade. Isolamento garantido via Git worktrees.
+
+### Setup técnico
+
+```bash
+# UMA vez após bootstrap (Prompt 00 concluído)
+cd /Users/leofrancaia/Desktop/dose-day-v5
+
+git worktree add ../dose-day-v5-low    feature/scratch-low
+git worktree add ../dose-day-v5-mid    feature/scratch-mid
+git worktree add ../dose-day-v5-high   feature/scratch-high
+
+# Resultado: 3 pastas físicas distintas, mesmo repo Git
+```
+
+### Atribuição de instâncias
+
+| Instância | Pasta física | Branch padrão | Caveman | Áreas tipicamente alocadas |
+|---|---|---|---|---|
+| **Code-LOW** | `dose-day-v5-low/` | `feature/NN-low-tarefa` | ✅ ON | `/components/ui/`, microcopy, fix cirúrgico, rename |
+| **Code-MID** | `dose-day-v5-mid/` | `feature/NN-mid-feature` | ❌ OFF | `/app/`, telas, fluxos médios (3-5 arquivos) |
+| **Code-HIGH** | `dose-day-v5-high/` | `feature/NN-high-feature` | ❌ OFF | `/supabase/functions/`, schema, IA, migrations |
+
+### Regras de coordenação
+
+1. **Léo é o único roteador.** Decide qual prompt vai pra qual instância. Nunca duas instâncias recebem o mesmo prompt
+2. **1 branch por instância em paralelo.** Nunca duas instâncias na mesma branch
+3. **Sem sobreposição de áreas.** Se LOW está mexendo em `/components/home/`, MID e HIGH ficam fora dessa pasta até LOW mergear
+4. **Decisões estruturais passam por Léo + Cowork (este chat) ANTES de virar mudança** — toda instância respeita
+5. **Handoff próprio por instância.** `docs/handoff/HANDOFF-low.md`, `HANDOFF-mid.md`, `HANDOFF-high.md`
+6. **Rebase antes de mergear.** Branch de feature rebasa em `main` antes de PR
+7. **Sequenciar quando necessário.** Se 2 features tocam o mesmo arquivo, uma espera a outra
+8. **Skills obrigatórias.** `superpowers:using-git-worktrees` (escopo) + `superpowers:dispatching-parallel-agents` (orquestração)
+
+### Quando escalar para 2 ou 3 instâncias
+
+| Fase do projeto | Nº de instâncias |
+|---|---|
+| Bootstrap (Prompts 00-03) | 1 só |
+| Esqueleto navegável (Prompts 04-07) | 1-2 |
+| Onboarding + aha-moment IA (Prompts 08-09) | 2 |
+| Features paralelas (Prompts 10+) | 2-3 |
+| Pre-ship (auditorias, harden, security) | 1 só (visão única) |
+| Submissão Apple | 1 só |
+
+### Anti-padrões
+
+| ❌ Nunca | Porquê |
+|---|---|
+| Duas instâncias editando o mesmo arquivo simultaneamente | Race condition, silent overwrite |
+| Duas instâncias na mesma branch | Caos de commits |
+| Instância LOW mexendo em Edge Function | Trabalho de HIGH, perde foco da especialização |
+| Atualizar `CLAUDE.md` em mais de uma instância simultaneamente | Conflito que perde decisões |
+| Iniciar 3 instâncias antes do bootstrap concluir | Setup base precisa estabilizar primeiro |
+
+## 11.1 RTK (Rust Token Killer) — otimização de tokens
+
+Instalado globalmente via Homebrew (`brew install rtk`). Hook `PreToolUse` registrado em `~/.claude/settings.json` intercepta toda chamada ao tool `Bash` do Claude Code e comprime a saída em 60-90%.
+
+| Item | Valor |
+|---|---|
+| Versão | v0.40.0+ |
+| Binário | `/usr/local/bin/rtk` (Homebrew) ou `~/.local/bin/rtk` (install.sh) |
+| Hook | `~/.claude/settings.json` — `hooks.PreToolUse[matcher=Bash]` → `rtk hook claude` |
+| Documentação local | `~/.claude/RTK.md` |
+| Comandos disponíveis no projeto | `rtk read`, `rtk grep`, `rtk ls`, `rtk find`, `rtk diff`, `rtk git *`, `rtk tsc`, `rtk lint`, `rtk jest`, `rtk gain` |
+
+**Regra arquitetural:**
+- Toda saída de comando shell via `Bash` é automaticamente comprimida pelo hook
+- Tools `Read`, `Grep`, `Glob` do Claude Code **NÃO passam pelo hook** — pra arquivos grandes / buscas extensas, preferir `Bash: rtk <comando>`
+- Analytics local: `Bash: rtk gain` mostra economia da sessão
+
+## 12. Scripts npm padrão
+
+```json
+{
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "test": "jest",
+    "test:e2e": "detox test --configuration ios.sim.debug",
+    "build:ios:dev": "eas build --platform ios --profile development",
+    "build:ios:preview": "eas build --platform ios --profile preview",
+    "build:ios:prod": "eas build --platform ios --profile production",
+    "submit:ios": "eas submit --platform ios --latest",
+    "supabase:types": "supabase gen types typescript --project-id pjesgdczasumgjzqyzzk > types/database.ts",
+    "supabase:migration:new": "supabase migration new"
+  }
+}
+```
+
+---
+
+## 13. EAS Build — `eas.json` (rascunho)
+
+```json
+{
+  "cli": { "version": ">= 12.0.0" },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": { "simulator": true }
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": { "simulator": false }
+    },
+    "production": {
+      "ios": { "autoIncrement": "buildNumber" }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "<preencher>",
+        "ascAppId": "6756668672",
+        "appleTeamId": "<preencher>"
+      }
+    }
+  }
+}
+```
+
+---
+
+**Fim do documento.**
