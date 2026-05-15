@@ -30,8 +30,7 @@
       "expo-localization",
       "expo-secure-store",
       "expo-notifications",
-      "expo-font",
-      ["@expo/ui", { "ios": { "deploymentTarget": "26.0" } }]
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
