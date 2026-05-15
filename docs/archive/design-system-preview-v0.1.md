@@ -1,3 +1,5 @@
+> **ARQUIVADO em 2026-05-15.** Sistema canônico vive em `docs/DESIGN.md`. Este arquivo é referência histórica das decisões tomadas em 14/mai/2026 que alimentaram o `/impeccable teach` do Prompt 02.
+
 # DoseDay V5 — Design System (Preview)
 
 **Data:** 14 de maio de 2026

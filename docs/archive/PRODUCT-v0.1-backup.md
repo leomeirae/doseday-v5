@@ -1,13 +1,11 @@
 # PRODUCT.md — DoseDay V5
 
-**Versão:** 1.0 (finalizado via `/impeccable teach` — Prompt 02)
-**Data:** 15 de maio de 2026
+**Versão:** 0.1 (rascunho — será refinado pelo `/impeccable teach` no Prompt 02)
+**Data:** 14 de maio de 2026
 **Local canônico:** `/Users/leofrancaia/Desktop/dose-day-v5/docs/PRODUCT.md`
-**Status:** documento-âncora ativo. Toda decisão de produto, design e copy deriva daqui.
+**Status:** documento-âncora. Toda decisão de produto, design e copy deriva daqui.
 
 > Este documento segue o formato Impeccable. Toda skill do Claude Code que faz design, copy ou UX **lê este arquivo antes de gerar qualquer coisa**.
-
-> Open Questions iniciais foram fechadas via `/impeccable teach` em 2026-05-15. Ver seções `### Voz da IA` e `### Linguagem do relatório bilíngue` para as decisões finais.
 
 ---
 
@@ -18,20 +16,6 @@
 Não somos:
 - **brand** (campanha, landing-page, editorial) — em DoseDay, marketing/landing é trabalho separado, não acontece dentro do app
 - **wellness app** flutuante e motivacional — somos sério, clínico, calmo
-
----
-
-## Product Purpose
-
-DoseDay é a **memória inteligente do tratamento entre uma consulta e outra**. Captura como o paciente se sente, quando, e em que dose. Devolve isso como insight para o paciente e relatório bilíngue para a equipe de saúde.
-
-**Sucesso =** paciente prepara a consulta sem esforço; profissional vê 30 dias de tratamento em 2 minutos.
-
-**Posicionamento:** não somos diário de saúde genérico. Somos a lacuna entre consultas de tratamentos com canetas GLP-1 (Mounjaro, Ozempic, Wegovy). O acompanhamento clínico acontece a cada 30-60 dias; o tratamento acontece todo dia. DoseDay preenche essa lacuna.
-
-**Proposta de valor por persona:**
-- **Mariana (paciente):** "Chego na consulta sabendo o que aconteceu. Minha médica entende meu tratamento como nunca antes."
-- **Profissional de saúde:** "Relatório objetivo, cronológico, sem filtro emocional. Em 2 minutos, vejo o que levaria 20 minutos de anamnese."
 
 ---
 
@@ -201,24 +185,6 @@ Toda saída de IA termina com disclaimer fixo: *"Isso é uma anotação intelige
 
 ---
 
-## Accessibility & Inclusion
-
-| Critério | Padrão |
-|---|---|
-| Contraste texto/bg | Mínimo 4.5:1 (WCAG AA). Meta 7:1 (WCAG AAA) onde possível |
-| VoiceOver | Todo componente interativo tem `accessibilityLabel` + `accessibilityHint` |
-| Dynamic Type | Suporta até `accessibility5` (200%) sem quebrar layout |
-| Reduce Motion | Animações sensíveis desativam quando `prefersReducedMotion === true` |
-| Cor não-comunicativa | Estado nunca depende SÓ de cor (sintoma intenso = cor + ícone + label) |
-| Tamanho de toque | Mínimo 44×44pt (Apple HIG) |
-| Foco visível | Estado `pressed` / `focused` claramente distinto do default |
-| Idioma | `accessibilityLanguage="pt-BR"` por padrão. EN e ES como opt-in (V5.x) |
-| Mobilidade reduzida | Ação principal de cada tela acessível com 1 toque, sem gestos complexos |
-
-**WCAG target:** AA mínimo obrigatório. AAA desejável em texto corrido de relatório e disclaimers de IA.
-
----
-
 ## Voice & Tone
 
 ### Tom base (default em toda copy)
@@ -254,46 +220,6 @@ Toda saída de IA termina com disclaimer fixo: *"Isso é uma anotação intelige
 | Loading | Informativo, contextual | "Loading...", genérico |
 | Confirmação destrutiva | Explicita consequência | "Tem certeza?" sem mais contexto |
 
-### Voz da IA
-
-Decisões finais fechadas via `/impeccable teach` em 2026-05-15:
-
-**Q1 — A IA tem nome próprio?**
-Não. A IA não tem nome próprio. Fala como o produto ("DoseDay") ou de forma impessoal, sem sujeito explícito. Evita criar persona-AI que compete com a marca ou soa Noom-like.
-
-| ✅ Correto | ❌ Incorreto |
-|---|---|
-| "Você está na semana 3 do Mounjaro 2.5mg." | "Assistente: Olá! Vou te ajudar hoje." |
-| "DoseDay identificou padrão nos seus registros." | "Dora notou que você teve náusea." |
-| "Padrão detectado: náusea nas 24h pós-dose." | "Eu observei seu histórico." |
-
-**Q2 — Como a IA se refere a si mesma?**
-Impessoal ou coletivo. Sem primeira pessoa ("Eu observei"). Sem terceira explícita ("A IA detectou"). O insight é do produto, não de uma entidade separada.
-
-| ✅ Correto | ❌ Incorreto |
-|---|---|
-| "Padrão detectado: náusea apareceu nas 24h após cada dose nas últimas 3 semanas." | "Eu observei que você teve náusea." |
-| "70% das pessoas nessa fase do Ozempic relatam isso." | "A IA do DoseDay detectou padrão de náusea pós-dose." |
-| "Você está na semana 3. O que esperar agora:" | "Com base na minha análise, você pode esperar:" |
-
-**Q3 — Tom muda no modo autônomo (persona João, V5.x)?**
-Tom não muda fundamentalmente (calmo, direto, cuidadoso, sério). Para João, adiciona **camada didática**: mais contexto sobre o que é esperado nessa fase, antecipação de efeitos comuns, convite explícito a procurar profissional se sintoma escale. João é adulto — recebe informação clara, não coaching motivacional.
-
-| Contexto | Tom Mariana | Tom João (V5.x) |
-|---|---|---|
-| Náusea pós-dose | "70% das pessoas relatam isso nessa fase." | "70% das pessoas relatam isso nessa fase. Se a intensidade for acima de 7/10 ou persistir mais de 48h, vale buscar orientação médica." |
-| Alerta de dose | "Sua próxima dose é amanhã." | "Sua próxima dose é amanhã. Dica pra reduzir náusea: aplicar após refeição leve." |
-
-**Q4 — Push notifications: qual voz?**
-Segunda pessoa, sem sujeito. Factual, convidativo, nunca cobrança. Push é momento delicado — usuário não pediu pra ouvir uma "voz". Imperativo seco ("Registre!") é cobrança. Primeira pessoa ("Eu lembrei") é invasivo.
-
-| ✅ Correto | ❌ Incorreto |
-|---|---|
-| "Hora da sua dose semanal." | "Eu lembrei: hora da dose!" |
-| "Como você está hoje?" | "Não esqueça de registrar sua dose." |
-| "Sua próxima dose é amanhã." | "REGISTRE SUA DOSE AGORA" |
-| "Relatório pronto para sua consulta." | "Você ainda não gerou seu relatório." |
-
 ---
 
 ## Vocabulário-âncora
@@ -324,32 +250,6 @@ Segunda pessoa, sem sujeito. Factual, convidativo, nunca cobrança. Push é mome
 | **emagrecer / perder peso** (em marketing oficial) | Compliance — não somos serviço de emagrecimento | "tratamento", "evolução" |
 | **streak / sequência** | Anti-padrão (gamificação) | Apenas "registrado X dias" sem pressão |
 | **revolucionário / transformador** | Hype | (omitir) |
-
-### Linguagem do relatório bilíngue
-
-Decisão final fechada via `/impeccable teach` em 2026-05-15:
-
-O relatório (Movimento 3) é **híbrido**: duas seções distintas no mesmo documento.
-
-| Seção | Público | Tom | Exemplo de frase |
-|---|---|---|---|
-| **Seção paciente** | Mariana (e João em V5.x) | Linguagem clara, coloquial | "Você aplicou Mounjaro 2.5mg em 4 domingos seguidos. Náusea apareceu nas 24h depois em 3 desses dias, intensidade média 5/10." |
-| **Seção profissional** | Endocrinologista, nutrólogo, clínico geral, nutricionista | Clínica generalista — legível por qualquer profissional habilitado | "Registro de adesão ao tratamento: 4 aplicações de semaglutida 2.5mg no período. Registro de eventos adversos: náusea grau leve-moderado em 3 de 4 ciclos pós-dose." |
-
-**Termos OK na seção profissional:**
-- "adesão ao tratamento" / "aderência terapêutica"
-- "registro de eventos adversos"
-- "cronologia de doses e sintomas"
-- "tolerabilidade"
-- "titulação de dose"
-- "período de observação"
-
-**Termos a evitar (jargão de subespecialidade que exclui generalistas):**
-- ❌ "farmacocinética" / "farmacodinâmica"
-- ❌ "comorbidades metabólicas"
-- ❌ "perfil farmacodinâmico"
-- ❌ "iatrogenia"
-- ❌ "biomarcadores de resposta"
 
 ---
 
@@ -429,7 +329,7 @@ Aparece no rodapé de TODO output gerado por IA:
 
 ---
 
-## Como esta PRODUCT.md é usada
+## Como esta `PRODUCT.md` é usada
 
 Cada skill do Claude Code lê este arquivo antes de gerar saída:
 
@@ -441,9 +341,21 @@ Cada skill do Claude Code lê este arquivo antes de gerar saída:
 | `/impeccable onboard` (onboarding/empty) | Tom convite, anti-pressão |
 | `/impeccable harden` (edge cases) | Tom honesto em erro |
 | `grill-with-docs` | Vocabulário-âncora, anti-references |
-| `claude-api` (Edge Function IA) | Disclaimer fixo, guardrails clínicos, voz da IA |
+| `claude-api` (Edge Function IA) | Disclaimer fixo, guardrails clínicos |
 | `app-store-optimization` | Decisões de copy fixadas, sub-claims |
 
 ---
 
-**Fim do PRODUCT.md v1.0.**
+## Open Questions (a confirmar no Prompt 02 ou conforme aparecer)
+
+| # | Pergunta | Quando resolver |
+|---|---|---|
+| 1 | Voz da IA tem nome? ("Assistente"? "DoseDay"? Sem nome?) | Antes de implementar Movimento 1 |
+| 2 | Como referenciar a própria IA? ("Eu observei...", "A IA observou...", impessoal?) | Antes de implementar Movimento 1 |
+| 3 | Em modo "autônomo" (V5.x persona João), tom muda? | Quando ativarmos João |
+| 4 | Comunicação por push: usa primeira pessoa? | Ao implementar push notification |
+| 5 | Linguagem clínica do relatório (versão médica): qual nível técnico? | Ao implementar Movimento 3 |
+
+---
+
+**Fim do PRODUCT.md (rascunho v0.1).**
