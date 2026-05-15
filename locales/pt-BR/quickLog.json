@@ -1,0 +1,22 @@
+{
+  "title": "Como você está?",
+  "subtitle": "Toque para registrar",
+  "nausea": "Enjoo",
+  "constipation": "Constipação",
+  "fatigue": "Fadiga",
+  "feelingGood": "Bem!",
+  "alcohol": "Álcool",
+  "headache": "Dor cabeça",
+  "heartburn": "Azia",
+  "diarrhea": "Diarreia",
+  "injectionPain": "Dor injeção",
+  "other": "Outro",
+  "error": "Erro",
+  "errorMessage": "Não foi possível registrar. Tente novamente.",
+  "intensityTitle": "Intensidade",
+  "intensityMessage": "Quão forte está o sintoma?",
+  "mild": "Leve",
+  "moderate": "Moderado",
+  "severe": "Forte",
+  "cancel": "Cancelar"
+}

@@ -1,0 +1,73 @@
+{
+    "paywall": {
+        "hero": "14 DÍAS GRATIS",
+        "subtitle": "Acompaña tu tratamiento GLP-1 de forma simple y completa",
+        "title": "Controla tu tratamiento GLP-1 con total claridad",
+        "features": {
+            "unlimitedRecords": "Registros ilimitados de peso, dosis y gastos",
+            "progressCharts": "Gráficos de evolución que muestran tu progreso",
+            "pdfReports": "Informes en PDF para tu médico",
+            "smartReminders": "Recordatorios inteligentes para no olvidar",
+            "investmentTracking": "Seguimiento de inversión en el tratamiento",
+            "fullHistory": "Historial completo siempre disponible"
+        },
+        "plans": {
+            "yearly": "Dose Day Anual",
+            "monthly": "Dose Day Mensual",
+            "months12": "1 año",
+            "month1": "1 mes",
+            "bestOffer": "MEJOR OFERTA -40%",
+            "perMonth": "/mes",
+            "perYear": "/año"
+        },
+        "cta": {
+            "subscribeNow": "Suscribirse Ahora",
+            "startTrial": "Comenzar Prueba Gratis",
+            "cancelAnytime": "Cancela cuando quieras",
+            "restorePurchases": "Restaurar Compras"
+        },
+        "success": {
+            "welcomePremium": "¡Bienvenido a Premium! 🎉",
+            "subscriptionActivated": "Tu suscripción ha sido activada con éxito. ¡Disfruta de todas las funciones!",
+            "startButton": "Comenzar",
+            "alreadyPremium": "¡Ya eres Premium!",
+            "enjoyFeatures": "Disfruta de todas las funciones ilimitadas",
+            "goToDashboard": "Ir al Dashboard"
+        },
+        "restore": {
+            "successTitle": "¡Compras Restauradas! ✅",
+            "successMessage": "Tu suscripción ha sido restaurada con éxito.",
+            "notFoundTitle": "No se encontraron compras",
+            "notFoundMessage": "No encontramos compras anteriores en esta cuenta."
+        },
+        "errors": {
+            "purchaseFailed": "No se pudo procesar la compra. Inténtalo de nuevo.",
+            "restoreFailed": "No se pudieron restaurar las compras."
+        }
+    },
+    "blocker": {
+        "trialExpired": "Comienza tu prueba gratis",
+        "subscribePremium": "Suscribirse a DoseDay Premium",
+        "back": "Volver",
+        "dataSafe": "Tus datos están seguros y tendrás 14 días gratis para probar.",
+        "actions": {
+            "dose": {
+                "title": "Registrar tus dosis",
+                "description": "Suscríbete y registra tus dosis para seguir tu tratamiento con precisión"
+            },
+            "weight": {
+                "title": "Registrar tu peso",
+                "description": "Suscríbete y sigue tu evolución con gráficos de progreso detallados"
+            },
+            "purchase": {
+                "title": "Registrar tus compras",
+                "description": "Suscríbete y controla tus gastos e inversión en el tratamiento"
+            }
+        }
+    },
+    "subscribe": {
+        "title": "Comienza tu tratamiento ahora",
+        "subtitle": "14 días de prueba gratis. Cancela cuando quieras.",
+        "cta": "Probar Gratis"
+    }
+}

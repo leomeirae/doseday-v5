@@ -1,0 +1,47 @@
+{
+  "card": {
+    "title": "Seu Progresso",
+    "lost": "perdidos",
+    "labelInitial": "INICIAL",
+    "labelCurrent": "ATUAL",
+    "labelGoal": "META",
+    "hintAdd": "Use o botão + para registrar seu peso",
+    "remaining": "Faltam <highlight>{{kg}} kg</highlight> para sua meta",
+    "goalReached": "Meta alcançada! 🎉"
+  },
+  "addModal": {
+    "titleAdd": "Registre seu peso",
+    "titleEdit": "Editar Peso",
+    "weightHint": "Entre 30 e 300 kg",
+    "dateLabel": "Data",
+    "notesLabel": "Notas (opcional)",
+    "notesPlaceholder": "Como você está se sentindo?",
+    "reminderTitle": "Quando lembrar?",
+    "saveButton": "Salvar",
+    "savingButton": "Salvando...",
+    "cancelButton": "Cancelar",
+    "errors": {
+      "title": "Erro",
+      "invalidWeight": "Por favor, insira um peso válido.",
+      "weightRange": "O peso deve estar entre 30kg e 300kg.",
+      "invalidDate": "Por favor, insira uma data válida",
+      "selectDate": "Por favor, selecione uma data válida.",
+      "saveFailed": "Não foi possível salvar o peso."
+    }
+  },
+  "historyModal": {
+    "title": "Histórico de Peso",
+    "editAction": "Editar",
+    "deleteAction": "Excluir",
+    "empty": "Nenhum registro encontrado.",
+    "deleteConfirm": {
+      "title": "Excluir Registro",
+      "message": "Tem certeza que deseja excluir este peso?",
+      "cancel": "Cancelar",
+      "confirm": "Excluir"
+    },
+    "errors": {
+      "deleteFailed": "Não foi possível excluir o registro."
+    }
+  }
+}

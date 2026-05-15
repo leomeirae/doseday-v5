@@ -1,0 +1,72 @@
+{
+  "title": "Daily Check-in",
+  "steps": {
+    "triage": {
+      "question": "Did you have any adverse reaction?",
+      "actions": {
+        "yes": "Yes, I had discomfort",
+        "yes_desc": "Nausea, headache, etc.",
+        "no": "No, all good"
+      }
+    },
+    "symptoms": {
+      "title": "Symptoms",
+      "question": "What did you feel?",
+      "nausea": "Nausea",
+      "constipation": "Constipation",
+      "diarrhea": "Diarrhea",
+      "fatigue": "Fatigue",
+      "headache": "Headache",
+      "heartburn": "Heartburn",
+      "dizziness": "Dizziness",
+      "injection_pain": "Injection Site Pain",
+      "vomiting": "Vomiting"
+    },
+    "details": {
+      "progress": "Symptom {{current}} of {{total}}",
+      "intensity_label": "Intensity",
+      "timing_label": "Period"
+    },
+    "triggers": {
+      "title": "Factors",
+      "question": "What might have influenced it?"
+    },
+    "medication": {
+      "title": "Application",
+      "question": "Did you take your dose today?",
+      "injectionSite": {
+        "title": "Injection Site",
+        "abdomen": "Abdomen",
+        "thigh": "Thigh",
+        "arm": "Arm",
+        "left": "Left",
+        "right": "Right"
+      }
+    },
+    "intensity": {
+        "MILD": "Mild",
+        "MODERATE": "Moderate",
+        "SEVERE": "Severe"
+    },
+    "timing": {
+        "MORNING": "Morning",
+        "AFTERNOON": "Afternoon",
+        "NIGHT": "Night",
+        "ALL_DAY": "All Day"
+    }
+  },
+  "actions": {
+    "confirm": "Confirm Record",
+    "next": "Next",
+    "finish": "Save Check-in",
+    "back": "Back",
+    "continue": "Continue",
+    "nextSymptom": "Next Symptom",
+    "no_symptoms": "No Symptoms",
+    "skip_details": "Skip Details (Quick Save)"
+  },
+  "notes": {
+    "label": "Notes (Optional)",
+    "placeholder": "E.g., Nausea improved after tea..."
+  }
+}

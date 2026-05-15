@@ -1,0 +1,65 @@
+{
+  "card": {
+    "title": "Last Purchase",
+    "emptyText": "No purchases registered",
+    "hintAdd": "Use the + button to register purchases",
+    "viewHistory": "View history"
+  },
+  "addModal": {
+    "titleAdd": "Register Purchase",
+    "titleEdit": "Edit Purchase",
+    "medicationLabel": "Medication",
+    "quantityShort": "Qty",
+    "priceLabel": "Price",
+    "pricePlaceholder": "0.00",
+    "quantityLabel": "Quantity",
+    "typeLabel": "Type",
+    "types": {
+      "caneta": "Pen",
+      "frasco": "Vial",
+      "outro": "Other"
+    },
+    "customTypeLabel": "Specify type",
+    "customTypePlaceholder": "Ex: Pill, Compounded, etc",
+    "dateLabel": "Purchase Date",
+    "datePrompt": "Enter the purchase date",
+    "locationLabel": "Location",
+    "locationPlaceholder": "Location or seller",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "Observations...",
+    "saveButton": "Save",
+    "savingButton": "Saving...",
+    "cancelButton": "Cancel",
+    "confirmButton": "Confirm",
+    "selectDate": "Select Date",
+    "errors": {
+      "title": "Error",
+      "invalidPrice": "Please enter a valid price.",
+      "priceRange": "Price must be between $1.00 and $50,000.00.",
+      "invalidQuantity": "Please enter a valid quantity.",
+      "quantityRange": "Quantity must be between 1 and 100.",
+      "customTypeRequired": "Please specify the type.",
+      "notesMaxLength": "Notes must be at most 200 characters.",
+      "saveFailed": "Could not save the purchase."
+    },
+    "success": {
+      "title": "Success",
+      "saved": "Purchase registered successfully!"
+    }
+  },
+  "historyModal": {
+    "title": "Purchase History",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "empty": "No purchases registered.",
+    "deleteConfirm": {
+      "title": "Delete Purchase",
+      "message": "Are you sure you want to delete this purchase?",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "errors": {
+      "deleteFailed": "Could not delete the purchase."
+    }
+  }
+}

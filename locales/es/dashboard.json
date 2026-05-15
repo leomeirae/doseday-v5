@@ -1,0 +1,83 @@
+{
+  "greeting": "¡Hola, {{name}}!",
+  "greetingDefault": "¡Hola!",
+  "tabs": {
+    "home": "Inicio",
+    "doses": "Dosis",
+    "add": "Añadir",
+    "weight": "Peso",
+    "metrics": "Métricas"
+  },
+  "widgets": {
+    "medicationCycle": {
+      "title": "CICLO ACTUAL",
+      "noRecord": "Sin registro",
+      "dayProgress": "Día {{current}} de {{total}}",
+      "nextDoseIn": "Próxima dosis en {{days}} días",
+      "overdueBy": "Atrasado por {{days}} días"
+    },
+    "dataConsistency": {
+      "title": "CONSISTENCIA DE DATOS",
+      "days": "días"
+    },
+    "weightSummary": {
+      "title": "PESO ACTUAL",
+      "initial": "Inicial: {{weight}} {{unit}}"
+    },
+    "quickActions": {
+        "title": "Acciones Rápidas",
+        "editJournal": "Editar Diario",
+        "clinicalJournal": "Diario Clínico",
+        "weight": "Peso",
+        "dose": "Dosis"
+    }
+  },
+  "addAction": {
+    "title": "Nuevo Registro",
+    "dose": "Dosis",
+    "weight": "Peso",
+    "purchase": "Compra",
+    "cancel": "Cancelar"
+  },
+  "menu": {
+    "generateReport": "Generar Informe",
+    "settings": "Configuración",
+    "cancel": "Cancelar"
+  },
+  "onboarding": {
+    "completeProfile": "Completa tu perfil"
+  },
+  "toast": {
+    "doseRegistered": "Dosis registrada",
+    "weightRegistered": "Peso registrado",
+    "purchaseRegistered": "Compra registrada",
+    "changesSaved": "Cambios guardados",
+    "weightRecorded": "¡Peso registrado con éxito!",
+    "doseRecorded": "¡Dosis registrada con éxito!",
+    "purchaseRecorded": "¡Compra registrada con éxito!",
+    "saveFailed": "No se pudo guardar",
+    "profileUpdated": "¡Perfil actualizado con éxito!",
+    "profileIncomplete": "Puedes completar tu perfil en Configuración"
+  },
+  "pdf": {
+    "noData": "Sin Datos",
+    "noDataMessage": "Aún no tienes registros para exportar. ¡Añade algunos datos primero!",
+    "generating": "Generando...",
+    "success": "¡PDF generado con éxito!",
+    "shareTitle": "Compartir Informe",
+    "error": "No se pudo generar el PDF. Inténtalo de nuevo."
+  },
+  "signOut": {
+    "title": "Cerrar sesión",
+    "message": "¿Estás seguro de que quieres cerrar sesión?"
+  },
+  "errors": {
+    "generic": "Error",
+    "saveFailed": "No se pudo guardar el perfil.",
+    "profileSaveError": "Error al guardar el perfil.",
+    "profileUpdateError": "Error al actualizar el perfil."
+  },
+  "alerts": {
+    "error": "Error"
+  }
+}

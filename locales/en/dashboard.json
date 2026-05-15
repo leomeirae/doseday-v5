@@ -1,0 +1,89 @@
+{
+  "greeting": "Hello, {{name}}!",
+  "greetingDefault": "Hello!",
+  "tabs": {
+    "home": "Home",
+    "doses": "Doses",
+    "add": "Add",
+    "weight": "Weight",
+    "metrics": "Metrics"
+  },
+  "widgets": {
+    "medicationCycle": {
+      "title": "CURRENT CYCLE",
+      "noRecord": "No record",
+      "dayProgress": "Day {{current}} of {{total}}",
+      "nextDoseIn": "Next dose in {{days}} days",
+      "overdueBy": "Overdue by {{days}} days"
+    },
+    "dataConsistency": {
+      "title": "DATA CONSISTENCY",
+      "days": "days"
+    },
+    "weightSummary": {
+      "title": "CURRENT WEIGHT",
+      "initial": "Start: {{weight}} {{unit}}",
+      "current": "CURRENT WEIGHT",
+      "start": "START",
+      "goal": "GOAL"
+    },
+    "quickActions": {
+        "title": "Quick Actions",
+        "editJournal": "Edit Journal",
+        "clinicalJournal": "Clinical Journal",
+        "weight": "Weight",
+        "dose": "Dose"
+    }
+  },
+  "addAction": {
+    "title": "New Record",
+    "dose": "Dose",
+    "doseSubtitle": "Log medication",
+    "weight": "Weight",
+    "weightSubtitle": "Update body weight",
+    "purchase": "Purchase",
+    "purchaseSubtitle": "New acquisition",
+    "cancel": "Cancel"
+  },
+  "menu": {
+    "generateReport": "Generate Report",
+    "settings": "Settings",
+    "cancel": "Cancel"
+  },
+  "onboarding": {
+    "completeProfile": "Complete your profile"
+  },
+  "toast": {
+    "doseRegistered": "Dose registered",
+    "weightRegistered": "Weight registered",
+    "purchaseRegistered": "Purchase registered",
+    "changesSaved": "Changes saved",
+    "weightRecorded": "Weight recorded successfully!",
+    "doseRecorded": "Dose recorded successfully!",
+    "purchaseRecorded": "Purchase recorded successfully!",
+    "saveFailed": "Could not save",
+    "profileUpdated": "Profile updated successfully!",
+    "profileIncomplete": "You can complete your profile in Settings"
+  },
+  "pdf": {
+    "noData": "No Data",
+    "noDataMessage": "You don't have any records to export yet. Add some data first!",
+    "generating": "Generating...",
+    "success": "PDF generated successfully!",
+    "shareTitle": "Share Report",
+    "error": "Could not generate PDF. Please try again."
+  },
+  "signOut": {
+    "title": "Sign Out",
+    "message": "Are you sure you want to sign out?"
+  },
+  "errors": {
+    "generic": "Error",
+    "saveFailed": "Could not save profile.",
+    "profileSaveError": "Error saving profile.",
+    "profileUpdateError": "Error updating profile."
+  },
+  "alerts": {
+    "error": "Error"
+  }
+}

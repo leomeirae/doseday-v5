@@ -1,3 +1,91 @@
 {
-  "hello": "Olá, DoseDay"
+  "buttons": {
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Salvar",
+    "continue": "Continuar",
+    "back": "Voltar",
+    "close": "Fechar",
+    "ok": "OK"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro. Tente novamente.",
+    "networkError": "Erro de conexão. Verifique sua internet.",
+    "saveFailed": "Não foi possível salvar.",
+    "loadFailed": "Não foi possível carregar os dados."
+  },
+  "loading": "Carregando...",
+  "or": "ou",
+  "date": {
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "future": "Em breve",
+    "daysAgo_one": "Há {{count}} dia",
+    "daysAgo_other": "Há {{count}} dias",
+    "daysAgo": "Há {{count}} dias",
+    "otherDate": "Outra Data",
+    "selectDate": "Selecionar Data",
+    "days": {
+      "sun": "Dom",
+      "mon": "Seg",
+      "tue": "Ter",
+      "wed": "Qua",
+      "thu": "Qui",
+      "fri": "Sex",
+      "sat": "Sáb"
+    }
+  },
+  "reminder": {
+    "remindOnDay": "Lembrar no dia",
+    "remindWeekly": "Lembrar semanalmente",
+    "at": "às"
+  },
+  "trial": {
+    "daysRemaining": "{{days}} dias restantes",
+    "lastDay": "Último dia do seu trial!",
+    "expiresIn": "Seu trial expira em {{days}} dias!",
+    "subscribe": "Assinar"
+  },
+  "time": {
+    "today": "Hoje",
+    "tomorrow": "Amanhã",
+    "overdue": "Atrasada há {{days}}d",
+    "daysLate": "{{days}}d atrasada",
+    "inDays": "em {{days}}d",
+    "next": "Próxima"
+  },
+  "legal": {
+    "termsOfUse": "Termos de Uso",
+    "privacyPolicy": "Política de Privacidade"
+  },
+  "splash": {
+    "tagline": "Doses, peso e compras — tudo num só lugar."
+  },
+  "presentation": {
+    "slides": {
+      "slide1": {
+        "title": "Semaglutida, Tirzepatida, Retatrutida...",
+        "subtitle": "Seu tratamento está funcionando? Veja em dados."
+      },
+      "slide2": {
+        "title": "Selecione a dose confirme data e pronto!",
+        "subtitle": "Saiba quando e quanto usou, sempre"
+      },
+      "slide3": {
+        "title": "Na próxima consulta, leve dados — não só memória.",
+        "subtitle": "Relatório em PDF pronto para seu médico."
+      }
+    },
+    "buttons": {
+      "next": "Próximo",
+      "startFree": "Começar Grátis",
+      "alreadyHaveAccount": "Já tenho conta"
+    }
+  },
+  "update": {
+    "title": "Nova Versão Disponível!",
+    "subtitle": "A versão {{version}} traz melhorias e novidades.",
+    "updateNow": "Atualizar Agora",
+    "later": "Depois"
+  }
 }

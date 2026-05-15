@@ -1,0 +1,76 @@
+{
+  "title": "Check-in Diario",
+  "steps": {
+    "triage": {
+      "question": "¿Sentiste algún malestar hoy?",
+      "noReaction": "Día tranquilo ✓",
+      "yesReaction": "Sí, tuve malestar"
+    },
+    "symptoms": {
+      "title": "Síntomas",
+      "question": "¿Qué sentiste?",
+      "nausea": "Náusea",
+      "constipation": "Estreñimiento",
+      "diarrhea": "Diarrea",
+      "fatigue": "Fatiga",
+      "headache": "Dolor de Cabeza",
+      "heartburn": "Acidez",
+      "dizziness": "Mareo",
+      "injection_pain": "Dolor en el Sitio",
+      "vomiting": "Vómito"
+    },
+    "details": {
+      "progress": "Síntoma {{current}} de {{total}}",
+      "intensity_label": "Intensidad",
+      "timing_label": "Período"
+    },
+    "triggers": {
+      "title": "Factores",
+      "question": "¿Qué pudo haber influido?"
+    },
+    "medication": {
+      "title": "Aplicación",
+      "question": "¿Aplicaste tu dosis hoy?",
+      "injectionSite": {
+        "title": "Sitio de Inyección",
+        "abdomen": "Abdomen",
+        "thigh": "Muslo",
+        "arm": "Brazo",
+        "left": "Izquierdo",
+        "right": "Derecho"
+      }
+    },
+    "intensity": {
+      "question": "¿Cómo fue la {{symptom}}?",
+      "MILD": "Leve",
+      "MODERATE": "Moderada",
+      "SEVERE": "Intensa"
+    },
+    "timing": {
+      "question": "¿Cuándo comenzó?",
+      "MORNING": "Mañana",
+      "AFTERNOON": "Tarde",
+      "NIGHT": "Noche",
+      "ALL_DAY": "Todo el día"
+    },
+    "impact": {
+      "question": "¿Afectó tu rutina?",
+      "none": "No",
+      "severe": "Sí, mucho"
+    }
+  },
+  "actions": {
+    "confirm": "Confirmar Registro",
+    "next": "Siguiente",
+    "finish": "Guardar Check-in",
+    "back": "Volver",
+    "continue": "Continuar",
+    "nextSymptom": "Siguiente Síntoma",
+    "no_symptoms": "Sin Síntomas",
+    "skip_details": "Saltar Detalles (Guardado Rápido)"
+  },
+  "notes": {
+    "label": "Notas (Opcional)",
+    "placeholder": "Ej: La náusea mejoró después del té..."
+  }
+}

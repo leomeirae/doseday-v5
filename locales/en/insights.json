@@ -1,0 +1,51 @@
+{
+    "cardTitle": "AI Insight",
+    "observations": {
+        "weightTrend": "Average loss of {{rate}}kg/week over the last 14 days of records.",
+        "coldStart": "🚀 Day {{days}} of 7! {{remaining}} more days until your personalized AI is activated.",
+        "coldStartDay1": "🎉 First day! Welcome! 6 days of data and your personalized insights will be unlocked.",
+        "coldStartDay3": "💪 Day 3! You're on track — 4 more days to activate your AI.",
+        "coldStartDay5": "🔥 Day 5! Almost there — just 2 more days for personalized insights!",
+        "coldStartDay6": "⚡ Last day! Tomorrow your AI analysis will be ready!",
+        "goalReached": "You reached your initial weight goal! Excellent indicators.",
+        "symptomPattern": "Dose peak is correlated with mild symptoms (24-36h post-injection)."
+    },
+
+    "report": {
+        "requirements": {
+            "checkins": "Check-in History",
+            "weights": "Weight Records",
+            "doses": "Doses Registered"
+        }
+    },
+    "header": {
+        "title": "Metrics",
+        "subtitle": "Track your progress and get weekly insights."
+    },
+    "weekly_summary": {
+        "title": "✨ Your Weekly Summary",
+        "subtitle": "AI-generated insights",
+        "analyzing": "Analyzing your data...",
+        "error": "Could not generate your summary.",
+        "retry": "Try again",
+        "overview": "Overview",
+        "highlights": "Highlights",
+        "next_week": "Next Days",
+        "motivation": "Motivation",
+        "consult_ready": "Ready for Consult",
+        "consult_desc": "Your data indicates important topics to discuss with your doctor.",
+        "cached": "Updated on"
+    },
+    "rings": {
+        "routine": "ROUTINE",
+        "doses": "DOSES",
+        "goal": "GOAL",
+        "days": "/30 DAYS",
+        "weeks": "/4 WEEKS"
+    },
+    "empty": {
+        "title": "Start Recording",
+        "body": "Record your weight, doses, and purchases to see your metrics here."
+    },
+    "footnote": "Metrics based on the last 30 days of activity."
+}

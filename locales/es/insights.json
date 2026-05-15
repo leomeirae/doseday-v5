@@ -1,0 +1,33 @@
+{
+    "cardTitle": "Insight de IA",
+    "header": {
+        "title": "Métricas",
+        "subtitle": "Sigue tu progreso y recibe insights semanales."
+    },
+    "weekly_summary": {
+        "title": "✨ Tu Resumen Semanal",
+        "subtitle": "Insights generados por IA",
+        "analyzing": "Analizando tus datos...",
+        "error": "No se pudo generar tu resumen.",
+        "retry": "Intentar de nuevo",
+        "overview": "Visión General",
+        "highlights": "Destacados",
+        "next_week": "Próximos Días",
+        "motivation": "Motivación",
+        "consult_ready": "Listo para Consulta",
+        "consult_desc": "Tus datos indican temas importantes para discutir con tu médico.",
+        "cached": "Actualizado el"
+    },
+    "rings": {
+        "routine": "RUTINA",
+        "doses": "DOSIS",
+        "goal": "META",
+        "days": "/30 DÍAS",
+        "weeks": "/4 SEM"
+    },
+    "empty": {
+        "title": "Empieza a registrar",
+        "body": "Registra tu peso, dosis y compras para ver tus métricas aquí."
+    },
+    "footnote": "Métricas basadas en los últimos 30 días de actividad."
+}

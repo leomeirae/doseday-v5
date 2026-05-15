@@ -1,0 +1,109 @@
+{
+    "header": {
+        "title": "Configuración"
+    },
+    "sections": {
+        "healthProfile": "PERFIL DE SALUD",
+        "preferences": "PREFERENCIAS",
+        "subscription": "SUSCRIPCIÓN",
+        "privacy": "PRIVACIDAD",
+        "data": "DATOS",
+        "support": "SOPORTE",
+        "about": "ACERCA DE",
+        "account": "CUENTA"
+    },
+    "healthProfile": {
+        "healthData": "Datos de Salud"
+    },
+    "preferences": {
+        "notifications": "Notificaciones",
+        "notificationsDisabled": "Desactivadas"
+    },
+    "language": {
+        "title": "Idioma",
+        "selectLanguage": "Seleccionar Idioma"
+    },
+    "theme": {
+        "darkMode": "Modo Oscuro",
+        "enabled": "Activado",
+        "disabled": "Desactivado"
+    },
+    "subscription": {
+        "status": "Estado",
+        "loading": "Cargando...",
+        "notSubscriber": "No Suscrito",
+        "trialActive": "Prueba Activa",
+        "premiumActive": "Premium Activo",
+        "renewsOn": "Renueva el",
+        "manageSubscription": "Gestionar Suscripción",
+        "subscribePremium": "Suscribir Premium"
+    },
+    "privacy": {
+        "termsOfUse": "Términos de Uso",
+        "privacyPolicy": "Política de Privacidad",
+        "medicalReferences": "Fuentes y Referencias Médicas"
+    },
+    "data": {
+        "exportPDF": "Exportar Informe PDF"
+    },
+    "support": {
+        "faq": "FAQ",
+        "reportBug": "Reportar Error",
+        "contact": "Contacto"
+    },
+    "about": {
+        "version": "Versión",
+        "build": "Build"
+    },
+    "account": {
+        "accountSettings": "Configuración de Cuenta",
+        "headerTitle": "Configuración de Cuenta",
+        "sections": {
+            "info": "INFORMACIÓN DE LA CUENTA",
+            "actions": "ACCIONES"
+        },
+        "email": "Correo electrónico",
+        "signOut": {
+            "button": "Cerrar Sesión",
+            "title": "Cerrar Sesión",
+            "message": "¿Estás seguro de que quieres cerrar sesión?",
+            "cancel": "Cancelar",
+            "confirm": "Cerrar Sesión",
+            "error": "No se pudo cerrar sesión."
+        },
+        "deleteAccount": {
+            "button": "Eliminar Cuenta Permanentemente",
+            "deleting": "Eliminando...",
+            "warning": "⚠️ Al eliminar tu cuenta, todos tus datos serán eliminados permanentemente y no podrán ser recuperados.",
+            "firstAlert": {
+                "title": "Eliminar Cuenta",
+                "message": "Esta acción es IRREVERSIBLE. Todos tus datos serán eliminados permanentemente:\n\n• Historial de peso\n• Registro de dosis\n• Compras de medicamentos\n• Preferencias y configuración\n\n¿Deseas continuar?",
+                "continue": "Continuar"
+            },
+            "secondAlert": {
+                "title": "Confirmación Final",
+                "message": "¿Estás absolutamente seguro de que deseas eliminar tu cuenta?\n\nEsta acción NO PUEDE deshacerse.",
+                "confirm": "Eliminar Definitivamente"
+            },
+            "success": {
+                "title": "Cuenta Eliminada",
+                "message": "Tu cuenta ha sido eliminada permanentemente. Esperamos verte de nuevo en el futuro."
+            },
+            "error": "Ocurrió un error al eliminar la cuenta. Por favor, inténtalo de nuevo."
+        }
+    },
+    "alerts": {
+        "success": "Éxito",
+        "error": "Error",
+        "healthDataUpdated": "¡Datos de salud actualizados con éxito!",
+        "updateFailed": "No se pudieron actualizar los datos.",
+        "noData": "Sin Datos",
+        "noDataMessage": "Aún no tienes registros para exportar. ¡Agrega algunos datos primero!",
+        "pdfGenerated": "¡PDF generado con éxito!",
+        "pdfFailed": "No se pudo generar el PDF. Inténtalo de nuevo.",
+        "linkFailed": "No se pudo abrir el enlace."
+    },
+    "bugReport": {
+        "subject": "Reportar Error - Dose Day"
+    }
+}

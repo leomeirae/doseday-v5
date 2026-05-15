@@ -1,0 +1,111 @@
+{
+    "header": {
+        "title": "Configurações"
+    },
+    "sections": {
+        "healthProfile": "PERFIL DE SAÚDE",
+        "preferences": "PREFERÊNCIAS",
+        "subscription": "ASSINATURA",
+        "privacy": "PRIVACIDADE",
+        "data": "DADOS",
+        "support": "SUPORTE",
+        "about": "SOBRE",
+        "account": "CONTA"
+    },
+    "healthProfile": {
+        "healthData": "Dados de Saúde"
+    },
+    "preferences": {
+        "notifications": "Notificações",
+        "notificationsDisabled": "Desativados",
+        "smartWeightReminders": "Lembretes Inteligentes de Peso",
+        "smartWeightRemindersHint": "Notificar se ficar 7 dias sem registrar"
+    },
+    "language": {
+        "title": "Idioma",
+        "selectLanguage": "Selecione o Idioma"
+    },
+    "theme": {
+        "darkMode": "Modo Escuro",
+        "enabled": "Ativado",
+        "disabled": "Desativado"
+    },
+    "subscription": {
+        "status": "Status",
+        "loading": "Carregando...",
+        "notSubscriber": "Não Assinante",
+        "trialActive": "Trial Ativo",
+        "premiumActive": "Premium Ativo",
+        "renewsOn": "Renova em",
+        "manageSubscription": "Gerenciar Assinatura",
+        "subscribePremium": "Assinar Premium"
+    },
+    "privacy": {
+        "termsOfUse": "Termos de Uso",
+        "privacyPolicy": "Política de Privacidade",
+        "medicalReferences": "Fontes e Referências Médicas"
+    },
+    "data": {
+        "exportPDF": "Exportar Relatório PDF"
+    },
+    "support": {
+        "faq": "FAQ",
+        "reportBug": "Reportar Bug",
+        "contact": "Contato"
+    },
+    "about": {
+        "version": "Versão",
+        "build": "Build"
+    },
+    "account": {
+        "accountSettings": "Configurações da Conta",
+        "headerTitle": "Configurações da Conta",
+        "sections": {
+            "info": "INFORMAÇÕES DA CONTA",
+            "actions": "AÇÕES"
+        },
+        "email": "E-mail",
+        "signOut": {
+            "button": "Sair da Conta",
+            "title": "Sair da Conta",
+            "message": "Tem certeza que deseja sair?",
+            "cancel": "Cancelar",
+            "confirm": "Sair",
+            "error": "Não foi possível sair da conta."
+        },
+        "deleteAccount": {
+            "button": "Excluir Conta Permanentemente",
+            "deleting": "Excluindo...",
+            "warning": "⚠️ Ao excluir sua conta, todos os seus dados serão permanentemente removidos e não poderão ser recuperados.",
+            "firstAlert": {
+                "title": "Excluir Conta",
+                "message": "Esta ação é IRREVERSÍVEL. Todos os seus dados serão permanentemente deletados:\n\n• Histórico de peso\n• Registro de doses aplicadas\n• Compras de medicamentos\n• Preferências e configurações\n\nDeseja continuar?",
+                "continue": "Continuar"
+            },
+            "secondAlert": {
+                "title": "Confirmação Final",
+                "message": "Você tem certeza absoluta que deseja excluir sua conta?\n\nEsta ação NÃO PODE ser desfeita.",
+                "confirm": "Excluir Definitivamente"
+            },
+            "success": {
+                "title": "Conta Excluída",
+                "message": "Sua conta foi excluída permanentemente. Esperamos vê-lo novamente no futuro."
+            },
+            "error": "Ocorreu um erro ao excluir a conta. Por favor, tente novamente."
+        }
+    },
+    "alerts": {
+        "success": "Sucesso",
+        "error": "Erro",
+        "healthDataUpdated": "Dados de saúde atualizados com sucesso!",
+        "updateFailed": "Não foi possível atualizar os dados.",
+        "noData": "Sem Dados",
+        "noDataMessage": "Você ainda não tem registros para exportar. Adicione alguns dados primeiro!",
+        "pdfGenerated": "PDF gerado com sucesso!",
+        "pdfFailed": "Não foi possível gerar o PDF. Tente novamente.",
+        "linkFailed": "Não foi possível abrir o link."
+    },
+    "bugReport": {
+        "subject": "Reportar Bug - Dose Day"
+    }
+}

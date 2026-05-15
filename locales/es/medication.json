@@ -1,0 +1,87 @@
+{
+  "card": {
+    "title": "Próxima Dosis",
+    "emptyTitle": "No hay dosis registradas",
+    "emptySubtitle": "Usa el botón + para registrar tu primera dosis",
+    "configure": "Configura tu día preferido",
+    "today": "¡Hoy!",
+    "tomorrow": "Mañana",
+    "inDays": "En {{days}} días",
+    "overdue_one": "{{count}} día atrasada",
+    "overdue_other": "{{count}} días atrasados",
+    "lastDose": "Última:",
+    "streak_one": "{{count}} semana consecutiva de tratamiento",
+    "streak_other": "{{count}} semanas consecutivas de tratamiento"
+  },
+  "addModal": {
+    "titleAdd": "Registrar Dosis",
+    "titleEdit": "Editar Dosis",
+    "heroLabel": "Ingresa o selecciona la dosis",
+    "heroHint": "Entre 2.5 y 15 mg",
+    "medicationLabel": "Medicamento",
+    "dateLabel": "Fecha de Aplicación",
+    "intervalLabel": "Próxima dosis en",
+    "intervalDays": "{{days}} días",
+    "sideEffectsLabel": "Efectos Secundarios",
+    "sideEffectsCount": "Efectos Secundarios ({{count}})",
+    "sideEffects": {
+      "nausea": "Náuseas",
+      "headache": "Dolor de cabeza",
+      "fatigue": "Fatiga",
+      "diarrhea": "Diarrea",
+      "constipation": "Estreñimiento",
+      "injectionPain": "Dolor en el sitio"
+    },
+    "notesLabel": "Notas (opcional)",
+    "notesPlaceholder": "Observaciones...",
+    "saveButton": "Guardar",
+    "savingButton": "Guardando...",
+    "cancelButton": "Cancelar",
+    "reminderTime": "Hora del recordatorio",
+    "errors": {
+      "title": "Error",
+      "invalidDose": "Por favor, ingresa una dosis válida.",
+      "doseRange": "La dosis debe estar entre 2.5mg y 15mg.",
+      "invalidDate": "Por favor, ingresa una fecha válida",
+      "dateInvalid": "Fecha inválida",
+      "futureDate": "La fecha no puede ser en el futuro",
+      "invalidInterval": "Por favor, ingresa un intervalo válido.",
+      "intervalRange": "El intervalo debe estar entre 1 y 49 días.",
+      "saveFailed": "No se pudo guardar. Inténtalo de nuevo."
+    },
+    "success": {
+      "title": "Éxito",
+      "saved": "¡Dosis registrada con éxito!"
+    }
+  },
+  "historyModal": {
+    "title": "Historial de Dosis",
+    "editAction": "Editar",
+    "deleteAction": "Eliminar",
+    "empty": "No hay dosis registradas.",
+    "deleteConfirm": {
+      "title": "Eliminar Dosis",
+      "message": "¿Estás seguro de que deseas eliminar esta dosis?",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
+    },
+    "errors": {
+      "deleteFailed": "No se pudo eliminar la dosis."
+    }
+  },
+  "screen": {
+    "title": "Historial de Dosis",
+    "subtitle": "Sigue tu tratamiento",
+    "emptyTitle": "No hay dosis registradas",
+    "emptySubtitle": "Comienza a registrar tus dosis para seguir tu tratamiento",
+    "emptyButton": "Registrar Primera Dosis",
+    "totalDoses": "Total de Dosis",
+    "streak": "Racha",
+    "nextDose": "Próxima",
+    "daysLate": "{{days}}d atrasada",
+    "deleteTitle": "Eliminar Dosis",
+    "deleteMessage": "¿Deseas eliminar el registro de {{dose}}mg de {{medication}}?",
+    "deleteError": "No se pudo eliminar el registro.",
+    "loadError": "Error al cargar datos"
+  }
+}

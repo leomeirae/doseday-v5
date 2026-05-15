@@ -1,3 +1,85 @@
 {
-  "hello": "Hello, DoseDay"
+  "buttons": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "continue": "Continue",
+    "back": "Back",
+    "close": "Close",
+    "ok": "OK"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "networkError": "Connection error. Check your internet.",
+    "saveFailed": "Could not save.",
+    "loadFailed": "Could not load data."
+  },
+  "loading": "Loading...",
+  "or": "or",
+  "date": {
+    "today": "Today",
+    "otherDate": "Other Date",
+    "selectDate": "Select Date",
+    "days": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    }
+  },
+  "reminder": {
+    "remindOnDay": "Remind on day",
+    "remindWeekly": "Remind weekly",
+    "at": "at"
+  },
+  "trial": {
+    "daysRemaining": "{{days}} days remaining",
+    "lastDay": "Last day of your trial!",
+    "expiresIn": "Trial expires in {{days}} days!",
+    "subscribe": "Subscribe"
+  },
+  "time": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "daysLate": "{{days}}d late",
+    "inDays": "in {{days}}d",
+    "next": "Next"
+  },
+  "legal": {
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "splash": {
+    "tagline": "Doses, weight, and purchases — all in one place."
+  },
+  "presentation": {
+    "slides": {
+      "slide1": {
+        "title": "Semaglutide, Tirzepatide, Retatrutide...",
+        "subtitle": "Is your treatment working? See it in data."
+      },
+      "slide2": {
+        "title": "Logging is faster than taking the dose.",
+        "subtitle": "Select dose. Confirm date. Done."
+      },
+      "slide3": {
+        "title": "At your next appointment, bring data — not just memory.",
+        "subtitle": "PDF reports ready for your doctor."
+      }
+    },
+    "buttons": {
+      "next": "Next",
+      "startFree": "Free Trial - no card needed",
+      "alreadyHaveAccount": "login into your account "
+    }
+  },
+  "update": {
+    "title": "New Version Available!",
+    "subtitle": "Version {{version}} brings improvements and new features.",
+    "updateNow": "Update Now",
+    "later": "Later"
+  }
 }
