@@ -18,7 +18,6 @@
     "supabase:types": "supabase gen types typescript --project-id pjesgdczasumgjzqyzzk > types/database.ts"
   },
   "dependencies": {
-    "@expo/ui": "~0.2.0-beta.9",
     "@react-navigation/native": "^7.1.8",
     "@tanstack/react-query": "^5.100.10",
     "date-fns": "^4.1.0",
