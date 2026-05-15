@@ -1,7 +1,7 @@
 # CLAUDE.md — Working Memory do DoseDay V5
 
 **Última atualização:** 14 de maio de 2026
-**Status do projeto:** docs prontos, código ainda não foi bootstrappado. Aguardando Prompt 00.
+**Status do projeto:** Prompt 00 concluído. App rodando no simulador iOS 26. Aguardando Prompt 01.
 
 ---
 
@@ -222,7 +222,7 @@ Quando Léo colar esse prompt aqui, siga o template:
 
 | Data | Prompt executado | Resultado | Commit |
 |---|---|---|---|
-| — | — | — | — |
+| 2026-05-15 | `00-MID-bootstrap-projeto-expo` | ✅ App rodando no simulador iOS 26. Expo SDK 54, TypeScript strict, Expo Router, i18next, React Query, Zod, date-fns. Bundle ID `com.doseday.premium` confirmado. | `4dc0c1e` + fixes em `9fd3d74` |
 
 (Atualize esta tabela ao final de cada execução bem-sucedida.)
 
