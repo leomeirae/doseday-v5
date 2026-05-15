@@ -8,7 +8,13 @@
       "Skill(react-native-best-practices)",
       "Bash(git init *)",
       "Bash(git checkout *)",
-      "Bash(rtk git *)"
+      "Bash(rtk git *)",
+      "Bash(cp /tmp/doseday-v5-router/package.json /Users/leofrancaia/Desktop/dose-day-v5/package.json)",
+      "Bash(cp /tmp/doseday-v5-router/.gitignore /Users/leofrancaia/Desktop/dose-day-v5/.gitignore)",
+      "Bash(cp -r /tmp/doseday-v5-router/assets /Users/leofrancaia/Desktop/dose-day-v5/)",
+      "Bash(npm install *)",
+      "Bash(rtk tsc *)",
+      "Bash(rtk grep *)"
     ]
   }
 }

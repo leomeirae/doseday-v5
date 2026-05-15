@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "DoseDay",
+    "slug": "doseday",
+    "version": "5.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "doseday",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#111827"
+    },
+    "ios": {
+      "bundleIdentifier": "com.doseday.premium",
+      "supportsTablet": false,
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "DoseDay lê peso e atividade do Apple Saúde para ajudar a entender seu tratamento.",
+        "NSHealthUpdateUsageDescription": "DoseDay pode salvar peso e doses no Apple Saúde se você autorizar.",
+        "NSMicrophoneUsageDescription": "DoseDay grava perguntas para sua consulta apenas se você autorizar (feature opcional).",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "associatedDomains": ["applinks:getdoseday.com"]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-notifications",
+      "expo-font",
+      ["@expo/ui", { "ios": { "deploymentTarget": "26.0" } }]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": { "projectId": "<PREENCHER_COM_EAS_INIT>" }
+    },
+    "runtimeVersion": "5.0.0"
+  }
+}
