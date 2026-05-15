@@ -652,4 +652,17 @@ Instalado globalmente via Homebrew (`brew install rtk`). Hook `PreToolUse` regis
 
 ---
 
+## 14. Aprendizados — Prompt 00 (Bootstrap)
+
+Registrado em 2026-05-15 após execução do bootstrap. Não alteram o plano — documentam o que funcionou diferente do esperado.
+
+| # | Aprendizado | Impacto em prompts futuros |
+|---|---|---|
+| 1 | **`@expo/ui` canary (`v0.2.0`) incompatível com SDK 54.** Usa `SafeAreaControllable` e `RNHostViewProtocol` ausentes no `expo-modules-core` SDK 54. | Reintroduzir no Prompt 04. Alternativa temporária: `expo-blur` para efeito de vidro. |
+| 2 | **iOS 26 sem Expo Go.** `expo start --ios` falha com `TypeError: fetch failed` — o `xcrun simctl openurl` não tem app para abrir `exp://`. | Usar `npx expo run:ios` para todo dev local em iOS 26. EAS não afetado. |
+| 3 | **`babel-preset-expo` deve ser `devDependency` explícita.** Não vem automaticamente ao recriar `package.json` manualmente. Metro não transpila sem ele. | Sempre incluir em `devDependencies` ao criar projeto Expo do zero. |
+| 4 | **`react-native-worklets@0.5.1` é peer dep obrigatório do `react-native-reanimated@~4.1.x`.** | Sempre instalar os dois juntos. Sem ele, `pod install` falha com "Failed to validate worklets version". |
+
+---
+
 **Fim do documento.**
