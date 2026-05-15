@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-15T00:00:00.000Z",
+  "title": "Design System: DoseDay V5",
+  "extensions": {
+    "colorMeta": {
+      "bg-base": {
+        "role": "neutral",
+        "displayName": "Clinical Midnight",
+        "canonical": "oklch(6% 0.03 250)",
+        "tonalRamp": ["#0D1520", "#132030", "#1B2D42", "#253D56", "#325065", "#476477", "#6B8A9E", "#A0B8C8"]
+      },
+      "bg-elevated": {
+        "role": "neutral",
+        "displayName": "Elevated Surface",
+        "canonical": "oklch(11% 0.03 248)",
+        "tonalRamp": ["#0E1620", "#152030", "#1D2C40", "#273A52", "#344B63", "#4A6178", "#6E879C", "#A3B9CC"]
+      },
+      "bg-surface": {
+        "role": "neutral",
+        "displayName": "Data Surface",
+        "canonical": "oklch(17% 0.04 248)",
+        "tonalRamp": ["#1B2433", "#233040", "#2C3D50", "#384D62", "#456174", "#577687", "#778EA3", "#A8BCC9"]
+      },
+      "brand": {
+        "role": "primary",
+        "displayName": "Vital Mint",
+        "canonical": "oklch(75% 0.19 175)",
+        "tonalRamp": ["#003328", "#004F3E", "#006D57", "#008A70", "#00A88A", "#00C7A3", "#3DDFC0", "#8FFAE6"]
+      },
+      "brand-dim": {
+        "role": "primary",
+        "displayName": "Vital Mint Dim",
+        "canonical": "oklch(68% 0.18 175)",
+        "tonalRamp": ["#002E24", "#004538", "#005E4D", "#007A66", "#009880", "#00B69B", "#3FD3B7", "#90F0DD"]
+      },
+      "semantic-warning": {
+        "role": "semantic",
+        "displayName": "Warm Amber",
+        "canonical": "oklch(80% 0.17 65)",
+        "tonalRamp": ["#2B1400", "#432100", "#5E3000", "#7A4200", "#975500", "#B46A00", "#CF8200", "#FFBE6A"]
+      },
+      "semantic-critical": {
+        "role": "semantic",
+        "displayName": "Alert Red",
+        "canonical": "oklch(55% 0.22 25)",
+        "tonalRamp": ["#300000", "#520000", "#720000", "#921505", "#B12A14", "#C83D27", "#DC5540", "#F08070"]
+      },
+      "semantic-info": {
+        "role": "semantic",
+        "displayName": "Clinical Blue",
+        "canonical": "oklch(65% 0.10 245)",
+        "tonalRamp": ["#0A1F35", "#112D4E", "#1B3E68", "#275180", "#356798", "#4880AD", "#6799BF", "#9CC0D8"]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Primary Text",
+        "canonical": "oklch(95% 0.005 245)",
+        "tonalRamp": ["#1A1F26", "#2A3040", "#3A4357", "#4E5A70", "#637285", "#7D8E9E", "#A0AFBC", "#D0DDE7"]
+      }
+    },
+    "shadows": [
+      {
+        "name": "elevation-0",
+        "value": "none",
+        "purpose": "Estado padrão de toda superfície. Cards de lista, backgrounds de tela, qualquer elemento que não precisa se destacar."
+      },
+      {
+        "name": "elevation-1",
+        "value": "0 1px 2px rgba(0,0,0,0.20)",
+        "purpose": "Card padrão com separação sutil. Cards de dashboard (NextDoseCard, WeightProgressBlock) quando camada tonal não é suficiente."
+      },
+      {
+        "name": "elevation-2",
+        "value": "0 4px 12px rgba(0,0,0,0.30)",
+        "purpose": "Elemento flutuante. FAB de dose, card de insight proativo que sobe sobre lista."
+      },
+      {
+        "name": "elevation-3",
+        "value": "0 12px 32px rgba(0,0,0,0.45)",
+        "purpose": "Modal e bottom sheet. Máximo nível — comunica bloqueio de interação."
+      }
+    ],
+    "motion": [
+      {
+        "name": "instant",
+        "value": "100ms linear",
+        "purpose": "Feedback imediato de tap. Scale do botão pressed."
+      },
+      {
+        "name": "quick",
+        "value": "200ms cubic-bezier(0.0, 0.0, 0.2, 1)",
+        "purpose": "Micro-interação: hover, fade-in de badge, toggle."
+      },
+      {
+        "name": "standard",
+        "value": "300ms cubic-bezier(0.4, 0.0, 0.2, 1)",
+        "purpose": "Modal in/out, bottom sheet, transição de tela."
+      },
+      {
+        "name": "slow",
+        "value": "500ms cubic-bezier(0.4, 0.0, 0.2, 1)",
+        "purpose": "Transição grande: onboarding step, resultado de relatório gerado."
+      },
+      {
+        "name": "spring",
+        "value": "spring(dampingRatio: 0.8, stiffness: 300)",
+        "purpose": "QuickMoodCheckin tap, botão de confirmação de dose, paywall CTA. Resposta física ao toque."
+      }
+    ],
+    "breakpoints": [
+      { "name": "iphone-se", "value": "375px", "purpose": "iPhone SE 3rd gen — menor viewport suportado." },
+      { "name": "iphone-standard", "value": "390px", "purpose": "iPhone 14/15/16 — viewport primário de projeto." },
+      { "name": "iphone-plus", "value": "430px", "purpose": "iPhone 14/15/16 Plus — layout mais espaçoso." },
+      { "name": "ipad-mini", "value": "744px", "purpose": "iPad mini — V5.x, não MVP." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Button Primary",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal da tela. Fundo Vital Mint, texto escuro. Máximo 1 por tela.",
+      "html": "<button class=\"ds-btn-primary\">Salvar dose</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; background: #00D4AA; color: #050B12; padding: 16px 24px; border-radius: 14px; font-family: system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 600; line-height: 20px; border: none; cursor: pointer; transition: background 100ms linear, transform 100ms linear; } .ds-btn-primary:hover { background: #00B894; } .ds-btn-primary:active { background: #00B894; transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: 2px solid #00D4AA; outline-offset: 3px; } .ds-btn-primary:disabled { background: #1B2433; color: rgba(242,244,247,0.30); cursor: not-allowed; transform: none; }"
+    },
+    {
+      "name": "Button Secondary",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação alternativa. Border Vital Mint, fundo transparente. Aparece ao lado do primary quando há 2 ações na tela.",
+      "html": "<button class=\"ds-btn-secondary\">Ver histórico</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; background: transparent; color: #00D4AA; padding: 15px 23px; border-radius: 14px; font-family: system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 600; line-height: 20px; border: 1px solid #00D4AA; cursor: pointer; transition: background 200ms cubic-bezier(0.0, 0.0, 0.2, 1); } .ds-btn-secondary:hover { background: rgba(0,212,170,0.08); } .ds-btn-secondary:active { background: rgba(0,212,170,0.14); transform: scale(0.98); } .ds-btn-secondary:focus-visible { outline: 2px solid #00D4AA; outline-offset: 3px; }"
+    },
+    {
+      "name": "Card Clinical Data",
+      "kind": "card",
+      "refersTo": "card-clinical",
+      "description": "Card de dado quantitativo clínico. Number Large lidera. Única exceção ao Flat-By-Default — recebe elevation.1.",
+      "html": "<div class=\"ds-card-clinical\"><div class=\"ds-card-clinical__number\">72.3<span class=\"ds-card-clinical__unit\"> kg</span></div><div class=\"ds-card-clinical__label\">peso atual</div><div class=\"ds-card-clinical__delta\">−2.3 kg esta semana</div></div>",
+      "css": ".ds-card-clinical { background: #1B2433; border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 1px 2px rgba(0,0,0,0.20); } .ds-card-clinical__number { font-family: system-ui, -apple-system, sans-serif; font-size: 40px; font-weight: 700; line-height: 48px; color: #F2F4F7; } .ds-card-clinical__unit { font-size: 22px; font-weight: 600; color: #9CA8B8; } .ds-card-clinical__label { font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 400; line-height: 18px; color: #9CA8B8; margin-top: 2px; } .ds-card-clinical__delta { font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 400; line-height: 18px; color: #00D4AA; margin-top: 4px; }"
+    },
+    {
+      "name": "Input Text",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "Campo de texto padrão. Label flutuante sobe quando ativo. Error state mostra causa + ação.",
+      "html": "<div class=\"ds-input-wrap\"><input type=\"text\" id=\"ds-inp-1\" class=\"ds-input-text\" placeholder=\" \" /><label for=\"ds-inp-1\" class=\"ds-input-label\">Seu peso hoje (kg)</label></div>",
+      "css": ".ds-input-wrap { position: relative; } .ds-input-text { width: 100%; background: #0E1620; color: #F2F4F7; border: 0.5px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 20px 16px 8px; font-family: system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 400; line-height: 22px; box-sizing: border-box; transition: border-color 200ms cubic-bezier(0.0,0.0,0.2,1); outline: none; } .ds-input-text:focus { border-color: #00D4AA; border-width: 1px; } .ds-input-label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-family: system-ui, -apple-system, sans-serif; font-size: 16px; color: #6B7280; transition: all 200ms; pointer-events: none; } .ds-input-text:focus ~ .ds-input-label, .ds-input-text:not(:placeholder-shown) ~ .ds-input-label { top: 10px; transform: translateY(0); font-size: 11px; color: #00D4AA; } .ds-input-text.ds-input-error { border-color: #E64545; border-width: 1px; }"
+    },
+    {
+      "name": "Quick Mood Checkin",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "Check-in de humor diário — o componente de assinatura do DoseDay. 5 estados, 1 toque. Grid 2×3 com célula vazia. SF Symbols + Caption label. Sem emoji.",
+      "html": "<div class=\"ds-mood-grid\" role=\"radiogroup\" aria-label=\"Como você está hoje?\"><button class=\"ds-mood-btn\" aria-label=\"Péssimo\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\"><circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"#9CA8B8\" stroke-width=\"1.5\"/><path d=\"M8 15c.667-1 2-2 4-2s3.333 1 4 2\" stroke=\"#9CA8B8\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"9\" cy=\"10\" r=\"1\" fill=\"#9CA8B8\"/><circle cx=\"15\" cy=\"10\" r=\"1\" fill=\"#9CA8B8\"/></svg><span class=\"ds-mood-label\">Péssimo</span></button><button class=\"ds-mood-btn\" aria-label=\"Mal\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\"><circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"#9CA8B8\" stroke-width=\"1.5\"/><path d=\"M9 15h6\" stroke=\"#9CA8B8\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"9\" cy=\"10\" r=\"1\" fill=\"#9CA8B8\"/><circle cx=\"15\" cy=\"10\" r=\"1\" fill=\"#9CA8B8\"/></svg><span class=\"ds-mood-label\">Mal</span></button><button class=\"ds-mood-btn\" aria-label=\"Ok\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\"><circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"#9CA8B8\" stroke-width=\"1.5\"/><path d=\"M9 14.5c.667.667 5.333.667 6 0\" stroke=\"#9CA8B8\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"9\" cy=\"10\" r=\"1\" fill=\"#9CA8B8\"/><circle cx=\"15\" cy=\"10\" r=\"1\" fill=\"#9CA8B8\"/></svg><span class=\"ds-mood-label\">Ok</span></button><button class=\"ds-mood-btn ds-mood-btn--selected\" aria-label=\"Bem\" aria-pressed=\"true\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\"><circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"#00D4AA\" stroke-width=\"1.5\"/><path d=\"M8 13c.5 1.5 2 2.5 4 2.5s3.5-1 4-2.5\" stroke=\"#00D4AA\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"9\" cy=\"10\" r=\"1\" fill=\"#00D4AA\"/><circle cx=\"15\" cy=\"10\" r=\"1\" fill=\"#00D4AA\"/></svg><span class=\"ds-mood-label ds-mood-label--selected\">Bem</span></button><button class=\"ds-mood-btn\" aria-label=\"Ótimo\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\"><circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"#9CA8B8\" stroke-width=\"1.5\"/><path d=\"M7.5 12.5c.8 2 2.5 3 4.5 3s3.7-1 4.5-3\" stroke=\"#9CA8B8\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"9\" cy=\"9.5\" r=\"1\" fill=\"#9CA8B8\"/><circle cx=\"15\" cy=\"9.5\" r=\"1\" fill=\"#9CA8B8\"/></svg><span class=\"ds-mood-label\">Ótimo</span></button></div>",
+      "css": ".ds-mood-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .ds-mood-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; background: #0E1620; border: 0.5px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 14px 8px; cursor: pointer; transition: background 100ms linear, border-color 100ms linear, transform 100ms linear; } .ds-mood-btn:hover { background: #1B2433; } .ds-mood-btn:active { transform: scale(0.95); } .ds-mood-btn:focus-visible { outline: 2px solid #00D4AA; outline-offset: 2px; } .ds-mood-btn--selected { background: rgba(0,212,170,0.12); border-color: #00D4AA; border-width: 1px; } .ds-mood-label { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 400; line-height: 14px; color: #9CA8B8; } .ds-mood-label--selected { color: #00D4AA; }"
+    },
+    {
+      "name": "Tab Bar Item",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "Item de tab bar. Glass nativo simulado em CSS. Ícone SF Symbol + label 11pt Medium. Ativo em Vital Mint, inativo em Secondary Text.",
+      "html": "<nav class=\"ds-tab-bar\"><button class=\"ds-tab-item ds-tab-item--active\" aria-label=\"Home\" aria-current=\"page\"><svg class=\"ds-tab-icon\" width=\"22\" height=\"22\" viewBox=\"0 0 22 22\" fill=\"none\"><path d=\"M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z\" stroke=\"#00D4AA\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><path d=\"M8 20v-7h6v7\" stroke=\"#00D4AA\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/></svg><span class=\"ds-tab-label ds-tab-label--active\">Início</span></button><button class=\"ds-tab-item\" aria-label=\"Doses\"><svg class=\"ds-tab-icon\" width=\"22\" height=\"22\" viewBox=\"0 0 22 22\" fill=\"none\"><circle cx=\"11\" cy=\"11\" r=\"8\" stroke=\"#9CA8B8\" stroke-width=\"1.5\"/><path d=\"M11 7v4l3 2\" stroke=\"#9CA8B8\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg><span class=\"ds-tab-label\">Doses</span></button><button class=\"ds-tab-item\" aria-label=\"Diário\"><svg class=\"ds-tab-icon\" width=\"22\" height=\"22\" viewBox=\"0 0 22 22\" fill=\"none\"><rect x=\"4\" y=\"3\" width=\"14\" height=\"16\" rx=\"2\" stroke=\"#9CA8B8\" stroke-width=\"1.5\"/><path d=\"M8 8h6M8 11h6M8 14h4\" stroke=\"#9CA8B8\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg><span class=\"ds-tab-label\">Diário</span></button><button class=\"ds-tab-item\" aria-label=\"Relatórios\"><svg class=\"ds-tab-icon\" width=\"22\" height=\"22\" viewBox=\"0 0 22 22\" fill=\"none\"><path d=\"M4 16l5-5 4 4 5-7\" stroke=\"#9CA8B8\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span class=\"ds-tab-label\">Relatórios</span></button></nav>",
+      "css": ".ds-tab-bar { display: flex; justify-content: space-around; align-items: center; background: rgba(14,22,32,0.72); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-top: 0.5px solid rgba(255,255,255,0.08); padding: 8px 0 20px; } .ds-tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; padding: 6px 12px; cursor: pointer; min-width: 44px; min-height: 44px; justify-content: center; border-radius: 10px; transition: background 200ms; } .ds-tab-item:hover { background: rgba(255,255,255,0.04); } .ds-tab-item:focus-visible { outline: 2px solid #00D4AA; outline-offset: 2px; } .ds-tab-icon { flex-shrink: 0; } .ds-tab-label { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 500; line-height: 14px; color: #9CA8B8; } .ds-tab-label--active { color: #00D4AA; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Clinical Memory",
+    "overview": "DoseDay é uma ferramenta clínica que parece um diário pessoal. A base visual é sólida, densa e controlada — alto contraste, tipografia assertiva, dados que ocupam espaço com autoridade. Não tentamos parecer um app de wellness. Não tentamos parecer um prontuário digital. Somos a memória entre os dois: o que o paciente viveu, organizado para que o profissional de saúde entenda em 2 minutos.\n\nO único momento de glamour é intencional e restrito: a navegação em Liquid Glass (iOS 26). Tab bar, toolbar, splash — esses são os 30% que podem brilhar. Os outros 70% são sobriedade clínica pura.\n\nO que este sistema explicitamente rejeita: gradiente roxo + rosa da V4, mockups 3D flutuantes, glass em conteúdo clínico, gamificação visual (streaks, badges motivacionais, animações de celebração).",
+    "keyCharacteristics": [
+      "Sobriedade clínica como estado padrão de toda superfície de conteúdo",
+      "Liquid Glass exclusivo de camada de navegação (tab bar, toolbar, paywall, splash)",
+      "Verde-menta (#00D4AA) como sinal de vida ativo, nunca decoração",
+      "SF Pro (system) como única família tipográfica — pesado no dado, leve na explicação",
+      "Profundidade via camadas tonais (bg-base → bg-elevated → bg-surface), não via sombra decorativa",
+      "Cor semântica estrita: positivo, alerta, crítico, informativo — nunca uso decorativo"
+    ],
+    "rules": [
+      {
+        "name": "The Vital Mint Rarity Rule",
+        "body": "Vital Mint (#00D4AA) aparece em ≤10% de qualquer tela. Sua raridade é o que o torna poderoso. Um app onde todo botão e todo ícone é verde não tem cor de marca — tem poluição visual.",
+        "section": "colors"
+      },
+      {
+        "name": "The 30% Glass Rule",
+        "body": "Glass aplica em no máximo 30% da área visível de qualquer tela. Nenhuma área de conteúdo toca glass. Se um card, lista, texto ou gráfico estiver sobre glass, está errado. Glass é camada de navegação, não padrão de card.",
+        "section": "colors"
+      },
+      {
+        "name": "The Semantic Integrity Rule",
+        "body": "Cor semântica (positivo, warning, critical, info) não é reutilizada para fins decorativos. Alert Red em um badge de marketing é um bug, não uma escolha de design.",
+        "section": "colors"
+      },
+      {
+        "name": "The Number-First Rule",
+        "body": "Em qualquer card de dado clínico, o número precede e domina o label. Number Large ou Number Medium tem no mínimo 2× o tamanho do label adjacente. 'Peso atual: 72.3kg' é errado. '72.3 kg' grande, 'peso atual' Caption abaixo é correto.",
+        "section": "typography"
+      },
+      {
+        "name": "The System-Only Rule",
+        "body": "Nunca usar string literal 'SF Pro' em código — Apple recomenda system (-apple-system em web). Usar a string literal quebra em atualizações do iOS. Todo fontFamily usa 'system' ou 'SF Mono, monospace'.",
+        "section": "typography"
+      },
+      {
+        "name": "The Weight-Is-Importance Rule",
+        "body": "Peso comunica importância. Bold = dado crítico. Semibold = label de seção. Regular = conteúdo explicativo. Medium = suporte de interface (tab, chip). Nunca usar Bold para decoração.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Toda superfície nasce plana (elevation.0). Sombra é adicionada apenas quando o elemento precisa comunicar que está acima de outro. 'Decorativo' não é justificativa para sombra. Se você está adicionando sombra para 'dar profundidade ao design', remova e use diferença tonal de background.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Glass-Navigation-Only Rule",
+        "body": "Glass aplica exclusivamente em: tab bar, toolbar de navegação, header de modal/sheet, botão primário em paywall, splash screen, welcome screen. É proibido em: card de dado clínico, lista de doses/sintomas/perguntas, texto corrido, gráfico, relatório bilíngue, estados de erro.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Tonal Layering Rule",
+        "body": "Antes de adicionar sombra a um card, tente usar bg-elevated em vez de bg-base. Se o contraste entre as duas camadas de fundo já comunica a hierarquia, não adicione elevation.1.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar #050B12 (Clinical Midnight) como background base de todas as telas. Nunca #000000.",
+      "Do reservar Vital Mint (#00D4AA) para ≤10% de qualquer tela.",
+      "Do usar glass APENAS em tab bar, toolbar, header de navegação, paywall hero, e splash screen.",
+      "Do nomear superfícies por papel semântico nos tokens: bg-base, bg-elevated, bg-surface.",
+      "Do usar Number Large (40pt Bold) para o valor principal de qualquer card clínico.",
+      "Do escrever mensagens de erro com causa + ação de recuperação.",
+      "Do aplicar accessibilityLabel + accessibilityHint em todo componente interativo.",
+      "Do desativar animações sensíveis quando prefersReducedMotion === true.",
+      "Do usar system (alias SF Pro) em todo fontFamily. Nunca a string literal 'SF Pro'.",
+      "Do mostrar disclaimer de IA em todo output gerado pela IA."
+    ],
+    "donts": [
+      "Don't aplicar glass em card de dado clínico, lista de doses, texto corrido, gráfico, ou relatório.",
+      "Don't usar gradiente roxo + rosa. Banido na V5 — substituído por verde-menta + azul-grafite.",
+      "Don't colocar mockups 3D flutuantes ou cards atravessando a tela.",
+      "Don't usar Alert Red (#E64545) como cor de destaque decorativa.",
+      "Don't escrever 'Ação necessária — Seu médico precisa de você hoje'. Pressão clínica falsa.",
+      "Don't mostrar streak ou sequência com pressão ('Você quebrou sua sequência de 7 dias').",
+      "Don't usar copy motivacional: 'Você consegue!', 'Continue assim!', 'Transforme sua vida!'.",
+      "Don't criar texto de botão genérico ('OK', 'Confirmar'). Todo botão diz o que acontece.",
+      "Don't usar 'diagnóstico', 'prescrição', 'recomendação médica' em qualquer copy ou label.",
+      "Don't usar fotos stock de modelos felizes ou ilustrações cartoonescas tipo wellness illustration.",
+      "Don't usar fonte custom. SF Pro é o iOS.",
+      "Don't adicionar sombra decorativa a cards de lista. elevation.0 é o padrão."
+    ]
+  }
+}

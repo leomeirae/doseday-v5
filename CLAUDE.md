@@ -1,7 +1,7 @@
 # CLAUDE.md — Working Memory do DoseDay V5
 
-**Última atualização:** 14 de maio de 2026
-**Status do projeto:** Prompt 00 concluído. App rodando no simulador iOS 26. Aguardando Prompt 01.
+**Última atualização:** 15 de maio de 2026
+**Status do projeto:** Prompt 02 concluído. PRODUCT.md v1.0 + DESIGN.md finalizados. Aguardando Prompt 03.
 
 ---
 
@@ -13,14 +13,11 @@ Antes de QUALQUER tarefa, você (Claude Code) DEVE ler estes documentos NA ORDEM
 2. **`docs/skills-stack.md`** — quais das 43 skills usar e quando. Tem tabela mestre por tipo de tarefa
 3. **`docs/architecture.md`** — estrutura de pastas, stack, schema Supabase, RevenueCat, LGPD
 4. **`docs/prompts/README.md`** — template padrão de prompt + regras anti-pirraça
-5. **`docs/design-system-preview.md`** — paleta verde-menta + azul-grafite + tokens + 7 decisões fixadas
+5. **`docs/DESIGN.md`** — cores, tipografia, elevação, componentes no formato Impeccable 6-seções (Stitch)
 6. **`CONTEXT.md`** (na raiz do repo) — glossário do domínio. Termos como "memória do tratamento", "Movimento 1/2/3", "dose", "persona Mariana". Lido por `grill-with-docs` e `improve-codebase-architecture`
 7. **`docs/handoff/HANDOFF.md`** (se existir) — última sessão. Estado, decisões, próximos passos
 
-Documentos que ainda não existem mas vão existir após o `/impeccable teach` (Prompt 02):
-
-8. **`docs/PRODUCT.md`** — quem é o usuário, tom, anti-references (gerado por Impeccable)
-9. **`docs/DESIGN.md`** — cores, tipografia, elevação, componentes (gerado por Impeccable)
+`docs/PRODUCT.md` e `docs/DESIGN.md` existem e estão finalizados (Prompt 02 — `/impeccable teach`). `docs/archive/design-system-preview-v0.1.md` é o histórico arquivado.
 
 ADRs (Architecture Decision Records) ficam em **`docs/adr/`**. Criados sob demanda pelo `grill-with-docs` quando uma decisão é (1) difícil de reverter, (2) surpreendente sem contexto, (3) resultado de trade-off real.
 
@@ -50,6 +47,32 @@ Léo é PO sênior mas **não tem background técnico em desenvolvimento**. Conc
 | **Sem jargão sem tradução** | Termo técnico novo? 1 frase explicando |
 
 Aplica-se tanto a este chat (Cowork) quanto a respostas do Claude Code (IDE).
+
+### Regra obrigatória — mensagem que Léo cola no Claude Code
+
+Toda vez que Cowork sugerir uma mensagem pra Léo colar no Claude Code, a mensagem DEVE conter, no mínimo:
+
+1. **Caminho do prompt principal** (ex.: `docs/prompts/NN-...md`)
+2. **Caminho do handoff anterior**, se houver (ex.: `docs/handoff/HANDOFF-prompt-XX.md`)
+3. **Skills obrigatórias** pra esse prompt (lista explícita, não confiar só na seção A do arquivo)
+4. **Inputs principais** (rascunhos, previews, contextos a serem carregados)
+5. **Instrução de "refinar, não recriar"** quando há rascunho pré-existente
+
+Razão: sem reforço explícito, o Claude Code pode ignorar skills, perder contexto do handoff, ou tentar começar do zero. Cole isso na cara dele.
+
+Exemplo correto:
+
+```
+Leia docs/prompts/NN-...md e me apresente o plano de execução.
+
+Antes, leia docs/handoff/HANDOFF-prompt-XX.md.
+
+Use obrigatoriamente:
+- skill A (motivo)
+- skill B (motivo)
+
+Carregue como input principal: docs/Y.md. Refine, não recrie do zero.
+```
 
 **Modus operandi do projeto:** Prompt Factory.
 - Cada feature/área = um prompt versionado em `docs/prompts/`
@@ -223,6 +246,8 @@ Quando Léo colar esse prompt aqui, siga o template:
 | Data | Prompt executado | Resultado | Commit |
 |---|---|---|---|
 | 2026-05-15 | `00-MID-bootstrap-projeto-expo` | ✅ App rodando no simulador iOS 26. Expo SDK 54, TypeScript strict, Expo Router, i18next, React Query, Zod, date-fns. Bundle ID `com.doseday.premium` confirmado. | `4dc0c1e` + fixes em `9fd3d74` |
+| 2026-05-15 | `01-LOW-migrar-arquivos-sensiveis` | ✅ `.env`, GSI, `eas.json`, 42 locales (14 namespaces × 3 idiomas), ícone de produção migrados da V4. | `144e10b` (PR #1) |
+| 2026-05-15 | `02-MID-impeccable-teach` | ✅ `docs/PRODUCT.md` v1.0 (5 Open Questions respondidas, Product Purpose, Accessibility & Inclusion). `docs/DESIGN.md` 6-seções Stitch + `.impeccable/design.json` sidecar. North Star "The Clinical Memory". | (este PR) |
 
 (Atualize esta tabela ao final de cada execução bem-sucedida.)
 
