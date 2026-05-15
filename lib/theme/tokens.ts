@@ -1,25 +1,78 @@
-// Tokens de design — placeholders estruturais até o Prompt 02 (/impeccable teach)
+// lib/theme/tokens.ts
+// Tokens canônicos do design system DoseDay V5.
+// Fonte de verdade: docs/DESIGN.md + .impeccable/design.json
+// Atualizado via Prompt 03 (aplicar tokens canônicos do DESIGN.md)
+
 export const colors = {
-  primary: '#00B37E',
-  background: '#111827',
-  surface: '#1F2937',
-  text: '#F9FAFB',
-  textMuted: '#9CA3AF',
+  // Background
+  bgBase: '#050B12',
+  bgElevated: '#0E1620',
+  bgSurface: '#1B2433',
+
+  // Brand
+  brand: '#00D4AA',
+  brandDim: '#00B894',
+
+  // Semantic
+  semanticPositive: '#00D4AA',
+  semanticWarning: '#FFB347',
+  semanticCritical: '#E64545',
+  semanticInfo: '#5BA8D9',
+  semanticMuted: '#5C6878',
+
+  // Text
+  textPrimary: '#F2F4F7',
+  textSecondary: '#9CA8B8',
+  textTertiary: '#6B7280',
+  textInverse: '#050B12',
+  textBrand: '#00D4AA',
+
+  // Clinical (gráficos)
+  clinicalWeight: '#00D4AA',
+  clinicalDose: '#5BA8D9',
+  clinicalMild: '#7DD3A0',
+  clinicalModerate: '#FFB347',
+  clinicalSevere: '#E64545',
+} as const
+
+export const typography = {
+  display:      { fontFamily: 'system', fontSize: 32, fontWeight: '700' as const, lineHeight: 38 },
+  headline:     { fontFamily: 'system', fontSize: 28, fontWeight: '600' as const, lineHeight: 34 },
+  title:        { fontFamily: 'system', fontSize: 22, fontWeight: '600' as const, lineHeight: 28 },
+  subtitle:     { fontFamily: 'system', fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
+  body:         { fontFamily: 'system', fontSize: 16, fontWeight: '400' as const, lineHeight: 22 },
+  bodyClinical: { fontFamily: 'system', fontSize: 15, fontWeight: '400' as const, lineHeight: 24 },
+  label:        { fontFamily: 'system', fontSize: 16, fontWeight: '600' as const, lineHeight: 20 },
+  caption:      { fontFamily: 'system', fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
+  tabLabel:     { fontFamily: 'system', fontSize: 11, fontWeight: '500' as const, lineHeight: 14 },
+  numberLarge:  { fontFamily: 'system', fontSize: 40, fontWeight: '700' as const, lineHeight: 48 },
+  numberMedium: { fontFamily: 'system', fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
+  monoData:     { fontFamily: 'SF Mono, monospace', fontSize: 14, fontWeight: '400' as const, lineHeight: 20 },
 } as const
 
 export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
+  xxs:  4,
+  xs:   8,
+  sm:  12,
+  md:  16,
+  lg:  24,
+  xl:  32,
   xxl: 48,
+  xxxl: 64,
 } as const
 
 export const radius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
+  xs:   6,
+  sm:  10,
+  md:  14,
+  lg:  20,
+  xl:  28,
   full: 9999,
+} as const
+
+export const elevation = {
+  0: { shadowOpacity: 0,    shadowRadius: 0,  shadowOffset: { width: 0, height: 0  } },
+  1: { shadowOpacity: 0.20, shadowRadius: 2,  shadowOffset: { width: 0, height: 1  } },
+  2: { shadowOpacity: 0.30, shadowRadius: 12, shadowOffset: { width: 0, height: 4  } },
+  3: { shadowOpacity: 0.45, shadowRadius: 32, shadowOffset: { width: 0, height: 12 } },
 } as const
