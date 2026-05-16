@@ -93,35 +93,69 @@ Pelos primeiros 3-4 prompts (bootstrap, migração de arquivos, conexão Supabas
 
 ---
 
-## Setup das instâncias paralelas (quando chegar a hora)
+## Paralelismo via Agent View (`claude agents`)
 
-**Quando rolar:** após Prompt 03 concluído (Supabase + RevenueCat conectados). Não antes.
+**Substituiu o setup manual de worktrees.** Worktrees são criados **automaticamente** pelo Agent View. Você não cria nada à mão.
 
-**Como abrir as 3 instâncias:**
+**Como abrir:**
 
 Passo 1 — Abrir terminal e ir pra pasta do projeto:
 ```bash
 cd /Users/leofrancaia/Desktop/dose-day-v5
 ```
 
-Passo 2 — Criar os 3 worktrees (UMA VEZ SÓ):
+Passo 2 — Abrir o Agent View:
 ```bash
-git worktree add ../dose-day-v5-low    -b scratch-low
-git worktree add ../dose-day-v5-mid    -b scratch-mid
-git worktree add ../dose-day-v5-high   -b scratch-high
+claude agents
 ```
 
-(Isso cria 3 pastas físicas no Desktop, todas apontando pro mesmo projeto Git.)
+Pronto. Você vê o dashboard com todas as sessões em background numa tela só.
 
-Passo 3 — Abrir 3 abas do terminal, uma em cada pasta:
+**Importante:** mantém uma **2ª aba** aberta na mesma pasta (sem `claude`), só pra `gh pr merge`, `git pull`, `rtk gain`, etc.
 
-- Aba 1: `cd ~/Desktop/dose-day-v5-low && claude` (instância LOW)
-- Aba 2: `cd ~/Desktop/dose-day-v5-mid && claude` (instância MID)
-- Aba 3: `cd ~/Desktop/dose-day-v5-high && claude` (instância HIGH)
+### Como dispatchar prompts
 
-(O comando `claude` é como você abre o Claude Code numa aba do terminal.)
+Dentro do Agent View, digita no input embaixo:
 
-**Importante:** mantém uma 4ª aba aberta na pasta principal (`~/Desktop/dose-day-v5/`) só pra você fazer `git pull`, `git log`, etc., sem mexer com Claude Code.
+```
+Leia docs/prompts/03-LOW-...md e me apresente o plano de execução. Aguardo aprovação.
+```
+
+Enter. Cria sessão background com worktree próprio em `.claude/worktrees/`.
+
+### Como acompanhar sessões
+
+| Estado (cor no dashboard) | O que fazer |
+|---|---|
+| **Working** (animado) | Aguardar |
+| **Needs input** (amarelo) | `Space` (peek) → responde direto sem entrar |
+| **Completed** (verde) | `Enter` (attach) → revisar e fazer PR |
+| **Failed** (vermelho) | `Enter` → ver erro |
+
+### Quando paralelizar vs sequencializar
+
+| Cenário | Modo |
+|---|---|
+| 2 prompts no MESMO arquivo | Sequencial (1 de cada vez) |
+| 2 prompts em áreas DIFERENTES (UI vs Edge Function) | Paralelo (dispatcha os 2 sem esperar) |
+| Pre-ship (audit, harden, security) | Sempre sequencial |
+
+**Máx 3 sessões paralelas no DoseDay V5.** Mais que isso, quota some rápido.
+
+### Atalhos essenciais
+
+| Atalho | Ação |
+|---|---|
+| `Space` | Peek (ver sessão sem entrar) |
+| `Enter` | Attach (entrar na sessão) |
+| `←` (em input vazio) | Detach (voltar pro dashboard) |
+| `Ctrl+X` (1×) | Stop sessão |
+| `Ctrl+X` (2× em 2s) | Delete sessão + worktree |
+| `?` | Mostra todos os atalhos |
+
+### Cheatsheet completo
+
+Tudo em `docs/agent-view-cheatsheet.md` — atalhos, comandos, troubleshooting.
 
 ---
 

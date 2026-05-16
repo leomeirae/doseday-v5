@@ -48,6 +48,25 @@ Léo é PO sênior mas **não tem background técnico em desenvolvimento**. Conc
 
 Aplica-se tanto a este chat (Cowork) quanto a respostas do Claude Code (IDE).
 
+### Regra obrigatória — consultar aprendizados antes de escrever qualquer prompt ou comando
+
+Antes de:
+- Escrever escopo de qualquer prompt novo (`docs/prompts/NN-...md`)
+- Sugerir comando shell ao Léo
+- Definir lista de arquivos de uma feature
+
+Cowork DEVE:
+
+1. **Ler `docs/architecture.md` seção "Aprendizados"** (registrada após cada prompt executado)
+2. **Fazer `rtk grep` ou `Grep`** procurando imports do que vai ser modificado (descobrir arquivos afetados que não estavam óbvios no escopo)
+3. **Consultar `docs/handoff/HANDOFF-prompt-XX.md`** mais recente
+
+Razão: erros recorrentes detectados —
+- Sugerido `npx expo start --ios` em vez de `npx expo run:ios` (aprendizado #2 do Prompt 00 já registrado em architecture.md)
+- Esqueci `app/_layout.tsx` no escopo do Prompt 03 (Claude Code pegou por grep)
+
+**Esses erros são evitáveis se Cowork ler os aprendizados antes de instruir Léo ou Claude Code.**
+
 ### Regra obrigatória — mensagem que Léo cola no Claude Code
 
 Toda vez que Cowork sugerir uma mensagem pra Léo colar no Claude Code, a mensagem DEVE conter, no mínimo:
@@ -105,8 +124,11 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 12. **SEMPRE rodar `/handoff`** ao fim de sessão longa ou antes de pausar — salva em `docs/handoff/HANDOFF.md`
 13. **SEMPRE rodar `/improve-codebase-architecture`** a cada janela rolante de 5-10 prompts implementados
 14. **SEMPRE preferir Bash + `rtk` pra arquivos grandes (>300 linhas) e buscas extensas.** Tools `Read`, `Grep`, `Glob` bypass o RTK e gastam mais tokens. Pra arquivos pequenos, `Read` segue OK
-15. **NUNCA duas instâncias do Claude Code na mesma branch ao mesmo tempo.** Cada instância opera em sua branch ou worktree próprio. Detalhes em `docs/architecture.md` seção "Múltiplas instâncias"
+15. **MODO PADRÃO: Claude Code direto (`claude`) com 1 prompt por vez.** Sequencial, sem worktree, sem dashboard. Mais econômico e simples. Agent View (`claude agents`) fica reservado pra quando precisar paralelizar 2+ prompts em áreas distintas. Branchs criadas manualmente (`git checkout -b feature/NN-...`). Detalhes em `docs/architecture.md` seção 11.0
 16. **Caveman NÃO É USADO no DoseDay V5.** Apesar de instalado, decisão estratégica: economia vem de RTK + boas práticas, sem perder clareza de respostas
+17. **Modelo Haiku 4.5 em prompts LOW.** Sonnet/Opus reservado pra prompts MID/HIGH com decisão arquitetural. Antes de dispatchar prompt LOW no Agent View, trocar via `/model` pra Haiku
+18. **Cleanup imediato** após merge: `Ctrl+X` 2× na sessão concluída do Agent View. Libera worktree e quota
+19. **Peek antes de atachar.** `Space` mostra resumo da sessão. Só atachar (`Enter`) se realmente precisar interagir
 
 ---
 
@@ -206,25 +228,24 @@ Hook global instalado em `~/.claude/settings.json` que intercepta toda chamada a
 
 - GitHub: `github.com/leomeirae/doseday-v5`
 - Local principal: `/Users/leofrancaia/Desktop/dose-day-v5/` (Léo + revisão)
-- Worktrees paralelos (criados após bootstrap):
-  - `/Users/leofrancaia/Desktop/dose-day-v5-low/` (Code-LOW, Caveman ON)
-  - `/Users/leofrancaia/Desktop/dose-day-v5-mid/` (Code-MID, Caveman OFF)
-  - `/Users/leofrancaia/Desktop/dose-day-v5-high/` (Code-HIGH, Caveman OFF)
-- Branch principal: `main`
-- Branches de feature: `feature/NN-area-curta` (uma por instância em curso)
+- Branch padrão: `main` (configurada como default no GitHub)
+- Branches de feature: `feature/NN-area-curta` (criadas automaticamente pelo Agent View)
+- Worktrees: `.claude/worktrees/` (criados automaticamente pelo Agent View, um por sessão)
 
-## Múltiplas instâncias do Claude Code (workflow paralelo)
+## Paralelismo via Agent View (`claude agents`)
 
-Até **3 instâncias** podem rodar em paralelo, uma por nível de complexidade (LOW/MID/HIGH). Detalhes completos em `docs/architecture.md` seção "Múltiplas instâncias". Resumo:
+Substitui o setup manual de worktrees. Dashboard único pra gerenciar várias sessões em background.
 
 | Regra | Aplicação |
 |---|---|
-| 1 branch por instância | Nunca duas tocando `main` ao mesmo tempo |
-| 1 worktree por instância | Isolamento físico |
-| Léo é o único roteador | Léo decide qual prompt vai pra qual instância |
-| Áreas não-sobrepostas | LOW em `/components/ui/`, MID em `/app/`, HIGH em `/supabase/functions/` (regra geral) |
-| Handoff próprio | `docs/handoff/HANDOFF-low.md`, `HANDOFF-mid.md`, `HANDOFF-high.md` |
-| Skills obrigatórias | `superpowers:using-git-worktrees` + `superpowers:dispatching-parallel-agents` |
+| 1 aba do terminal só | `claude agents` — todas as sessões aparecem nessa tela |
+| Worktrees automáticos | Cada sessão dispatcheada cria worktree próprio em `.claude/worktrees/` |
+| Léo é o único roteador | Léo decide qual prompt vai pra qual sessão (dispatch via input do Agent View) |
+| Áreas não-sobrepostas | Sessões paralelas só se editam arquivos distintos |
+| Máx 3 sessões em paralelo no início | Quota some rápido se exagerar |
+| Handoff próprio | `/handoff` dentro de cada sessão salva em `docs/handoff/HANDOFF-<nome-sessao>.md` |
+| Skills obrigatórias | `superpowers:dispatching-parallel-agents` (orquestração) |
+| Cheatsheet | `docs/agent-view-cheatsheet.md` — atalhos + comandos |
 
 ---
 
@@ -247,7 +268,8 @@ Quando Léo colar esse prompt aqui, siga o template:
 |---|---|---|---|
 | 2026-05-15 | `00-MID-bootstrap-projeto-expo` | ✅ App rodando no simulador iOS 26. Expo SDK 54, TypeScript strict, Expo Router, i18next, React Query, Zod, date-fns. Bundle ID `com.doseday.premium` confirmado. | `4dc0c1e` + fixes em `9fd3d74` |
 | 2026-05-15 | `01-LOW-migrar-arquivos-sensiveis` | ✅ `.env`, GSI, `eas.json`, 42 locales (14 namespaces × 3 idiomas), ícone de produção migrados da V4. | `144e10b` (PR #1) |
-| 2026-05-15 | `02-MID-impeccable-teach` | ✅ `docs/PRODUCT.md` v1.0 (5 Open Questions respondidas, Product Purpose, Accessibility & Inclusion). `docs/DESIGN.md` 6-seções Stitch + `.impeccable/design.json` sidecar. North Star "The Clinical Memory". | (este PR) |
+| 2026-05-15 | `02-MID-impeccable-teach` | ✅ `docs/PRODUCT.md` v1.0 (5 Open Questions respondidas, Product Purpose, Accessibility & Inclusion). `docs/DESIGN.md` 6-seções Stitch + `.impeccable/design.json` sidecar. North Star "The Clinical Memory". | `e4782c3` (PR #2 cherry-picked) + `4b46ca0` (handoff) |
+| 2026-05-15 | Recovery git | ✅ PR #2 foi mergeado na branch errada (`feature/00-bootstrap`). Cherry-pick recuperou commits pra `main`. Default branch corrigida para `main` no GitHub. | `64b0c5e` (.DS_Store ignored) |
 
 (Atualize esta tabela ao final de cada execução bem-sucedida.)
 

@@ -520,62 +520,130 @@ Cada decisão tem doc em `/docs/decisions/NNN-titulo.md` com contexto, alternati
 
 ---
 
-## 11.0 Múltiplas instâncias do Claude Code
+## 11.0 Paralelismo via Agent View
 
-DoseDay V5 usa **até 3 instâncias paralelas** do Claude Code, cada uma especializada em um nível de complexidade. Isolamento garantido via Git worktrees.
+DoseDay V5 usa **Agent View** (`claude agents`, Claude Code v2.1.139+) como motor único de paralelização. Substitui o setup manual de worktrees do plano original. Worktrees são criados automaticamente pelo Agent View em `.claude/worktrees/`.
 
 ### Setup técnico
 
 ```bash
-# UMA vez após bootstrap (Prompt 00 concluído)
 cd /Users/leofrancaia/Desktop/dose-day-v5
-
-git worktree add ../dose-day-v5-low    feature/scratch-low
-git worktree add ../dose-day-v5-mid    feature/scratch-mid
-git worktree add ../dose-day-v5-high   feature/scratch-high
-
-# Resultado: 3 pastas físicas distintas, mesmo repo Git
+claude agents
 ```
 
-### Atribuição de instâncias
+Abre o dashboard. Cada prompt dispatchado vira sessão background em worktree próprio. **Sem criar worktrees manualmente.**
 
-| Instância | Pasta física | Branch padrão | Caveman | Áreas tipicamente alocadas |
-|---|---|---|---|---|
-| **Code-LOW** | `dose-day-v5-low/` | `feature/NN-low-tarefa` | ✅ ON | `/components/ui/`, microcopy, fix cirúrgico, rename |
-| **Code-MID** | `dose-day-v5-mid/` | `feature/NN-mid-feature` | ❌ OFF | `/app/`, telas, fluxos médios (3-5 arquivos) |
-| **Code-HIGH** | `dose-day-v5-high/` | `feature/NN-high-feature` | ❌ OFF | `/supabase/functions/`, schema, IA, migrations |
+### Como funciona
+
+| Componente | Detalhe |
+|---|---|
+| Aba do terminal | 1 só — `claude agents` ocupa a tela |
+| Sessões background | Cada prompt dispatchado vira Claude Code completo rodando isolado |
+| Worktrees | Auto-criados em `.claude/worktrees/<session-name>/`. Removidos quando deletar a sessão (`Ctrl+X`) |
+| Branches | Auto-criadas. Convenção: `feature/NN-area-curta` |
+| Estados visuais | Working (animado) · Needs input (amarelo) · Completed (verde) · Failed (vermelho) · Idle (cinza) |
+| Pull request status | Bolinha colorida no card (yellow checks/waiting · green passed · purple merged) |
 
 ### Regras de coordenação
 
-1. **Léo é o único roteador.** Decide qual prompt vai pra qual instância. Nunca duas instâncias recebem o mesmo prompt
-2. **1 branch por instância em paralelo.** Nunca duas instâncias na mesma branch
-3. **Sem sobreposição de áreas.** Se LOW está mexendo em `/components/home/`, MID e HIGH ficam fora dessa pasta até LOW mergear
-4. **Decisões estruturais passam por Léo + Cowork (este chat) ANTES de virar mudança** — toda instância respeita
-5. **Handoff próprio por instância.** `docs/handoff/HANDOFF-low.md`, `HANDOFF-mid.md`, `HANDOFF-high.md`
-6. **Rebase antes de mergear.** Branch de feature rebasa em `main` antes de PR
-7. **Sequenciar quando necessário.** Se 2 features tocam o mesmo arquivo, uma espera a outra
-8. **Skills obrigatórias.** `superpowers:using-git-worktrees` (escopo) + `superpowers:dispatching-parallel-agents` (orquestração)
+1. **Léo é o único roteador.** Dispatcha cada prompt via input do Agent View
+2. **Máx 3 sessões paralelas no início do projeto.** Quota some rápido
+3. **Sem sobreposição de áreas.** Sessões paralelas só se editam arquivos distintos
+4. **Decisões estruturais passam por Léo + Cowork antes** — toda sessão respeita
+5. **Handoff por sessão.** `/handoff` salva em `docs/handoff/HANDOFF-<nome-sessao>.md`
+6. **Rebase antes de mergear.** Branch rebasa em `main` antes de PR
+7. **Sequenciar quando necessário.** Se 2 prompts tocam o mesmo arquivo, dispatcha um e espera mergear
+8. **Skill obrigatória:** `superpowers:dispatching-parallel-agents` (orquestração interna)
+9. **Cleanup ao finalizar.** `Ctrl+X` na sessão concluída libera worktree e quota
 
-### Quando escalar para 2 ou 3 instâncias
+### Quando paralelizar vs sequencializar
 
-| Fase do projeto | Nº de instâncias |
+| Cenário | Modo |
+|---|---|
+| 2 prompts tocam o **mesmo arquivo** | **Sequencial** |
+| 2 prompts em **áreas distintas** (UI vs Edge Function vs migração) | **Paralelo** |
+| Prompt HIGH demorado + LOW microcopy | Paralelo (áreas distintas) |
+| Pre-ship (audit, harden, security-review) | **Sequencial** (visão única) |
+| Bug crítico em produção | **Exclusivo, sequencial** |
+
+### Quando escalar para 2 ou 3 sessões
+
+| Fase do projeto | Nº sessões |
 |---|---|
 | Bootstrap (Prompts 00-03) | 1 só |
 | Esqueleto navegável (Prompts 04-07) | 1-2 |
-| Onboarding + aha-moment IA (Prompts 08-09) | 2 |
 | Features paralelas (Prompts 10+) | 2-3 |
-| Pre-ship (auditorias, harden, security) | 1 só (visão única) |
-| Submissão Apple | 1 só |
+| Pre-ship | 1 só |
 
 ### Anti-padrões
 
 | ❌ Nunca | Porquê |
 |---|---|
-| Duas instâncias editando o mesmo arquivo simultaneamente | Race condition, silent overwrite |
-| Duas instâncias na mesma branch | Caos de commits |
-| Instância LOW mexendo em Edge Function | Trabalho de HIGH, perde foco da especialização |
-| Atualizar `CLAUDE.md` em mais de uma instância simultaneamente | Conflito que perde decisões |
-| Iniciar 3 instâncias antes do bootstrap concluir | Setup base precisa estabilizar primeiro |
+| Duas sessões editando o mesmo arquivo simultaneamente | Race condition, silent overwrite |
+| 4+ sessões paralelas no início | Quota some, sobrecarga cognitiva |
+| Atualizar `CLAUDE.md` em duas sessões simultâneas | Conflito que perde decisões |
+| Aprovar `--dangerously-skip-permissions` ou `auto` mode | Sessão executa sem você aprovar plano |
+| Deletar sessão (`Ctrl+X`) antes de mergear PR | Perde worktree e commits não-mergeados |
+
+### Subagents — fan-out dentro de 1 sessão
+
+Skill `superpowers:dispatching-parallel-agents` invoca subagents automaticamente quando o prompt tem várias tarefas independentes internas. Você não precisa pensar nisso — é interno à sessão Claude Code.
+
+### Agent Teams — NÃO usamos
+
+Feature experimental (lead + teammates que conversam entre si). Não adotada no DoseDay V5. Razões: experimental + alto consumo + complexidade desnecessária pra PO solo.
+
+### Cheatsheet completo
+
+`docs/agent-view-cheatsheet.md` — atalhos de teclado, comandos, troubleshooting.
+
+## 11.0.1 Custom Subagents — quando criar (decisão registrada)
+
+**Decisão:** Agent View é motor padrão. Subagents só criados pra tarefas REPETITIVAS com regras CRÍTICAS.
+
+**Gatilho de criação:** logo antes do **Prompt 16** (Edge Function Insight do Dia). Criar em sessão dedicada antes dos Prompts 16-18 dos Movimentos de IA.
+
+### Subagents planejados pra DoseDay V5
+
+| Subagent | Quando entra no fluxo | Por que vale especialista |
+|---|---|---|
+| **`security-reviewer`** | Toda migration Supabase + toda Edge Function que toca PHI | LGPD Art. 11 + criptografia em repouso são checks repetidos. Tools restritos a leitura |
+| **`clinical-copy-writer`** | Toda copy nova (telas, push, email, notifications) | Vocabulário-âncora do PRODUCT.md (sem "endo", sem motivacional, sem culpa). Subagent força consistência |
+| **`ia-prompt-author`** | Movimentos 1, 2, 3 (Insight do Dia, Memória de Perguntas, Relatório Bilíngue) | Disclaimer fixo + guardrails clínicos repetidos em 3+ edge functions |
+| **`expo-deployer`** | EAS Build + App Store submission | Checklist de submissão se repete em toda subida. Garante que não pula passo |
+
+### NÃO criar subagent pra
+
+- Bootstrap (uma vez só)
+- Tab bar (uma vez só)
+- Migrar arquivos sensíveis (uma vez só)
+- Aplicar tokens (uma vez só)
+- Refactor pontual
+- Qualquer feature one-shot
+
+### Arquivos de subagent
+
+Quando criar, vão em `.claude/agents/<nome>.md` com frontmatter:
+
+```yaml
+---
+name: security-reviewer
+description: Audita migrations Supabase e Edge Functions contra LGPD Art. 11
+tools: [Read, Grep, Glob]  # tools restritos = só leitura
+model: opus  # ou sonnet
+permissionMode: plan  # nunca auto
+isolation: worktree  # roda em worktree próprio
+---
+
+# System prompt do subagent
+...
+```
+
+### Referência oficial
+
+https://code.claude.com/docs/en/sub-agents — frontmatter completo, tools allowlist, isolation, model override.
+
+---
 
 ## 11.1 RTK (Rust Token Killer) — otimização de tokens
 
