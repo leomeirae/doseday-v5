@@ -36,17 +36,17 @@ export const colors = {
 } as const
 
 export const typography = {
-  display:      { fontFamily: 'system', fontSize: 32, fontWeight: '700' as const, lineHeight: 38 },
-  headline:     { fontFamily: 'system', fontSize: 28, fontWeight: '600' as const, lineHeight: 34 },
-  title:        { fontFamily: 'system', fontSize: 22, fontWeight: '600' as const, lineHeight: 28 },
-  subtitle:     { fontFamily: 'system', fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
-  body:         { fontFamily: 'system', fontSize: 16, fontWeight: '400' as const, lineHeight: 22 },
-  bodyClinical: { fontFamily: 'system', fontSize: 15, fontWeight: '400' as const, lineHeight: 24 },
-  label:        { fontFamily: 'system', fontSize: 16, fontWeight: '600' as const, lineHeight: 20 },
-  caption:      { fontFamily: 'system', fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
-  tabLabel:     { fontFamily: 'system', fontSize: 11, fontWeight: '500' as const, lineHeight: 14 },
-  numberLarge:  { fontFamily: 'system', fontSize: 40, fontWeight: '700' as const, lineHeight: 48 },
-  numberMedium: { fontFamily: 'system', fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
+  display:      { fontSize: 32, fontWeight: '700' as const, lineHeight: 38 },
+  headline:     { fontSize: 28, fontWeight: '600' as const, lineHeight: 34 },
+  title:        { fontSize: 22, fontWeight: '600' as const, lineHeight: 28 },
+  subtitle:     { fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
+  body:         { fontSize: 16, fontWeight: '400' as const, lineHeight: 22 },
+  bodyClinical: { fontSize: 15, fontWeight: '400' as const, lineHeight: 24 },
+  label:        { fontSize: 16, fontWeight: '600' as const, lineHeight: 20 },
+  caption:      { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
+  tabLabel:     { fontSize: 11, fontWeight: '500' as const, lineHeight: 14 },
+  numberLarge:  { fontSize: 40, fontWeight: '700' as const, lineHeight: 48 },
+  numberMedium: { fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
   monoData:     { fontFamily: 'SF Mono, monospace', fontSize: 14, fontWeight: '400' as const, lineHeight: 20 },
 } as const
 
