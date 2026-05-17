@@ -8,7 +8,7 @@
     "android": "expo run:android",
     "web": "expo start --web",
     "type-check": "tsc --noEmit",
-    "lint": "eslint . --ext .ts,.tsx",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "test": "jest",
     "build:ios:dev": "eas build --platform ios --profile development",
