@@ -745,4 +745,63 @@ Registrado em 2026-05-17 após migração de `.eslintrc.js` → `eslint.config.j
 
 ---
 
+## 14.2 Aprendizados — Prompt 09 (Supabase client + session)
+
+Registrado em 2026-05-17 após implementação do cliente Supabase e AuthProvider.
+
+| # | Aprendizado | Impacto em prompts futuros |
+|---|---|---|
+| 8 | **`@types/*` é namespace reservado pelo TypeScript.** Importar `from '@types/database'` gera TS6137 ("Cannot import type declaration files"). O tsconfig pode ter `@types/*` como path alias, mas TS bloqueia o import. | Sempre usar path relativo (ex: `../../types/database`) quando o arquivo está dentro de `lib/`. Alternativa: renomear o alias para `@db/*` ou `@schema/*`. |
+| 9 | **Logs de `console.log` do React Native (Hermes) não aparecem no stdout do Metro quando redirecionado para arquivo.** Vão via CDP (Chrome DevTools Protocol) WebSocket. Capturar com Node.js conectando ao endpoint `ws://localhost:8081/inspector/debug?device=ID&page=1` e escutando eventos `Runtime.consoleAPICalled`. | Para validação headless de lógica JS no simulador, usar script Node.js com o WebSocket CDP. Não tentar capturar com `tee` ou `CI=1`. |
+
+---
+
+## 15. Ferramenta global de validação automatizada — `react-native-devtools-mcp`
+
+**Instalado globalmente em 2026-05-17** após adoção do Prompt 09 (validação manual de auth ficou caro). Repo: https://github.com/pnarayanaswamy/react-native-devtools-mcp
+
+**Localização local:** `~/react-native-devtools-mcp` (clonado + buildado)
+**Registro no Claude Code:** `react-native` (global, qualquer projeto pode usar)
+**Conecta a:** simulador iOS ou emulador Android atualmente booted
+
+### Quando o Claude Code DEVE usar
+
+| Cenário | Tool a usar |
+|---|---|
+| Validar visualmente uma tela após implementação | `screenshot` |
+| Testar fluxo de auth (signIn, signUp, signOut) | `js_eval` chamando `supabase.auth.*` direto no runtime |
+| Capturar logs do Metro durante teste | `get_js_logs` (duration, filter, level) |
+| Verificar a11y de uma tela (regra clínica + LGPD) | `get_view_hierarchy` (tree ou raw, com filter) |
+| Reproduzir bug reportado pelo Léo | `tap` + `type_text` + `screenshot` no fluxo descrito |
+| Smoke test pós-merge | `screenshot` em cada tab + `get_view_hierarchy` |
+| Validar deep link / URL scheme | `open_deeplink` |
+| Logs de crash / errors do device | `get_device_logs` |
+
+### Os 16 tools disponíveis
+
+**Observação:** `screenshot`, `get_view_hierarchy`, `get_device_info`, `get_device_logs`, `get_metro_status`, `get_js_logs`
+**Interação:** `tap`, `type_text`, `press_button`, `scroll`, `open_deeplink`, `js_eval`
+**Utilidade:** `ping`, `start_recording`, `stop_recording`, `help`
+
+### Mudança no modus operandi a partir do Prompt 10
+
+| Antes (Prompts 04, 06, 08, 09) | A partir do Prompt 10 |
+|---|---|
+| Claude Code roda `expo run:ios` → Léo abre simulador → Léo manda screenshot → Claude Code analisa | Claude Code roda `expo run:ios` → Claude Code captura screenshot via `screenshot` tool → Claude Code analisa direto |
+| Léo edita `useEffect` com signIn de teste → Léo cola logs no chat | Claude Code chama `js_eval('await supabase.auth.signInWithPassword(...)')` + lê logs via `get_js_logs` |
+| `/impeccable critique` depende de Léo anexar screenshot | `/impeccable critique` recebe screenshot capturado automaticamente |
+| Validação a11y manual (raro acontecer) | `get_view_hierarchy` no critério de aceitação de toda tela nova |
+
+### Pré-requisitos (já satisfeitos)
+
+- Node ≥ 20 ✅
+- Xcode + iOS Simulator ✅
+- Facebook IDB (instalado via `brew install idb-companion` + `pip3 install fb-idb`) — necessário para `get_view_hierarchy` no iOS
+
+### Aprendizado integrado às regras anti-pirraça do CLAUDE.md
+
+**Regra 20** (adicionada): Claude Code **NUNCA** delega validação manual repetitiva ao Léo se o `react-native-devtools-mcp` estiver disponível. Léo só valida o resultado final (PR + screenshots capturados pelo MCP), não os passos intermediários.
+
+---
+
 **Fim do documento.**

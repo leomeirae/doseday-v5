@@ -129,6 +129,7 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 17. **Modelo Haiku 4.5 em prompts LOW.** Sonnet/Opus reservado pra prompts MID/HIGH com decisão arquitetural. Antes de dispatchar prompt LOW no Agent View, trocar via `/model` pra Haiku
 18. **Cleanup imediato** após merge: `Ctrl+X` 2× na sessão concluída do Agent View. Libera worktree e quota
 19. **Peek antes de atachar.** `Space` mostra resumo da sessão. Só atachar (`Enter`) se realmente precisar interagir
+20. **`react-native-devtools-mcp` instalado globalmente.** Claude Code NUNCA delega validação manual repetitiva ao Léo (descomentar linhas, observar logs do Metro, fazer screenshot manual). Usa as 16 ferramentas do MCP `react-native`: `screenshot`, `js_eval`, `get_js_logs`, `tap`, `type_text`, `scroll`, `get_view_hierarchy` etc. Léo só revisa o resultado final no PR. Detalhes em `docs/architecture.md` seção 15
 
 ---
 
@@ -270,6 +271,14 @@ Quando Léo colar esse prompt aqui, siga o template:
 | 2026-05-15 | `01-LOW-migrar-arquivos-sensiveis` | ✅ `.env`, GSI, `eas.json`, 42 locales (14 namespaces × 3 idiomas), ícone de produção migrados da V4. | `144e10b` (PR #1) |
 | 2026-05-15 | `02-MID-impeccable-teach` | ✅ `docs/PRODUCT.md` v1.0 (5 Open Questions respondidas, Product Purpose, Accessibility & Inclusion). `docs/DESIGN.md` 6-seções Stitch + `.impeccable/design.json` sidecar. North Star "The Clinical Memory". | `e4782c3` (PR #2 cherry-picked) + `4b46ca0` (handoff) |
 | 2026-05-15 | Recovery git | ✅ PR #2 foi mergeado na branch errada (`feature/00-bootstrap`). Cherry-pick recuperou commits pra `main`. Default branch corrigida para `main` no GitHub. | `64b0c5e` (.DS_Store ignored) |
+| 2026-05-16 | `03-LOW-aplicar-tokens-design` | ✅ Tokens canônicos aplicados em `lib/theme/tokens.ts`. 5 namespaces: colors (20), typography (12), spacing (8), radius (6), elevation (4). | (PR #3) |
+| 2026-05-16 | `04-MID-tab-bar-5-abas` | ✅ Tab bar com 5 abas (Início, Doses, Diário, Relatórios, Perfil). Glass via `expo-blur` BlurView, SF Symbols via `expo-symbols`, scale 0.96 + haptic no tap. | `a9a420c` (PR #4) |
+| 2026-05-17 | `05-LOW-remover-fontfamily-system` | ✅ Removido `fontFamily: 'system'` de 11 tokens em `lib/theme/tokens.ts`. Warning de RN sumiu. `monoData` preservado. | `c65d595` (PR #5) |
+| 2026-05-17 | `06-MID-home-screen` | ✅ Home Screen V1: GreetingHeader + NextDoseCard (Number-First, Vital Mint só no número) + InsightCard (border Card Default spec). Mocks em `lib/mocks/home.ts`. `/impeccable critique` 28/40, A11y aplicada (P2). P1/P3 adiados. | `cfeaf36` (PR #6) |
+| 2026-05-17 | `07-LOW-eslint-flat-config` | ✅ Migrado de `.eslintrc.js` legacy pra `eslint.config.js` flat config. `react.version` pinado em `'18.0.0'` (eslint-plugin-react@7.x quebra com 'detect' em ESLint v10). Aprendizados 5-7 registrados em `architecture.md`. | (PR #7) |
+| 2026-05-17 | `08-MID-tela-doses` | ✅ Tela Doses V1: 4 próximas + 4 histórico (mocked), com 1 dose "Pulada" (semanticWarning). `DoseCard`, `StatusBadge` (dot + label + cor — regra cor não-comunicativa), `SectionHeader` reutilizável. `/impeccable critique` 28/40, P2 (a11y + dose urgente) resolvidos pré-commit. Vital Mint Rarity preservado (zero `colors.brand` na tela). | (PR #8) |
+| 2026-05-17 | `09-MID-supabase-client-session` | ✅ `@supabase/supabase-js` v2 instalado. `lib/supabase/client.ts` (SecureStore adapter), `lib/supabase/auth.ts` (6 helpers), `contexts/AuthContext.tsx`, `hooks/useSession.ts`, `types/database.ts` (schema V4). Alias `@contexts` adicionado. 5 cenários de validação via CDP inspector passaram (signIn, signOut, SecureStore persistência). | `86b71f0` (PR #9) |
+| 2026-05-17 | Adoção `react-native-devtools-mcp` | ✅ MCP global instalado em `~/react-native-devtools-mcp`. 16 tools (`screenshot`, `js_eval`, `get_view_hierarchy`, etc) disponíveis a partir do Prompt 10. Regra anti-pirraça 20 adicionada ao CLAUDE.md. Seção 15 em `architecture.md`. | (sem PR) |
 
 (Atualize esta tabela ao final de cada execução bem-sucedida.)
 
