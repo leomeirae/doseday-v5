@@ -733,4 +733,16 @@ Registrado em 2026-05-15 após execução do bootstrap. Não alteram o plano —
 
 ---
 
+## 14.1 Aprendizados — Prompt 07 (ESLint flat config)
+
+Registrado em 2026-05-17 após migração de `.eslintrc.js` → `eslint.config.js`.
+
+| # | Aprendizado | Impacto em prompts futuros |
+|---|---|---|
+| 5 | **ESLint v10 não suporta mais legacy config.** Repos criados com bootstrap antigo precisam migrar pra flat config (`eslint.config.js`/`.mjs`) antes do primeiro `npm run lint`. | Em bootstraps futuros, já criar com flat config desde o início. |
+| 6 | **`eslint-plugin-react@7.x` quebra no ESLint v10 quando `react.version: 'detect'`.** O plugin usa `context.getFilename()`, API removida na v10. Crash silencioso ao rodar lint. | Sempre pinar `react.version` explicitamente no `settings` do flat config — para Expo 54 + RN 0.81, usar `'18.0.0'`. |
+| 7 | **Script `lint` em `package.json` precisa perder o `--ext .ts,.tsx`.** Flat config define os files via pattern no próprio config. Script correto: `"lint": "eslint ."`. | Aplicar em qualquer migração futura. |
+
+---
+
 **Fim do documento.**
