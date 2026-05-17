@@ -12,6 +12,7 @@
     "paths": {
       "@/*": ["./*"],
       "@components/*": ["./components/*"],
+      "@contexts/*": ["./contexts/*"],
       "@hooks/*": ["./hooks/*"],
       "@lib/*": ["./lib/*"],
       "@types/*": ["./types/*"]
