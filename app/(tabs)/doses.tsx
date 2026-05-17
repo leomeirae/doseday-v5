@@ -1,23 +1,50 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { ScrollView, Text, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors, typography, spacing } from '@lib/theme/tokens'
+import { mockNextDoses, mockHistoryDoses } from '@lib/mocks/doses'
+import { DoseCard } from '@components/doses/DoseCard'
+import { SectionHeader } from '@components/doses/SectionHeader'
 
 export default function DosesScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Doses</Text>
-      <Text style={styles.subtitle}>em construção</Text>
-    </View>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.headline}>Doses</Text>
+
+        <SectionHeader title="Próximas" />
+        {mockNextDoses.map((dose, index) => (
+          <DoseCard key={dose.id} dose={dose} isNext={index === 0} />
+        ))}
+
+        <SectionHeader title="Histórico" />
+        {mockHistoryDoses.map(dose => (
+          <DoseCard key={dose.id} dose={dose} />
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: colors.bgBase,
-    padding: spacing.lg,
   },
-  title: { ...typography.title, color: colors.textPrimary },
-  subtitle: { ...typography.body, color: colors.textSecondary, marginTop: spacing.xs },
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxxl,
+  },
+  headline: {
+    ...typography.headline,
+    color: colors.textPrimary,
+    marginTop: spacing.lg,
+    marginBottom: spacing.xl,
+  },
 })
