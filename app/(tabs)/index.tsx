@@ -1,23 +1,38 @@
-import { View, Text, StyleSheet } from 'react-native'
-import { colors, typography, spacing } from '@lib/theme/tokens'
+import { ScrollView, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { colors, spacing } from '@lib/theme/tokens'
+import { GreetingHeader } from '@components/home/GreetingHeader'
+import { NextDoseCard } from '@components/home/NextDoseCard'
+import { InsightCard } from '@components/home/InsightCard'
 
 export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Início</Text>
-      <Text style={styles.subtitle}>em construção</Text>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <GreetingHeader />
+        <NextDoseCard />
+        <InsightCard />
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: colors.bgBase,
-    padding: spacing.lg,
   },
-  title: { ...typography.title, color: colors.textPrimary },
-  subtitle: { ...typography.body, color: colors.textSecondary, marginTop: spacing.xs },
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    gap: spacing.xl,
+    paddingBottom: spacing.xl,
+  },
 })
