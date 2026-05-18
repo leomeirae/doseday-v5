@@ -804,4 +804,18 @@ Registrado em 2026-05-17 após implementação do cliente Supabase e AuthProvide
 
 ---
 
+## 14.3 Aprendizados — Prompt 10 (telas signin/signup)
+
+Registrado em 2026-05-17 após implementação do fluxo de autenticação completo.
+
+| # | Aprendizado | Impacto em prompts futuros |
+|---|---|---|
+| 10 | **Expo Router route groups são transparentes na URL.** `(auth)` some da URL: o deep link para `app/(auth)/signin.tsx` é `/signin`, não `/(auth)/signin`. Ao usar `router.replace` ou `open_deeplink`, usar sempre o caminho sem o grupo. | Em qualquer tela nova dentro de grupos `(auth)`, `(tabs)`, etc, usar o caminho sem parênteses no deep link e no `router.push/replace`. |
+| 11 | **`.expo/types/router.d.ts` não é regenerado automaticamente no type-check.** O Metro regenera ao rodar o dev server, mas `tsc --noEmit` offline não. Quando uma nova route group é criada (`(auth)`), estender manualmente o arquivo antes do type-check — caso contrário, `router.replace('/(auth)/signup')` gera TS2322. | Sempre incluir `.expo/types/router.d.ts` no escopo quando um prompt criar nova route group ou nova tela. `.expo/` está no `.gitignore`, então não commitar. |
+| 12 | **`xcrun simctl io tap` não existe no Xcode / iOS 26 simulator.** O subcomando `io` do simctl não suporta `tap`, `swipe` ou `type`. Usar `idb ui tap --udid DEVICE_UDID x y` e `idb ui text --udid DEVICE_UDID "texto"` via Facebook IDB. | Toda automação de toque/texto no simulador iOS: sempre usar `idb ui *`, nunca `xcrun simctl io *`. Pré-requisito: `idb-companion` (Homebrew) + `fb-idb` (pip3). |
+| 13 | **`js_eval` do MCP react-native não aguarda Promises.** Expressões async (`await supabase.auth.signIn(...)`) retornam `[]` ou `undefined`. Usar para evals síncronos apenas (ler estado, verificar valor de variável). Para auth async, preferir `open_deeplink` + verificar estado após navegação. | Nos critérios de aceitação de prompts futuros: nunca colocar `js_eval` para operações async. Usar `tap` + `type_text` + `screenshot` para fluxos de formulário. |
+| 14 | **DEV link fica oculto quando existe sessão ativa.** `{__DEV__ && !session}` funciona como esperado — se há sessão persistida no SecureStore do Prompt 09, o link não aparece. Isso é comportamento correto; não confundir com bug. | Ao testar DEV links em futuros prompts: fazer `signOut` primeiro via `js_eval('supabase.auth.signOut()')` se a sessão existir. |
+
+---
+
 **Fim do documento.**
