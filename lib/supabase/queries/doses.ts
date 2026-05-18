@@ -1,4 +1,5 @@
 import { supabase } from '@lib/supabase/client'
+import type { RegisterDoseInput } from '@lib/validation/doseSchemas'
 
 export type DoseStatus = 'scheduled' | 'applied' | 'skipped'
 
@@ -69,4 +70,22 @@ export async function getDoseSummary(userId: string): Promise<DoseSummary> {
     },
     history,
   }
+}
+
+export async function registerDose(
+  userId: string,
+  input: RegisterDoseInput,
+  medicationName: string
+): Promise<void> {
+  const { error } = await supabase.from('medication_applications').insert({
+    user_id: userId,
+    medication_name: medicationName,
+    dose: input.dose,
+    application_date: input.applicationDate.toISOString(),
+    injection_site: input.injectionSite ?? null,
+    side_effects: input.sideEffects,
+    notes: input.notes ?? null,
+  })
+
+  if (error) throw error
 }
