@@ -5,6 +5,7 @@ import { DoseCard } from '@components/doses/DoseCard'
 import { SectionHeader } from '@components/doses/SectionHeader'
 import { useDoseSummary } from '@hooks/useDoseSummary'
 import { mapQueryError } from '@lib/supabase/queries/errors'
+import { formatMedicationName } from '@lib/utils/formatMedicationName'
 import type { DoseRecord } from '@lib/supabase/queries/doses'
 import type { Dose } from '@lib/mocks/doses'
 
@@ -12,7 +13,7 @@ function toDoseCard(record: DoseRecord): Dose {
   return {
     id: record.id,
     date: record.applicationDate,
-    medication: record.medicationName,
+    medication: formatMedicationName(record.medicationName),
     dosage: record.dose != null ? `${record.dose}mg` : '--',
     time: '--',
     status: record.status,
@@ -53,7 +54,7 @@ export default function DosesScreen() {
     ? {
         id: 'next-calculated',
         date: dose.nextDose.scheduledDate,
-        medication: dose.nextDose.medicationName,
+        medication: formatMedicationName(dose.nextDose.medicationName),
         dosage: dose.nextDose.dose != null ? `${dose.nextDose.dose}mg` : '--',
         time: '--',
         status: 'scheduled',
