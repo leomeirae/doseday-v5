@@ -4,10 +4,12 @@ import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-rout
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@lib/queryClient'
 import { StatusBar } from 'expo-status-bar'
+import Toast from 'react-native-toast-message'
 import { colors } from '@lib/theme/tokens'
 import { AuthProvider } from '@contexts/AuthContext'
 import { useSession } from '@hooks/useSession'
 import { SplashView } from '@components/auth/SplashView'
+import { toastConfig } from '@components/ui/toastConfig'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { session, loading } = useSession()
@@ -37,18 +39,26 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <StatusBar style="light" />
-        <AuthGuard>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: colors.bgBase },
-            }}
-          />
-        </AuthGuard>
-      </AuthProvider>
-    </QueryClientProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <StatusBar style="light" />
+          <AuthGuard>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: colors.bgBase },
+              }}
+            >
+              <Stack.Screen
+                name="dose/registrar"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+            </Stack>
+          </AuthGuard>
+        </AuthProvider>
+      </QueryClientProvider>
+      <Toast config={toastConfig} />
+    </>
   )
 }
