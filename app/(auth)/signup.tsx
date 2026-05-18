@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { colors, typography, spacing } from '@lib/theme/tokens'
-import { AuthHeader } from '@components/auth/AuthHeader'
+import { AuthHeader } from '@components/ui/AuthHeader'
 import { TextField } from '@components/ui/TextField'
 import { AuthButton } from '@components/ui/AuthButton'
 import { AuthLink } from '@components/ui/AuthLink'
