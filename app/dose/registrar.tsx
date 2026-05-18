@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   View,
   Text,
@@ -45,11 +45,12 @@ export default function RegistrarDoseScreen() {
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showPicker, setShowPicker] = useState(false)
+  const autoFilledRef = useRef(false)
 
   useEffect(() => {
-    if (profile?.currentDose != null && doseText === '') {
-      setDoseText(String(profile.currentDose))
-    }
+    if (autoFilledRef.current || profile?.currentDose == null) return
+    setDoseText(String(profile.currentDose))
+    autoFilledRef.current = true
   }, [profile?.currentDose])
 
   const hasMedication = !!profile?.currentMedication
