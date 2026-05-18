@@ -59,7 +59,7 @@ export default function RegistrarDoseScreen() {
 
   function handleSubmit() {
     const parsed = registerDoseSchema.safeParse({
-      dose: doseText === '' ? undefined : parseFloat(doseText),
+      dose: doseText === '' ? undefined : parseFloat(doseText.replace(',', '.')),
       applicationDate,
       injectionSite,
       notes: notes.trim() === '' ? undefined : notes.trim(),
@@ -93,7 +93,7 @@ export default function RegistrarDoseScreen() {
       <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
-          hitSlop={8}
+          hitSlop={13}
           accessibilityLabel="Fechar"
           accessibilityRole="button"
         >
@@ -117,8 +117,14 @@ export default function RegistrarDoseScreen() {
           {/* Medicamento (read-only) */}
           <View style={styles.field}>
             <Text style={styles.fieldLabel}>Medicamento</Text>
-            <View style={styles.readOnlyField}>
+            <Pressable
+              style={styles.readOnlyField}
+              onPress={!hasMedication ? () => router.push('/(tabs)/perfil') : undefined}
+              accessibilityRole={!hasMedication ? 'button' : 'none'}
+              accessibilityHint={!hasMedication ? 'Toque para configurar no perfil' : undefined}
+            >
               <Text
+                numberOfLines={1}
                 style={[
                   styles.readOnlyText,
                   !hasMedication && styles.readOnlyTextDim,
@@ -126,9 +132,9 @@ export default function RegistrarDoseScreen() {
               >
                 {hasMedication
                   ? formatMedicationName(profile.currentMedication!)
-                  : 'Defina seu medicamento no perfil'}
+                  : 'Defina seu medicamento no perfil →'}
               </Text>
-            </View>
+            </Pressable>
           </View>
 
           {/* Dose */}
@@ -181,12 +187,8 @@ export default function RegistrarDoseScreen() {
 
           {/* Local da aplicação */}
           <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Local da aplicação</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chips}
-            >
+            <Text style={styles.fieldLabel}>Local da aplicação (opcional)</Text>
+            <View style={styles.chips}>
               {INJECTION_SITES.map((site) => (
                 <Chip
                   key={site}
@@ -195,7 +197,7 @@ export default function RegistrarDoseScreen() {
                   onPress={() => selectInjectionSite(site)}
                 />
               ))}
-            </ScrollView>
+            </View>
           </View>
 
           {/* Observações */}
@@ -324,8 +326,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.xxs,
   },
   chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.xs,
-    paddingRight: spacing.lg,
   },
   chip: {
     paddingHorizontal: spacing.md,
