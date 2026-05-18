@@ -833,3 +833,17 @@ Registrado em 2026-05-18 após fechamento do ciclo de autenticação.
 ---
 
 **Fim do documento.**
+
+---
+
+## 14.5 Aprendizados — Prompt 12 (conectar Home e Doses ao Supabase)
+
+Registrado em 2026-05-18 após primeiro prompt com dados reais.
+
+| # | Aprendizado | Impacto em prompts futuros |
+|---|---|---|
+| 20 | **`staleTime: 5min` é adequado para dados clínicos de dose.** Doses semanais não mudam segundo a segundo. `refetchOnWindowFocus: false` é correto em mobile (não há conceito de window focus como na web). Configurado em `lib/queryClient.ts`. | Manter esses defaults para todas as queries clínicas. Queries de menor sensibilidade (config do perfil) podem usar `staleTime: Infinity`. |
+| 21 | **`getDoseSummary` é a única fonte de verdade para cálculo da próxima dose.** Fórmula: `nextDate = last.applicationDate + last.daysUntilNextDose`. Diff em dias: `round((nextDateMidnight - todayMidnight) / 86400000)`. Não existe entrada futura em `medication_applications` (CHECK constraint `<= now() + 1h`). | Todo cálculo de "próxima dose" no client-side deve usar esta fórmula. Nunca buscar entradas futuras no DB — elas não existem por design. |
+| 22 | **`mapQueryError` centraliza tradução de erros de rede para PT-BR.** Padrão estabelecido em `lib/supabase/queries/errors.ts`. Detecta erros de rede (fetch/network), JWT expirado (jwt/401), e genérico. | Todos os hooks que fazem queries Supabase devem usar `mapQueryError` para exibir mensagens ao usuário. Nunca exibir `error.message` bruto. |
+| 23 | **DoseCard.time não tem equivalente no banco.** `medication_applications` não tem campo de horário (doses semanais). V1: mapper passa `'--'`. DoseCard guarda o campo mas omite visualmente quando `time === '--'`. | Em V2 (se horário for necessário): adicionar coluna `application_time` na tabela e popular no flow de registro. |
+| 24 | **Loading inline (manter scaffold visível) é superior a full-screen spinner.** Home implementou corretamente desde o início; Doses foi corrigido no harden. Manter o contexto visual (headline, SectionHeaders) durante o fetch reduz desorientação. | Em telas com seções fixas (título, headers), sempre usar loading inline nas seções de dados, nunca substituir a tela inteira por spinner. |
