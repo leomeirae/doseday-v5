@@ -5,9 +5,10 @@ type Props = {
   label: string
   onPress: () => void
   accessibilityLabel?: string
+  dim?: boolean
 }
 
-export function AuthLink({ label, onPress, accessibilityLabel }: Props) {
+export function AuthLink({ label, onPress, accessibilityLabel, dim }: Props) {
   return (
     <Pressable
       onPress={onPress}
@@ -15,7 +16,7 @@ export function AuthLink({ label, onPress, accessibilityLabel }: Props) {
       accessibilityLabel={accessibilityLabel ?? label}
       style={styles.container}
     >
-      <Text style={styles.text}>{label}</Text>
+      <Text style={[styles.text, dim && styles.textDim]}>{label}</Text>
     </Pressable>
   )
 }
@@ -29,5 +30,9 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     textDecorationLine: 'underline',
+  },
+  textDim: {
+    ...typography.caption,
+    textDecorationLine: 'none',
   },
 })
