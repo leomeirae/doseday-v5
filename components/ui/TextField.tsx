@@ -18,6 +18,8 @@ type Props = {
   onSubmitEditing?: () => void
   blurOnSubmit?: boolean
   maxLength?: number
+  multiline?: boolean
+  numberOfLines?: number
 }
 
 export function TextField({
@@ -36,6 +38,8 @@ export function TextField({
   onSubmitEditing,
   blurOnSubmit,
   maxLength,
+  multiline = false,
+  numberOfLines,
 }: Props) {
   const [focused, setFocused] = useState(false)
 
@@ -70,6 +74,9 @@ export function TextField({
         accessibilityLabel={accessibilityLabel ?? label}
         accessibilityHint={error}
         testID={testID}
+        multiline={multiline}
+        numberOfLines={multiline ? (numberOfLines ?? 3) : undefined}
+        textAlignVertical={multiline ? 'top' : 'center'}
         style={[styles.input, { borderColor, borderWidth }]}
       />
       {!!error && <Text style={styles.error}>{error}</Text>}
