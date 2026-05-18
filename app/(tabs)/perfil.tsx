@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors, typography, spacing, radius } from '@lib/theme/tokens'
-import { AuthButton } from '@components/auth/AuthButton'
+import { AuthButton } from '@components/ui/AuthButton'
 import { signOut } from '@lib/supabase/auth'
 import { useSession } from '@hooks/useSession'
 
