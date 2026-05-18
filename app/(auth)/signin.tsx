@@ -128,8 +128,15 @@ export default function SignInScreen() {
             )}
 
             <AuthLink
+              label="Esqueci minha senha"
+              onPress={() => router.push('/(auth)/recover')}
+              accessibilityLabel="Recuperar senha"
+            />
+
+            <AuthLink
               label="Não tem conta? Cadastre-se"
               onPress={() => router.replace('/(auth)/signup')}
+              dim
             />
           </View>
         </ScrollView>

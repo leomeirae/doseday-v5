@@ -1,23 +1,54 @@
 import '../lib/i18n'
-import { Stack } from 'expo-router'
+import { useEffect } from 'react'
+import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StatusBar } from 'expo-status-bar'
 import { colors } from '@lib/theme/tokens'
 import { AuthProvider } from '@contexts/AuthContext'
+import { useSession } from '@hooks/useSession'
+import { SplashView } from '@components/auth/SplashView'
 
 const queryClient = new QueryClient()
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { session, loading } = useSession()
+  const segments = useSegments()
+  const router = useRouter()
+  const navigationState = useRootNavigationState()
+
+  useEffect(() => {
+    if (loading) return
+    if (!navigationState?.key) return // navigator not yet mounted — wait
+
+    const inAuthGroup = segments[0] === '(auth)'
+
+    if (!session && !inAuthGroup) {
+      router.replace('/(auth)/signin')
+    } else if (session && inAuthGroup) {
+      router.replace('/(tabs)')
+    }
+  }, [session, loading, navigationState?.key, segments, router])
+
+  if (loading) {
+    return <SplashView />
+  }
+
+  return <>{children}</>
+}
 
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <StatusBar style="light" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.bgBase },
-          }}
-        />
+        <AuthGuard>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.bgBase },
+            }}
+          />
+        </AuthGuard>
       </AuthProvider>
     </QueryClientProvider>
   )

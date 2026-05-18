@@ -818,4 +818,18 @@ Registrado em 2026-05-17 após implementação do fluxo de autenticação comple
 
 ---
 
+## 14.4 Aprendizados — Prompt 11 (AuthGuard + recover + perfil V1)
+
+Registrado em 2026-05-18 após fechamento do ciclo de autenticação.
+
+| # | Aprendizado | Impacto em prompts futuros |
+|---|---|---|
+| 15 | **`useRootNavigationState` é obrigatório no AuthGuard para evitar race condition.** Sem o guard `if (!navigationState?.key) return`, o `router.replace` dispara antes do navegador montar, causando crash silencioso (`navigate()` called before mount). | Todo guard de navegação baseado em sessão deve checar `navigationState?.key` antes de chamar qualquer `router.*`. |
+| 16 | **`router` deve estar no array de deps do `useEffect` do AuthGuard.** O eslint `react-hooks/exhaustive-deps` sinaliza se omitido. Embora `router` seja estável, incluir é a abordagem correta para passar lint sem `// eslint-disable`. | Sempre incluir `router` nos deps de `useEffect` que chamam `router.replace/push`. |
+| 17 | **Supabase `resetPasswordForEmail` retorna sucesso mesmo para emails inexistentes (segurança por design).** Não é um bug — é o comportamento intencional da API para não vazar existência de conta. Só expor erro de rede ao usuário; nunca expor o status real do email. | Em fluxos de recover/magic-link: usar `isNetworkError(error.message)` para filtrar o que exibir. Nunca mostrar `error.message` bruto do Supabase diretamente ao usuário. |
+| 18 | **O `AuthButton` já computa `isDisabled = disabled || loading` internamente.** Não é necessário passar `disabled={!email || loading}` — passar só `disabled={!email}` já é suficiente; o loading bloqueia via prop `loading`. | Ao usar `AuthButton`, só passar `disabled` para a condição de negócio (campo vazio, validação falhou). Loading é separado. |
+| 19 | **`idb ui text` trunca strings com `@` após ~16 caracteres.** Emails como `"leonardo@teste.com"` ficam `"leonardo@teste."` com o `@` sendo interpretado como separador de argumento. Workaround: enviar em dois fragmentos (`"leonardo@teste."` + `"com"`). | Ao digitar email via IDB em testes MCP: sempre dividir no ponto após `@` se o email total tiver >16 chars. |
+
+---
+
 **Fim do documento.**

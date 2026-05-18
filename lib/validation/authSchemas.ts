@@ -11,5 +11,10 @@ export const signUpSchema = z.object({
   password: z.string().min(8, 'Senha deve ter pelo menos 8 caracteres'),
 })
 
+export const recoverSchema = z.object({
+  email: z.string().email('Email inválido'),
+})
+
 export type SignInInput = z.infer<typeof signInSchema>
 export type SignUpInput = z.infer<typeof signUpSchema>
+export type RecoverInput = z.infer<typeof recoverSchema>
