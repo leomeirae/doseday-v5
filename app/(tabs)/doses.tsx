@@ -1,5 +1,7 @@
-import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native'
+import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, Pressable, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { SymbolView } from 'expo-symbols'
 import { colors, typography, spacing } from '@lib/theme/tokens'
 import { DoseCard } from '@components/doses/DoseCard'
 import { SectionHeader } from '@components/doses/SectionHeader'
@@ -21,13 +23,24 @@ function toDoseCard(record: DoseRecord): Dose {
 }
 
 export default function DosesScreen() {
+  const router = useRouter()
   const { data: dose, isLoading, error, refetch } = useDoseSummary()
 
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          <Text style={styles.headline}>Doses</Text>
+          <View style={styles.headlineRow}>
+            <Text style={styles.headline}>Doses</Text>
+            <Pressable
+              onPress={() => router.push('/dose/registrar')}
+              hitSlop={8}
+              accessibilityLabel="Registrar nova dose"
+              accessibilityRole="button"
+            >
+              <SymbolView name="plus" size={22} tintColor={colors.brand} />
+            </Pressable>
+          </View>
           <SectionHeader title="Próximas" />
           <View style={styles.inlineLoader}><ActivityIndicator size="small" color={colors.brand} /></View>
           <SectionHeader title="Histórico" />
@@ -70,7 +83,17 @@ export default function DosesScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.headline}>Doses</Text>
+        <View style={styles.headlineRow}>
+          <Text style={styles.headline}>Doses</Text>
+          <Pressable
+            onPress={() => router.push('/dose/registrar')}
+            hitSlop={8}
+            accessibilityLabel="Registrar nova dose"
+            accessibilityRole="button"
+          >
+            <SymbolView name="plus" size={22} tintColor={colors.brand} />
+          </Pressable>
+        </View>
 
         <SectionHeader title="Próximas" />
         {nextDoseCard ? (
@@ -104,11 +127,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxxl,
   },
+  headlineRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.lg,
+    marginBottom: spacing.xl,
+  },
   headline: {
     ...typography.headline,
     color: colors.textPrimary,
-    marginTop: spacing.lg,
-    marginBottom: spacing.xl,
   },
   center: {
     flex: 1,
