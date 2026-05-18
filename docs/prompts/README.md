@@ -147,6 +147,45 @@ Format: `tipo(área): descrição curta`
 Ex.: `feat(dashboard): adiciona check-in 1-tap com 5 estados emocionais`
 Decisão técnica não-óbvia → linha extra explicando ou doc em `/docs/decisions/`.
 
+### 2.12 SEMPRE salvar o plano em arquivo antes de executar
+
+Após Léo aprovar Skills + Plano + Riscos + Arquivos + Validação, Claude Code DEVE usar a skill `superpowers:writing-plans` para persistir o plano em:
+
+```
+docs/superpowers/plans/YYYY-MM-DD-<slug>.md
+```
+
+Antes de qualquer execução de código. Sem exceção.
+
+**Razão:**
+
+- `/clear` ou perda de sessão = re-planejamento divergente
+- Plano refinado contém mitigações de risco específicas (ex: `@types/*` → TS6137, IDB truncation, `js_eval` async limit) que NÃO estão no arquivo do prompt original
+- Plano-fonte-de-verdade no repo, não memória de sessão
+
+**Padrão de nomenclatura:**
+
+| Componente | Exemplo |
+|---|---|
+| Data | `2026-05-18` |
+| Slug curto | `conectar-home-doses-supabase` |
+| Arquivo | `2026-05-18-conectar-home-doses-supabase.md` |
+
+**O que o arquivo deve conter (mínimo):**
+
+1. Skills utilizadas (tabela)
+2. Diagnóstico do estado atual (arquivos × o que muda)
+3. Plano em fases ordenadas
+4. Riscos identificados com mitigações
+5. Arquivos envolvidos (Criados / Modificados / Intocados)
+6. Bateria de validação (testes MCP ou manuais)
+7. Critério de critique e screenshots no PR
+8. Commit alvo
+
+**Quando reativar pra sessões com `/clear`:** mensagem nova pro Claude Code aponta pra `docs/superpowers/plans/<data>-<slug>.md` como **fonte de verdade** (plano JÁ APROVADO).
+
+---
+
 ### 2.11 RTK — preferir Bash pra leituras/buscas grandes
 
 Hook RTK ativo no `~/.claude/settings.json`. **Toda chamada ao tool `Bash` é interceptada e comprimida automaticamente** (60-90% economia).

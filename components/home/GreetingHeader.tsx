@@ -2,7 +2,10 @@ import { View, Text, StyleSheet } from 'react-native'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { colors, typography, spacing } from '@lib/theme/tokens'
-import { homeMock } from '@lib/mocks/home'
+
+interface Props {
+  name: string
+}
 
 function getGreeting(name: string): string {
   const hour = new Date().getHours()
@@ -16,8 +19,8 @@ function formatCurrentDate(): string {
   return raw.charAt(0).toUpperCase() + raw.slice(1)
 }
 
-export function GreetingHeader() {
-  const greeting = getGreeting(homeMock.user.name)
+export function GreetingHeader({ name }: Props) {
+  const greeting = getGreeting(name)
   const dateLabel = formatCurrentDate()
 
   return (

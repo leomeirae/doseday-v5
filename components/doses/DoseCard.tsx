@@ -17,8 +17,11 @@ const STATUS_A11Y: Record<Dose['status'], string> = {
 
 export function DoseCard({ dose, isNext = false }: Props) {
   const dateLabel = formatDoseDate(dose.date)
-  const timeLabel = dose.time.replace(':', ' horas e ').replace(/^0/, '')
-  const a11yLabel = `${dateLabel}, ${dose.medication} ${dose.dosage} às ${timeLabel} minutos, ${STATUS_A11Y[dose.status]}`
+  const hasTime = dose.time !== '--'
+  const timeLabel = hasTime ? dose.time.replace(':', ' horas e ').replace(/^0/, '') : ''
+  const a11yLabel = hasTime
+    ? `${dateLabel}, ${dose.medication} ${dose.dosage} às ${timeLabel} minutos, ${STATUS_A11Y[dose.status]}`
+    : `${dateLabel}, ${dose.medication} ${dose.dosage}, ${STATUS_A11Y[dose.status]}`
 
   return (
     <View
@@ -27,7 +30,7 @@ export function DoseCard({ dose, isNext = false }: Props) {
       accessibilityLabel={a11yLabel}
     >
       <Text style={styles.date}>{dateLabel}</Text>
-      <Text style={styles.medication}>{dose.medication} {dose.dosage} • {dose.time}</Text>
+      <Text style={styles.medication}>{dose.medication} {dose.dosage}{hasTime ? ` • ${dose.time}` : ''}</Text>
       <View style={styles.badgeRow}>
         <StatusBadge status={dose.status} />
       </View>

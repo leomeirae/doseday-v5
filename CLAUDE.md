@@ -130,6 +130,7 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 18. **Cleanup imediato** após merge: `Ctrl+X` 2× na sessão concluída do Agent View. Libera worktree e quota
 19. **Peek antes de atachar.** `Space` mostra resumo da sessão. Só atachar (`Enter`) se realmente precisar interagir
 20. **`react-native-devtools-mcp` instalado globalmente.** Claude Code NUNCA delega validação manual repetitiva ao Léo (descomentar linhas, observar logs do Metro, fazer screenshot manual). Usa as 16 ferramentas do MCP `react-native`: `screenshot`, `js_eval`, `get_js_logs`, `tap`, `type_text`, `scroll`, `get_view_hierarchy` etc. Léo só revisa o resultado final no PR. Detalhes em `docs/architecture.md` seção 15
+21. **SEMPRE salvar o plano em arquivo ANTES de executar.** Após Léo aprovar o plano de execução (Skills + Plano + Riscos + Arquivos + Validação), Claude Code DEVE usar a skill `superpowers:writing-plans` para persistir o plano em `docs/superpowers/plans/YYYY-MM-DD-<slug>.md` antes de tocar em código. Sem isso, `/clear` ou perda de sessão = re-planejamento divergente. Plano é fonte-de-verdade no repo, não memória da sessão
 
 ---
 
@@ -281,6 +282,7 @@ Quando Léo colar esse prompt aqui, siga o template:
 | 2026-05-17 | Adoção `react-native-devtools-mcp` | ✅ MCP global instalado em `~/react-native-devtools-mcp`. 16 tools (`screenshot`, `js_eval`, `get_view_hierarchy`, etc) disponíveis a partir do Prompt 10. Regra anti-pirraça 20 adicionada ao CLAUDE.md. Seção 15 em `architecture.md`. | (sem PR) |
 | 2026-05-17 | `10-MID-telas-signin-signup` | ✅ Telas SignIn + SignUp com Zod (min 6/8 chars), mapeamento erros Supabase → PT-BR, TextField reutilizável (focus state, error state, maxLength), KeyboardAvoidingView iOS, [DEV] link na Home. `/impeccable critique` 28/40, P2 resolvidos. `/impeccable harden` aplicado (maxLength, generalError clear). 14 testes MCP. Aprendizados 10-14 em `architecture.md`. | (PR #10) |
 | 2026-05-18 | `11-MID-session-guard-recover` | ✅ AuthGuard global com `useRootNavigationState` (race-condition-safe). SplashView com ActivityIndicator. `recover.tsx`: fluxo de recuperação (segurança: sempre sent mesmo email inexistente, só erro de rede exibido). `perfil.tsx` V1: card email + Sair (guard faz redirect). `AuthLink.dim` prop cria hierarquia visual em signin. `/impeccable critique` 31/40; harden: maxLength 254, numberOfLines 1. 15 testes MCP. Aprendizados 15-19 em `architecture.md`. | `6552d73` (PR #11) |
+| 2026-05-18 | `12-MID-conectar-home-doses-supabase` | ✅ Primeiro prompt com dados REAIS do Supabase. `lib/queryClient.ts` + `lib/supabase/queries/{profile,doses,errors}.ts` + `hooks/{useProfile,useDoseSummary}.ts`. Home mostra "Bom dia, Leonardo", "2 dias", Mounjaro 5mg, 20/05. Doses: 1 próxima + 4 histórico. States: loading (inline), error (retry), empty, overdue. `/impeccable critique` 27/40. 10 testes MCP. DoseCard.time '--' guardado. InsightCard mockado (deferred). | (PR #12) |
 
 (Atualize esta tabela ao final de cada execução bem-sucedida.)
 
