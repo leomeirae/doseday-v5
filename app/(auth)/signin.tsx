@@ -13,7 +13,7 @@ import { colors, typography, spacing } from '@lib/theme/tokens'
 import { AuthHeader } from '@components/auth/AuthHeader'
 import { TextField } from '@components/ui/TextField'
 import { AuthButton } from '@components/ui/AuthButton'
-import { AuthLink } from '@components/auth/AuthLink'
+import { AuthLink } from '@components/ui/AuthLink'
 import { signIn } from '@lib/supabase/auth'
 import { signInSchema } from '@lib/validation/authSchemas'
 
