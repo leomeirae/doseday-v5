@@ -54,6 +54,14 @@ export default function RootLayout() {
                 name="dose/registrar"
                 options={{ presentation: 'modal', headerShown: false }}
               />
+              <Stack.Screen
+                name="diario/checkin"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+              <Stack.Screen
+                name="diario/quick-log"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
             </Stack>
           </AuthGuard>
         </AuthProvider>
