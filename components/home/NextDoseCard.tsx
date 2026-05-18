@@ -2,6 +2,7 @@ import { View, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from 'rea
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { colors, typography, spacing, radius } from '@lib/theme/tokens'
+import { formatMedicationName } from '@lib/utils/formatMedicationName'
 import type { NextDoseData } from '@lib/supabase/queries/doses'
 
 interface Props {
@@ -71,7 +72,7 @@ export function NextDoseCard({ nextDose, isLoading, error, onRetry }: Props) {
             <View style={styles.separator} />
             <View style={styles.detailsRow}>
               <Text style={styles.medicationLabel} numberOfLines={1}>
-                {nextDose.medicationName}{nextDose.dose != null ? ` · ${nextDose.dose}mg` : ''}
+                {formatMedicationName(nextDose.medicationName)}{nextDose.dose != null ? ` · ${nextDose.dose}mg` : ''}
               </Text>
               <Text style={styles.scheduledDate}>
                 {formatScheduledDate(nextDose.scheduledDate)}
