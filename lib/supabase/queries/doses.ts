@@ -83,7 +83,6 @@ export async function registerDose(
     dose: input.dose,
     application_date: input.applicationDate.toISOString(),
     injection_site: input.injectionSite ?? null,
-    side_effects: input.sideEffects,
     notes: input.notes ?? null,
   })
 

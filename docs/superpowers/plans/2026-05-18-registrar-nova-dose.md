@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Implementar o primeiro fluxo de WRITE do DoseDay V5 — registrar uma dose aplicada via modal sheet com form (medicamento read-only, dose decimal, DateTimePicker, chips de local e efeitos colaterais, textarea de observações) + toast de feedback + invalidação de query.
+**Goal:** Implementar o primeiro fluxo de WRITE do DoseDay V5 — registrar uma dose aplicada via modal sheet com form (medicamento read-only, dose decimal, DateTimePicker, chips de local de aplicação, textarea de observações) + toast de feedback + invalidação de query.
 
 **Architecture:** Modal sheet via Expo Router (`presentation: 'modal'`, `app/dose/registrar.tsx`). Mutation via `useRegisterDose` hook que chama `registerDose` em `lib/supabase/queries/doses.ts`. Após sucesso, invalida `queryKey: ['doseSummary']` cobrindo Home e Doses. Toast via `react-native-toast-message` com config de tokens. `formatMedicationName` extrai nome base sem parênteses — aplicado em NextDoseCard e DoseCard. `TextField` migrado de `components/auth/` → `components/ui/` com suporte a `multiline`.
 
@@ -11,10 +11,13 @@
 **Decisions locked in:**
 - `TextField` movido para `components/ui/TextField.tsx` + props `multiline?`/`numberOfLines?`
 - `DoseCard` migra de `Dose` (mocks) → `DoseRecord` (queries) + renomeia props
-- `side_effects: []` (não `null`) no INSERT
+- `side_effects` **NÃO enviado** no INSERT — DB usa default `[]`. Campo removido do form (Aprendizado 29)
 - `days_until_next_dose` não enviado no INSERT (default 7 no DB)
 - DateTimePicker client: `maximumDate = new Date()` (mais restritivo que CHECK `<= now()+1h`)
-- Chip "Outro" em efeitos colaterais = seleção simples de enum, sem texto adicional
+- **Efeitos colaterais removidos do form de Dose** — pertencem ao Diário (Prompt 14+). Registro de dose ≠ registro de sintomas (Aprendizado 29)
+
+**Scope change pós-implementação (2026-05-18):**
+Campo "Efeitos colaterais" removido do modal por decisão de UX: sintomas aparecem horas/dias após a aplicação e pertencem ao fluxo de Diário. Manter form focado no ato clínico (5 campos: med, dose, quando, local, notas) preserva o North Star "6 segundos pra registrar".
 
 ---
 

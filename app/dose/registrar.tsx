@@ -28,10 +28,8 @@ import {
   registerDoseSchema,
   INJECTION_SITES,
   INJECTION_SITE_LABELS,
-  SIDE_EFFECTS,
-  SIDE_EFFECT_LABELS,
 } from '@lib/validation/doseSchemas'
-import type { InjectionSite, SideEffect } from '@lib/validation/doseSchemas'
+import type { InjectionSite } from '@lib/validation/doseSchemas'
 
 export default function RegistrarDoseScreen() {
   const router = useRouter()
@@ -41,7 +39,6 @@ export default function RegistrarDoseScreen() {
   const [doseText, setDoseText] = useState('')
   const [applicationDate, setApplicationDate] = useState(() => new Date())
   const [injectionSite, setInjectionSite] = useState<InjectionSite | undefined>(undefined)
-  const [sideEffects, setSideEffects] = useState<SideEffect[]>([])
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showPicker, setShowPicker] = useState(false)
@@ -55,13 +52,6 @@ export default function RegistrarDoseScreen() {
 
   const hasMedication = !!profile?.currentMedication
 
-  function toggleSideEffect(effect: SideEffect) {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-    setSideEffects((prev) =>
-      prev.includes(effect) ? prev.filter((e) => e !== effect) : [...prev, effect]
-    )
-  }
-
   function selectInjectionSite(site: InjectionSite) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
     setInjectionSite((prev) => (prev === site ? undefined : site))
@@ -72,7 +62,6 @@ export default function RegistrarDoseScreen() {
       dose: doseText === '' ? undefined : parseFloat(doseText),
       applicationDate,
       injectionSite,
-      sideEffects,
       notes: notes.trim() === '' ? undefined : notes.trim(),
     })
 
@@ -209,21 +198,6 @@ export default function RegistrarDoseScreen() {
             </ScrollView>
           </View>
 
-          {/* Efeitos colaterais */}
-          <View style={styles.field}>
-            <Text style={styles.fieldLabel}>Efeitos colaterais</Text>
-            <View style={styles.chipsWrap}>
-              {SIDE_EFFECTS.map((effect) => (
-                <Chip
-                  key={effect}
-                  label={SIDE_EFFECT_LABELS[effect]}
-                  selected={sideEffects.includes(effect)}
-                  onPress={() => toggleSideEffect(effect)}
-                />
-              ))}
-            </View>
-          </View>
-
           {/* Observações */}
           <TextField
             label="Observações"
@@ -352,11 +326,6 @@ const styles = StyleSheet.create({
   chips: {
     gap: spacing.xs,
     paddingRight: spacing.lg,
-  },
-  chipsWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
   },
   chip: {
     paddingHorizontal: spacing.md,
