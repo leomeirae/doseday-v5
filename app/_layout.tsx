@@ -1,14 +1,13 @@
 import '../lib/i18n'
 import { useEffect } from 'react'
 import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from '@lib/queryClient'
 import { StatusBar } from 'expo-status-bar'
 import { colors } from '@lib/theme/tokens'
 import { AuthProvider } from '@contexts/AuthContext'
 import { useSession } from '@hooks/useSession'
 import { SplashView } from '@components/auth/SplashView'
-
-const queryClient = new QueryClient()
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { session, loading } = useSession()
