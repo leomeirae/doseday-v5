@@ -131,6 +131,7 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 19. **Peek antes de atachar.** `Space` mostra resumo da sessão. Só atachar (`Enter`) se realmente precisar interagir
 20. **`react-native-devtools-mcp` instalado globalmente.** Claude Code NUNCA delega validação manual repetitiva ao Léo (descomentar linhas, observar logs do Metro, fazer screenshot manual). Usa as 16 ferramentas do MCP `react-native`: `screenshot`, `js_eval`, `get_js_logs`, `tap`, `type_text`, `scroll`, `get_view_hierarchy` etc. Léo só revisa o resultado final no PR. Detalhes em `docs/architecture.md` seção 15. **Screenshots no PR DEVEM ser imagens reais, não descrições textuais.** Quando critério de aceitação pedir "N screenshots no PR", o fluxo correto é: (a) capturar via MCP `screenshot` salvando PNG local em `.impeccable/critique/screenshots/<prompt>-<n>.png`; (b) anexar ao PR via `gh pr comment <PR> --body "![desc](url)"` após upload das imagens, OU mover pra repo (`assets/screenshots/`) e referenciar; (c) embedar no PR description com markdown `![alt](url)`. Texto descrevendo o conteúdo de uma screenshot NÃO cumpre o critério — é "fake screenshot" e fere a verificabilidade do PR. Aprendizado registrado no Prompt 13
 21. **SEMPRE salvar o plano em arquivo ANTES de executar.** Após Léo aprovar o plano de execução (Skills + Plano + Riscos + Arquivos + Validação), Claude Code DEVE usar a skill `superpowers:writing-plans` para persistir o plano em `docs/superpowers/plans/YYYY-MM-DD-<slug>.md` antes de tocar em código. Sem isso, `/clear` ou perda de sessão = re-planejamento divergente. Plano é fonte-de-verdade no repo, não memória da sessão
+22. **Karpathy Guidelines aplicadas em TODA tarefa não-trivial.** As 4 disciplinas (Think Before Coding / Simplicity First / Surgical Changes / Goal-Driven Execution — detalhe na seção Karpathy Guidelines abaixo) são obrigatórias em qualquer prompt MID/HIGH. Antes do `ok`, no plano apresentado, agente DEVE declarar explicitamente: (a) assumptions feitas, (b) "could 50 lines do this?" — se a resposta for sim, simplificar, (c) "cada linha mudada traceia direto pro pedido?", (d) success criteria verificáveis (tests-first quando aplicável). Em PRs, diff deve ser cirúrgico — zero "drive-by refactoring". Combinado com RTK (regra 14), economia esperada de tokens em prompts MID/HIGH: 50-60% (RTK comprime ferramentas, Karpathy reduz código gerado na raiz)
 
 ---
 
@@ -288,6 +289,63 @@ Quando Léo colar esse prompt aqui, siga o template:
 | 2026-05-18 | `15-MID-diario-v1` (Codex) | ✅ Segundo fluxo de WRITE — Diário V1. Quick log 1-tap em `quick_logs` com `intensity=2`, check-in diário em `daily_checkins`, Zod schemas, React Query hooks, modais `/diario/checkin` e `/diario/quick-log`, timeline discriminated union sem `as never`. 17 testes MCP/IDB executados, inserts verificados via Supabase MCP e fixtures limpos. 5 screenshots REAIS versionadas em `assets/screenshots/prompt15/`. Greps de segurança vazios para `generate-checkin-insight`, `symptom_logs` e hex hardcoded. | (PR #15) |
 
 (Atualize esta tabela ao final de cada execução bem-sucedida.)
+
+---
+
+## Karpathy Guidelines — Diretrizes Anti-Erros LLM
+
+Derivadas das observações de Andrej Karpathy sobre pitfalls comuns de LLMs em coding.
+
+**Tradeoff:** Estas diretrizes priorizam cautela sobre velocidade. Em tarefas triviais (typo fix, one-liners óbvios), use julgamento — nem toda mudança precisa do rigor completo. O objetivo é reduzir erros custosos em trabalho não-trivial, não desacelerar tarefas simples.
+
+### 1. Think Before Coding
+
+Antes de implementar:
+- Apresente assumptions explicitamente. Se incerto, pergunte.
+- Se múltiplas interpretações existem, apresente-as — não escolha silenciosamente.
+- Se uma abordagem mais simples existe, diga. Questione quando necessário.
+- Se algo está confuso, pare. Nomeie o que está confuso. Pergunte.
+
+### 2. Simplicity First
+
+- Sem features além do que foi pedido.
+- Sem abstrações para código de uso único.
+- Sem "flexibilidade" ou "configurabilidade" não solicitada.
+- Sem error handling para cenários impossíveis.
+- Se você escreveu 200 linhas e poderia ser 50, reescreva.
+
+### 3. Surgical Changes
+
+Ao editar código existente:
+- Não "melhore" código adjacente, comentários ou formatação.
+- Não refatore o que não está quebrado.
+- Mantenha o estilo existente, mesmo que faria diferente.
+- Se notar dead code não relacionado, mencione — não delete.
+
+Quando suas mudanças criarem órfãos:
+- Remova imports/variáveis/funções que SUAS mudanças tornaram unused.
+- Não remova dead code pré-existente sem ser solicitado.
+
+### 4. Goal-Driven Execution
+
+Transforme tarefas em metas verificáveis:
+- "Adicionar validação" → "Escrever testes para inputs inválidos, depois fazê-los passar"
+- "Corrigir o bug" → "Escrever teste que reproduz, depois fazê-lo passar"
+
+Para tarefas multi-step, apresente plano breve antes de executar:
+```
+1. [Passo] → verificar: [critério]
+2. [Passo] → verificar: [critério]
+3. [Passo] → verificar: [critério]
+```
+
+### Project-Specific Guidelines (DoseDay V5)
+
+- TypeScript strict mode em todos os arquivos — zero `as any` sem justificativa
+- Queries Supabase ficam em `lib/supabase/queries/`
+- Hooks React Query ficam em `hooks/`
+- Validação via Zod schemas em `lib/validation/`
+- Seguir padrões de error handling existentes em `lib/supabase/queries/errors.ts`
 
 ---
 
