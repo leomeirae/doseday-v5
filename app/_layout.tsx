@@ -62,6 +62,10 @@ export default function RootLayout() {
                 name="diario/quick-log"
                 options={{ presentation: 'modal', headerShown: false }}
               />
+              <Stack.Screen
+                name="perfil/excluir"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
             </Stack>
           </AuthGuard>
         </AuthProvider>

@@ -1,0 +1,36 @@
+{
+  "title": "Perfil",
+  "account": {
+    "section": "Conta",
+    "supportId": "ID: {{id}}",
+    "memberSince": "Membro desde {{date}}"
+  },
+  "privacy": {
+    "section": "Privacidade & Dados",
+    "privacyPolicy": "Política de privacidade",
+    "terms": "Termos de uso",
+    "deleteAccount": "Excluir minha conta"
+  },
+  "support": {
+    "section": "Suporte",
+    "contact": "Falar com suporte",
+    "version": "Versão"
+  },
+  "deleteModal": {
+    "title": "Excluir conta",
+    "body": "Esta ação é permanente. Você vai perder:",
+    "losses": {
+      "doses": "Histórico de doses",
+      "diary": "Diário e check-ins",
+      "insights": "Insights gerados",
+      "session": "Sua sessão atual"
+    },
+    "confirmLabel": "Digite EXCLUIR para confirmar",
+    "deleteButton": "Excluir permanentemente",
+    "cancelButton": "Cancelar",
+    "success": "Conta excluída",
+    "error": "Não foi possível excluir. Tente novamente."
+  },
+  "signOut": "Sair"
+}
+

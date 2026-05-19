@@ -6,8 +6,9 @@ type Props = {
   onPress: () => void
   loading?: boolean
   disabled?: boolean
-  variant?: 'primary' | 'secondary'
+  variant?: 'primary' | 'secondary' | 'destructive'
   accessibilityLabel?: string
+  accessibilityHint?: string
   testID?: string
 }
 
@@ -18,9 +19,12 @@ export function AuthButton({
   disabled = false,
   variant = 'primary',
   accessibilityLabel,
+  accessibilityHint,
   testID,
 }: Props) {
   const isPrimary = variant === 'primary'
+  const isDestructive = variant === 'destructive'
+  const usesInverseText = isPrimary || isDestructive
   const isDisabled = disabled || loading
 
   return (
@@ -29,22 +33,30 @@ export function AuthButton({
       disabled={isDisabled}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       testID={testID}
       style={({ pressed }) => [
         styles.base,
-        isPrimary ? styles.primary : styles.secondary,
+        isPrimary && styles.primary,
+        isDestructive && styles.destructive,
+        !usesInverseText && styles.secondary,
         isDisabled && styles.disabled,
         pressed && !isDisabled && styles.pressed,
       ]}
     >
       {loading ? (
         <ActivityIndicator
-          color={isPrimary ? colors.textInverse : colors.textPrimary}
+          color={usesInverseText ? colors.textInverse : colors.textPrimary}
           size="small"
         />
       ) : (
-        <Text style={[styles.label, isPrimary ? styles.labelPrimary : styles.labelSecondary]}>
+        <Text
+          style={[
+            styles.label,
+            usesInverseText ? styles.labelPrimary : styles.labelSecondary,
+          ]}
+        >
           {label}
         </Text>
       )}
@@ -62,6 +74,9 @@ const styles = StyleSheet.create({
   },
   primary: {
     backgroundColor: colors.brand,
+  },
+  destructive: {
+    backgroundColor: colors.semanticCritical,
   },
   secondary: {
     backgroundColor: 'transparent',

@@ -720,6 +720,16 @@ Instalado globalmente via Homebrew (`brew install rtk`). Hook `PreToolUse` regis
 
 ---
 
+## 13.1 Pendências Pre-ship
+
+| Item | Status | Bloqueio |
+|---|---|---|
+| `https://doseday.com.br/privacidade` | Placeholder usado no Perfil V2 | Criar página real antes da submissão App Store |
+| `https://doseday.com.br/termos` | Placeholder usado no Perfil V2 | Criar página real antes da submissão App Store |
+| `mailto:suporte@doseday.com.br` | Placeholder usado no Perfil V2 | Configurar forwarder/caixa de suporte antes da submissão App Store |
+
+---
+
 ## 14. Aprendizados — Prompt 00 (Bootstrap)
 
 Registrado em 2026-05-15 após execução do bootstrap. Não alteram o plano — documentam o que funcionou diferente do esperado.
@@ -872,3 +882,12 @@ Registrado em 2026-05-18 após implementação do Diário V1.
 | 33 | **Email de teste via IDB é mais confiável em 3 fragmentos.** O split `"leonardo@teste." + "com"` ainda perdeu caracteres em uma tentativa (`leonardo@tescom`). O fluxo estável foi `"leonardo"` + `"@teste."` + `"com"`. | Ao digitar email com `@` via IDB, usar fragmentos curtos e validar por screenshot/árvore antes de enviar. Para `leonardo@teste.com`, preferir 3 fragmentos. |
 | 34 | **Screenshots reais no PR ficam verificáveis quando versionadas como assets.** O MCP retorna imagem no chat, mas para embed estável no PR o caminho mais simples foi salvar PNG via `xcrun simctl io booted screenshot` em `assets/screenshots/prompt15/` e espelhar em `.impeccable/critique/screenshots/`. | Quando o critério exigir markdown `![desc](url)` no PR, salvar screenshots em `assets/screenshots/<prompt>/` e commitar junto. O PR pode referenciar raw URLs desses arquivos. |
 | 35 | **`DiarioTimelineItem` deve renderizar discriminated union no caller, não com `item as never`.** O workaround do plano passa no TS, mas perde segurança de tipo justamente no merge da timeline. | Ao juntar arrays heterogêneos para timeline/feed, renderizar por branch (`entry.kind === ...`) e passar props discriminadas explícitas para o componente. |
+
+## 14.8 Aprendizados — Prompt 18 (Perfil V2 LGPD)
+
+Registrado em 2026-05-18 após implementação do Perfil V2 compliance.
+
+| # | Aprendizado | Impacto em prompts futuros |
+|---|---|---|
+| 36 | **`delete-user-account` é one-shot e CASCADE-based.** O cliente chama a Edge Function autenticada e não orquestra deletes manuais de tabelas clínicas. | Fluxos LGPD devem preferir a função server-side existente. Não recriar delete em cascata no client. |
+| 37 | **LGPD + App Store compliance dependem de URLs externas funcionais.** Perfil V2 expõe política, termos e suporte, mas os destinos ainda são placeholders. | Antes de submissão App Store, resolver a seção 13.1 de Pendências Pre-ship. |
