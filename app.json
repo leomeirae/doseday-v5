@@ -22,16 +22,19 @@
         "NSHealthUpdateUsageDescription": "DoseDay pode salvar peso e doses no Apple Saúde se você autorizar.",
         "NSMicrophoneUsageDescription": "DoseDay grava perguntas para sua consulta apenas se você autorizar (feature opcional).",
         "ITSAppUsesNonExemptEncryption": false
-      },
-      "associatedDomains": [
-        "applinks:getdoseday.com"
-      ]
+      }
     },
     "plugins": [
       "expo-router",
       "expo-localization",
       "expo-secure-store",
-      ["expo-notifications", { "color": "#5BA8D9", "sounds": [] }],
+      [
+        "expo-notifications",
+        {
+          "color": "#5BA8D9",
+          "sounds": []
+        }
+      ],
       "expo-font",
       "@react-native-community/datetimepicker"
     ],
@@ -43,6 +46,9 @@
         "projectId": "<PREENCHER_COM_EAS_INIT>"
       }
     },
-    "runtimeVersion": "5.0.0"
+    "runtimeVersion": "5.0.0",
+    "android": {
+      "package": "com.doseday.premium"
+    }
   }
 }

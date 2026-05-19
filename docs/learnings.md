@@ -151,3 +151,19 @@ O erro é gerado dentro do binding `net` quando o argumento `port` é repassado 
 Alternativa (quando precisar do `start` puro): rodar via `nvm use 22` antes de invocar `expo start`. Não fazemos isso no fluxo padrão — ficamos com `run:ios` direto.
 
 **Aprendizado.** (a) Não recomendar `npx expo start --port` em docs/scripts enquanto o ambiente padrão for Node 26 — todo template ou prompt deve listar `npx expo run:ios` como comando canônico de boot do dev server local. (b) Em CI/EAS o problema não aparece porque o build cloud usa imagem com Node LTS controlado. (c) Esse aprendizado complementa o Aprendizado #2 (iOS 26 sem Expo Go) — agora há duas razões distintas pra evitar `expo start` em dev local: uma do lado iOS (Expo Go ausente), outra do lado runtime (Node 26 + `ERR_SOCKET_BAD_PORT`). Ambas convergem na mesma solução: `npx expo run:ios`.
+
+## 14.11 Aprendizado 43 — Erro estratégico: features novas antes de auditar paridade V4
+
+Registrado em 2026-05-19 após testar Push V1 em device físico e descobrir que **fluxo core do app está quebrado**.
+
+**Contexto.** Léo testou PR #27 (Push V1) no iPhone físico e descobriu que ao criar conta nova, ao tentar registrar 1ª dose, a tela diz "Defina seu medicamento no perfil →" — mas a tela Perfil V5 não tem opção de cadastrar medicamento. Mais grave: **toda a sequência de onboarding da V4 (15 telas) não foi portada pra V5**.
+
+**Problema.** Cowork (eu) priorizou features novas em sequência (Push Notifications, Liquid Glass, Perfil V2 LGPD, Relatórios V1, IA Movimento 1, Edge Functions IaC) sem auditar paridade funcional V4 → V5 antes. Resultado: V5 tem features avançadas (Liquid Glass, IA, Push) mas falha no fluxo básico — user cria conta, cai em app vazio sem `current_medication`, `treatment_start_date`, `goal_weight`, etc.
+
+V4 tem 43 telas. V5 tem 16 (37% cobertura). Schema Supabase JÁ tem TODAS as colunas que o onboarding captura — backend pronto desde o início. Erro 100% no frontend, por priorização equivocada do Cowork.
+
+Lista de gaps em `docs/audit/2026-05-19-frontend-paridade.md`.
+
+**Solução.** Nova Regra 27 anti-pirraça no `CLAUDE.md`: antes de qualquer prompt MID/HIGH de feature nova, Cowork DEVE consultar `docs/audit/2026-05-19-frontend-paridade.md` e confirmar que o gap não está marcado P0/P1. Se está, priorizar o gap antes da feature nova.
+
+**Aprendizado.** (a) Paridade funcional V4 → V5 é pré-condição pra features novas, não item paralelo. Schema Supabase pronto não significa app pronto. (b) Audit de paridade deve ser feito ANTES da primeira onda de prompts de feature em qualquer projeto refactor — não no meio. (c) "App em produção há meses na V4" não significa que features básicas existem na V5 — preciso verificar tela-a-tela. (d) Sequência correta em refactor: paridade primeiro, depois novidades. Sem isso, app fica desbalanceado — feature avançada (push, IA, liquid glass) sem feature básica (onboarding) é pior que sem nenhuma das duas. (e) Audit dura ~30min. Pular o audit custou semanas de prompts focados em features que não conseguem nem ser testadas pelo user real.

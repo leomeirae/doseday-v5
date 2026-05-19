@@ -84,6 +84,8 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 25. **`@file path/to/file.md`** no Claude Code em vez de paste de conteúdo. Carrega arquivo sob demanda, sai do contexto quando não precisa. Paste de arquivo grande no chat vira dead weight pelo resto da sessão. Aplica-se a outputs de bash > 50 linhas também — salvar em arquivo e referenciar.
 26. **`/btw <pergunta>`** pra perguntas laterais durante execução de prompt. Roda em canal paralelo, não injeta resposta na conversa principal. Evita custo de interromper Claude Code no meio de uma tarefa multi-step.
 
+27. **Paridade V4 → V5 antes de feature nova.** Antes de qualquer prompt MID/HIGH, Cowork DEVE consultar [`docs/audit/2026-05-19-frontend-paridade.md`](docs/audit/2026-05-19-frontend-paridade.md) e confirmar que o gap não está marcado P0/P1. Se está, priorizar o gap antes da feature nova. Schema Supabase pronto NÃO significa app pronto — verificar tela-a-tela. Sequência canônica em refactor: paridade primeiro, novidades depois (ver Aprendizado #43).
+
 ---
 
 ## Auxiliares por tipo de tarefa (carregar com `@file`)
