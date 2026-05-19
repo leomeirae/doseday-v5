@@ -129,3 +129,25 @@ Registrado em 2026-05-19 após implementar 4 cards de charts reais em Relatório
 | 40 | **Charts em React Native exigem lib nativa no dev client.** `react-native-gifted-charts` usa `react-native-svg`; se o dev client foi instalado antes dessa dependência nativa, a tela quebra com `Unimplemented component: <RNSVGSvgView>`. Recharts continua web-only e não deve entrar no app RN. | Após adicionar ou validar chart/SVG nativo, rodar `npx expo run:ios` para reinstalar o dev client antes de concluir QA visual. Grep pré-merge deve confirmar zero Recharts. |
 | 41 | **Date-only de série clínica precisa ser parseado no meio-dia local.** Peso e buckets semanais são datas clínicas, não instantes UTC; parsear `yyyy-MM-dd` em midnight pode deslocar label por timezone. | Para gráficos e labels de datas vindas do Supabase como date-only, construir `new Date(year, month - 1, day, 12)` antes de formatar. |
 | 42 | **Performance de scroll via `js_eval` deve medir jank sustentado, não frames isolados no limite de 60Hz.** No iPhone 17, o monitor registrou frames pontuais acima de 16ms, mas máximo de 3 consecutivos e pico de 18.5ms durante scroll completo com fixtures. | Critério operacional: reportar `framesOver16ms`, `maxConsecutiveOver16ms` e `maxFrameMs`; bloquear só quando houver sequência sustentada de frames lentos ou pico visualmente perceptível. |
+
+## 14.10 Aprendizado 41 — Node 26 + npx expo start --port retorna ERR_SOCKET_BAD_PORT
+
+Registrado em 2026-05-19. Descoberto durante o Prompt 16 (Conectar IA Movimento 1).
+
+**Contexto.** Ao tentar levantar o dev server pra QA do `memory-daily-insight`/`generate-checkin-insight`, o comando recomendado em scripts internos era `npx expo start --port 8081`. Mesmo com o Metro saudável em sessões anteriores, o processo passou a falhar ainda no boot.
+
+**Problema.** Sob **Node.js 26**, qualquer chamada `npx expo start --port <N>` aborta com:
+
+```
+Error: connect ERR_SOCKET_BAD_PORT
+    at internalConnect (node:net:...)
+    at defaultTriggerAsyncIdScope (node:internal/async_hooks:...)
+```
+
+O erro é gerado dentro do binding `net` quando o argumento `port` é repassado ao subprocess de bundling. Acontece mesmo com portas válidas (8081, 19000, 19002). Reproduzível em Node 26.0.x; Node 22 LTS não exibe o bug. Não há flag oficial Expo pra contornar — o `--port` é repassado bruto pro Metro, que cai no path quebrado.
+
+**Solução (workaround).** Usar `npx expo run:ios` no lugar de `npx expo start --port ...` para todo dev local em iOS 26 sob Node 26. O `run:ios` reconstrói o dev client e levanta o Metro internamente sem o caminho `--port` que dispara o `ERR_SOCKET_BAD_PORT`. Para QA via MCP `react-native`, `run:ios` também é compatível.
+
+Alternativa (quando precisar do `start` puro): rodar via `nvm use 22` antes de invocar `expo start`. Não fazemos isso no fluxo padrão — ficamos com `run:ios` direto.
+
+**Aprendizado.** (a) Não recomendar `npx expo start --port` em docs/scripts enquanto o ambiente padrão for Node 26 — todo template ou prompt deve listar `npx expo run:ios` como comando canônico de boot do dev server local. (b) Em CI/EAS o problema não aparece porque o build cloud usa imagem com Node LTS controlado. (c) Esse aprendizado complementa o Aprendizado #2 (iOS 26 sem Expo Go) — agora há duas razões distintas pra evitar `expo start` em dev local: uma do lado iOS (Expo Go ausente), outra do lado runtime (Node 26 + `ERR_SOCKET_BAD_PORT`). Ambas convergem na mesma solução: `npx expo run:ios`.
