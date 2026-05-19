@@ -19,6 +19,7 @@ import { TextField } from '@components/ui/TextField'
 import { AuthButton } from '@components/ui/AuthButton'
 import { useProfile } from '@hooks/useProfile'
 import { useRegisterDose } from '@hooks/useRegisterDose'
+import { useDoseSummary } from '@hooks/useDoseSummary'
 import { showSuccessToast, showErrorToast } from '@lib/utils/showToast'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 import { format } from 'date-fns'
@@ -30,11 +31,15 @@ import {
   INJECTION_SITE_LABELS,
 } from '@lib/validation/doseSchemas'
 import type { InjectionSite } from '@lib/validation/doseSchemas'
+import { getPermissionStatus } from '@lib/notifications'
+import { PermissionRequestModal } from '@components/notifications/PermissionRequestModal'
 
 export default function RegistrarDoseScreen() {
   const router = useRouter()
   const { data: profile } = useProfile()
+  const { data: doseSummary } = useDoseSummary()
   const { mutate, isPending } = useRegisterDose()
+  const [showPermissionModal, setShowPermissionModal] = useState(false)
 
   const [doseText, setDoseText] = useState('')
   const [applicationDate, setApplicationDate] = useState(() => new Date())
@@ -77,8 +82,20 @@ export default function RegistrarDoseScreen() {
 
     setErrors({})
     mutate(parsed.data, {
-      onSuccess: () => {
+      onSuccess: async () => {
         showSuccessToast('Dose registrada')
+
+        // Trigger permission modal on first dose if permission not yet determined
+        const isFirstDose = (doseSummary?.history.length ?? 0) === 0
+        const hasSeenModal = profile?.hasSeenPushPermissionModal ?? false
+        if (isFirstDose && !hasSeenModal) {
+          const status = await getPermissionStatus()
+          if (status === 'undetermined') {
+            setShowPermissionModal(true)
+            return
+          }
+        }
+
         router.back()
       },
       onError: (err) => {
@@ -89,6 +106,13 @@ export default function RegistrarDoseScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <PermissionRequestModal
+        visible={showPermissionModal}
+        onDismiss={() => {
+          setShowPermissionModal(false)
+          router.back()
+        }}
+      />
       {/* Header */}
       <View style={styles.header}>
         <Pressable

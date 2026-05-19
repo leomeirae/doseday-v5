@@ -31,7 +31,7 @@
       "expo-router",
       "expo-localization",
       "expo-secure-store",
-      "expo-notifications",
+      ["expo-notifications", { "color": "#5BA8D9", "sounds": [] }],
       "expo-font",
       "@react-native-community/datetimepicker"
     ],

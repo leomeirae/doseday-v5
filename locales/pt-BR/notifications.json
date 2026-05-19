@@ -1,0 +1,30 @@
+{
+  "permission": {
+    "modalTitle": "Lembre-se da sua dose",
+    "modalBody": "Ative as notificações para que o DoseDay te lembre da dose semanal no horário certo. Nunca mais esqueça.",
+    "allow": "Ativar notificações",
+    "skip": "Agora não",
+    "deniedBannerTitle": "Notificações desativadas",
+    "deniedBannerBody": "Ative nas configurações do iPhone para receber lembretes da dose.",
+    "openSettings": "Abrir Configurações"
+  },
+  "settings": {
+    "title": "Notificações",
+    "statusCard": "Status",
+    "statusGranted": "Ativas",
+    "statusDenied": "Bloqueadas",
+    "statusUndetermined": "Não configurado",
+    "masterToggle": "Lembretes de dose",
+    "masterToggleHint": "Receber lembrete no horário configurado",
+    "nextNotif": "Próximo lembrete",
+    "nextNotifNone": "Nenhum agendado",
+    "testButton": "Testar notificação",
+    "testScheduled": "Notificação de teste em 5 segundos",
+    "timeLabel": "Horário",
+    "timeValue": "20:00"
+  },
+  "notification": {
+    "doseTitle": "DoseDay",
+    "doseBody": "Hora da sua dose semanal."
+  }
+}
