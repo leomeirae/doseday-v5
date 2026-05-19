@@ -8,8 +8,7 @@ import { SectionHeader } from '@components/ui/SectionHeader'
 import { useDoseSummary } from '@hooks/useDoseSummary'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 import { formatMedicationName } from '@lib/utils/formatMedicationName'
-import type { DoseRecord } from '@lib/supabase/queries/doses'
-import type { Dose } from '@lib/mocks/doses'
+import type { Dose, DoseRecord } from '@lib/supabase/queries/doses'
 
 function toDoseCard(record: DoseRecord): Dose {
   return {

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { colors, typography, spacing, radius } from '@lib/theme/tokens'
-import type { Dose } from '@lib/mocks/doses'
+import type { Dose } from '@lib/supabase/queries/doses'
 import { StatusBadge } from './StatusBadge'
 import { formatDoseDate } from '@lib/utils/dateFormat'
 
