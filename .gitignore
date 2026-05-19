@@ -51,3 +51,9 @@ android/
 # macOS
 .DS_Store
 .claude/settings.local.json
+
+# Codex agent cache (local-only)
+.agents/
+
+# Impeccable critique binaries (screenshots ficam no PR via raw URL)
+.impeccable/critique/screenshots/
