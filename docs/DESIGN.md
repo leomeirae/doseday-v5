@@ -330,7 +330,7 @@ Três variantes com hierarquia de background tonal.
 
 O componente de assinatura do DoseDay. A única superfície do app que usa Liquid Glass fora de paywall/splash.
 
-- **Tab bar:** 5 tabs (Home, Doses, Diário, Relatórios, Perfil). Glass `.regular` style nativo iOS 26. Ícone SF Symbol + label `tab-label` (11pt Medium) abaixo. Tab ativa: ícone e label em `text-brand`, glass tint `brand` 8%. Tab inativa: ícone e label em `text-secondary`.
+- **Tab bar:** 5 tabs (Home, Doses, Diário, Relatórios, Perfil). Em iOS 26+, usa `expo-glass-effect` com `GlassView` nativo, `glassEffectStyle="regular"` e `colorScheme="dark"`. Em iOS <26 e Android, mantém `expo-blur` `BlurView` como fallback visual, nunca `<View />` puro. Ícone SF Symbol + label `tab-label` (11pt Medium) abaixo. Tab ativa: ícone e label em `text-brand`; não usar `tintColor` no `GlassView` para preservar Vital Mint Rarity. Tab inativa: ícone e label em `text-secondary`.
 - **Toolbar:** Botões de ação secundária em telas com ações (Gerar Relatório, Compartilhar). Glass `.regular`. Botões em `text-brand` ou `text-secondary` dependendo de estado.
 - **Header de navegação:** Título de tela em `headline` (28pt Semibold `text-primary`). Backdrop em Glass `.clear` em telas com hero visual (relatório, paywall). Em telas de dado: sem glass no header — apenas background `bg-base`.
 

@@ -21,7 +21,7 @@ A V5 é **refatoração completa do código** mas mantém **infraestrutura, marc
 | App | React Native + Expo | Expo SDK 54+ |
 | Linguagem | TypeScript estrito | 5.x |
 | Routing | Expo Router (file-based) | última |
-| UI nativa iOS | `@expo/ui` + Liquid Glass | iOS 26+ |
+| UI nativa iOS | `expo-glass-effect` + Liquid Glass | iOS 26+ |
 | Estado de servidor | React Query (`@tanstack/react-query`) | 5.x |
 | Estado de cliente | Context API + hooks | nativo |
 | Validação de schema | Zod | última |
@@ -268,7 +268,7 @@ A V5 é **refatoração completa do código** mas mantém **infraestrutura, marc
       "expo-secure-store",
       "expo-notifications",
       "expo-font",
-      ["@expo/ui", { "ios": { "deploymentTarget": "26.0" } }]
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true
@@ -726,7 +726,7 @@ Registrado em 2026-05-15 após execução do bootstrap. Não alteram o plano —
 
 | # | Aprendizado | Impacto em prompts futuros |
 |---|---|---|
-| 1 | **`@expo/ui` canary (`v0.2.0`) incompatível com SDK 54.** Usa `SafeAreaControllable` e `RNHostViewProtocol` ausentes no `expo-modules-core` SDK 54. | Reintroduzir no Prompt 04. Alternativa temporária: `expo-blur` para efeito de vidro. |
+| 1 | **`@expo/ui` canary (`v0.2.0`) incompatível com SDK 54.** Usa `SafeAreaControllable` e `RNHostViewProtocol` ausentes no `expo-modules-core` SDK 54. | Reintroduzir no Prompt 04. Alternativa temporária: `expo-blur` para efeito de vidro. **RESOLVIDO no Prompt 19:** substituído por `expo-glass-effect` (pacote estável dedicado, não canary). `@expo/ui` foi abandonado em favor desta solução. |
 | 2 | **iOS 26 sem Expo Go.** `expo start --ios` falha com `TypeError: fetch failed` — o `xcrun simctl openurl` não tem app para abrir `exp://`. | Usar `npx expo run:ios` para todo dev local em iOS 26. EAS não afetado. |
 | 3 | **`babel-preset-expo` deve ser `devDependency` explícita.** Não vem automaticamente ao recriar `package.json` manualmente. Metro não transpila sem ele. | Sempre incluir em `devDependencies` ao criar projeto Expo do zero. |
 | 4 | **`react-native-worklets@0.5.1` é peer dep obrigatório do `react-native-reanimated@~4.1.x`.** | Sempre instalar os dois juntos. Sem ele, `pod install` falha com "Failed to validate worklets version". |

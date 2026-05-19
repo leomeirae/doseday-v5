@@ -483,7 +483,7 @@ A V5.0 sobe quando:
 |---|---|---|
 | App | React Native + Expo SDK 54+ | Continuidade, ecossistema, AI-friendly |
 | Routing | Expo Router (file-based) | Padrão Expo, native tabs |
-| UI nativa iOS | @expo/ui + Liquid Glass (iOS 26+) | Diferencial visual, native feel |
+| UI nativa iOS | expo-glass-effect + Liquid Glass (iOS 26+) | Diferencial visual, native feel |
 | **Design language** | **Impeccable** (skill local) | PRODUCT.md + DESIGN.md como fonte única. 23 comandos especializados. Open source, sem dependência externa |
 | Estado | React Query + Context API | Sem Redux. Suficiente, simples |
 | Backend | Supabase (mantido) | Auth, DB Postgres, RLS, Edge Functions, Storage |

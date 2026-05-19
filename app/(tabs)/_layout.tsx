@@ -1,10 +1,9 @@
 import { Tabs } from 'expo-router'
-import { BlurView } from 'expo-blur'
 import { SymbolView } from 'expo-symbols'
-import { StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { colors } from '@lib/theme/tokens'
 import { TabBarButton } from '@components/ui/TabBarButton'
+import { TabBarBackground } from '@components/ui/TabBarBackground'
 
 const TAB_BAR_HEIGHT = 49
 
@@ -25,13 +24,7 @@ export default function TabsLayout() {
           height: TAB_BAR_HEIGHT + insets.bottom,
           paddingBottom: insets.bottom,
         },
-        tabBarBackground: () => (
-          <BlurView
-            intensity={80}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
-        ),
+        tabBarBackground: () => <TabBarBackground />,
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '500',
