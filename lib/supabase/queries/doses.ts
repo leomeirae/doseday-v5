@@ -3,6 +3,15 @@ import type { RegisterDoseInput } from '@lib/validation/doseSchemas'
 
 export type DoseStatus = 'scheduled' | 'applied' | 'skipped'
 
+export type Dose = {
+  id: string
+  date: Date
+  medication: string
+  dosage: string
+  time: string
+  status: DoseStatus
+}
+
 export type DoseRecord = {
   id: string
   medicationName: string

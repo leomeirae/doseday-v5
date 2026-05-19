@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { colors, typography, spacing } from '@lib/theme/tokens'
-import type { DoseStatus } from '@lib/mocks/doses'
+import type { DoseStatus } from '@lib/supabase/queries/doses'
 
 const STATUS_MAP: Record<DoseStatus, { color: string; label: string }> = {
   scheduled: { color: colors.semanticInfo,     label: 'Agendada' },
