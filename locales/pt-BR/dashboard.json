@@ -73,6 +73,9 @@
     "shareTitle": "Compartilhar Relatório",
     "error": "Não foi possível gerar o PDF. Tente novamente."
   },
+  "insightToday": {
+    "freePlaceholder": "Insight do dia disponível no Premium. Toque pra saber mais."
+  },
   "signOut": {
     "title": "Sair",
     "message": "Tem certeza que deseja sair?"

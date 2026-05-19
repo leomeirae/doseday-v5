@@ -66,6 +66,20 @@ export const EMOTIONAL_EMOJIS: Record<EmotionalState, string> = {
   great: '😊',
 }
 
+export type MoodValue = 'mal' | 'ok' | 'bem' | 'otimo'
+
+export const EMOTIONAL_TO_MOOD_MAP: Record<EmotionalState, MoodValue> = {
+  terrible: 'mal',
+  bad: 'mal',
+  ok: 'ok',
+  good: 'bem',
+  great: 'otimo',
+}
+
+export function emotionalStateToMood(state: EmotionalState): MoodValue {
+  return EMOTIONAL_TO_MOOD_MAP[state]
+}
+
 export const TRIGGERS = [
   'alcohol',
   'fatty_food',

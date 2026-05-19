@@ -6,12 +6,15 @@ export type Profile = {
   currentMedication: string | null
   currentDose: number | null
   treatmentStartDate: string | null
+  currentWeight: number | null
+  initialWeight: number | null
+  goalWeight: number | null
 }
 
 export async function getProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, full_name, current_medication, current_dose, treatment_start_date')
+    .select('id, full_name, current_medication, current_dose, treatment_start_date, current_weight, initial_weight, goal_weight')
     .eq('user_id', userId)
     .maybeSingle()
 
@@ -24,5 +27,8 @@ export async function getProfile(userId: string): Promise<Profile | null> {
     currentMedication: data.current_medication,
     currentDose: data.current_dose !== null ? Number(data.current_dose) : null,
     treatmentStartDate: data.treatment_start_date,
+    currentWeight: data.current_weight !== null ? Number(data.current_weight) : null,
+    initialWeight: data.initial_weight !== null ? Number(data.initial_weight) : null,
+    goalWeight: data.goal_weight !== null ? Number(data.goal_weight) : null,
   }
 }
