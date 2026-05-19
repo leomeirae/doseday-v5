@@ -7,6 +7,7 @@ import { formatDoseDate } from '@lib/utils/dateFormat'
 interface Props {
   dose: Dose
   isNext?: boolean
+  highlighted?: boolean
 }
 
 const STATUS_A11Y: Record<Dose['status'], string> = {
@@ -15,7 +16,7 @@ const STATUS_A11Y: Record<Dose['status'], string> = {
   skipped:   'Pulada',
 }
 
-export function DoseCard({ dose, isNext = false }: Props) {
+export function DoseCard({ dose, isNext = false, highlighted = false }: Props) {
   const dateLabel = formatDoseDate(dose.date)
   const hasTime = dose.time !== '--'
   const timeLabel = hasTime ? dose.time.replace(':', ' horas e ').replace(/^0/, '') : ''
@@ -25,7 +26,7 @@ export function DoseCard({ dose, isNext = false }: Props) {
 
   return (
     <View
-      style={[styles.card, isNext && styles.cardNext]}
+      style={[styles.card, isNext && styles.cardNext, highlighted && styles.cardHighlighted]}
       accessible={true}
       accessibilityLabel={a11yLabel}
     >
@@ -47,9 +48,12 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'rgba(255,255,255,0.06)',
   },
-  // Próxima dose imediata: borda sutil em semanticInfo para distinguir da fila
   cardNext: {
     borderColor: 'rgba(91,168,217,0.25)',
+  },
+  cardHighlighted: {
+    borderColor: colors.semanticInfo,
+    borderWidth: 1.5,
   },
   date: {
     ...typography.subtitle,

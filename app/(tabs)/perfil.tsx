@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { SymbolView } from 'expo-symbols'
 import { colors, typography, spacing, radius } from '@lib/theme/tokens'
 import { AuthButton } from '@components/ui/AuthButton'
 import { signOut } from '@lib/supabase/auth'
@@ -8,6 +10,7 @@ import { useSession } from '@hooks/useSession'
 
 export default function PerfilScreen() {
   const { session } = useSession()
+  const router = useRouter()
   const [loadingSignOut, setLoadingSignOut] = useState(false)
 
   async function handleSignOut() {
@@ -38,6 +41,20 @@ export default function PerfilScreen() {
             {session?.user.email ?? ''}
           </Text>
         </View>
+
+        {/* Notificações row */}
+        <Pressable
+          style={({ pressed }) => [styles.notifRow, pressed && styles.notifRowPressed]}
+          onPress={() => router.push('/perfil/notificacoes')}
+          accessibilityRole="button"
+          accessibilityLabel="Configurações de Notificações"
+        >
+          <View style={styles.notifRowLeft}>
+            <SymbolView name="bell.fill" size={18} tintColor={colors.semanticInfo} />
+            <Text style={styles.notifRowLabel}>Notificações</Text>
+          </View>
+          <SymbolView name="chevron.right" size={14} tintColor={colors.textTertiary} />
+        </Pressable>
 
         <View style={styles.spacer} />
 
@@ -90,5 +107,27 @@ const styles = StyleSheet.create({
   spacer: {
     flex: 1,
     minHeight: spacing.xxl,
+  },
+  notifRow: {
+    backgroundColor: colors.bgElevated,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+  },
+  notifRowPressed: {
+    opacity: 0.75,
+  },
+  notifRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  notifRowLabel: {
+    ...typography.body,
+    color: colors.textPrimary,
   },
 })

@@ -1,13 +1,15 @@
 import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, Pressable, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
+import { useRouter, useLocalSearchParams } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
 import { colors, typography, spacing } from '@lib/theme/tokens'
 import { DoseCard } from '@components/doses/DoseCard'
 import { SectionHeader } from '@components/ui/SectionHeader'
 import { useDoseSummary } from '@hooks/useDoseSummary'
+import { useNotifications } from '@hooks/useNotifications'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 import { formatMedicationName } from '@lib/utils/formatMedicationName'
+import { PermissionDeniedBanner } from '@components/notifications/PermissionDeniedBanner'
 import type { Dose, DoseRecord } from '@lib/supabase/queries/doses'
 
 function toDoseCard(record: DoseRecord): Dose {
@@ -23,7 +25,9 @@ function toDoseCard(record: DoseRecord): Dose {
 
 export default function DosesScreen() {
   const router = useRouter()
+  const { highlight } = useLocalSearchParams<{ highlight?: string }>()
   const { data: dose, isLoading, error, refetch } = useDoseSummary()
+  const { permissionStatus } = useNotifications()
 
   if (isLoading) {
     return (
@@ -77,6 +81,7 @@ export default function DosesScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
+      <PermissionDeniedBanner visible={permissionStatus === 'denied'} />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -105,7 +110,9 @@ export default function DosesScreen() {
 
         <SectionHeader title="Histórico" />
         {historyCards.length > 0 ? (
-          historyCards.map((d) => <DoseCard key={d.id} dose={d} />)
+          historyCards.map((d) => (
+            <DoseCard key={d.id} dose={d} highlighted={highlight === d.id} />
+          ))
         ) : (
           <Text style={styles.emptyText}>Sem doses registradas ainda</Text>
         )}

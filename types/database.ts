@@ -750,6 +750,7 @@ export type Database = {
           full_name: string | null
           goal_weight: number | null
           has_medical_support: string | null
+          has_seen_push_permission_modal: boolean
           height: number | null
           id: string
           initial_weight: number | null
@@ -779,6 +780,7 @@ export type Database = {
           full_name?: string | null
           goal_weight?: number | null
           has_medical_support?: string | null
+          has_seen_push_permission_modal?: boolean
           height?: number | null
           id?: string
           initial_weight?: number | null
@@ -808,6 +810,7 @@ export type Database = {
           full_name?: string | null
           goal_weight?: number | null
           has_medical_support?: string | null
+          has_seen_push_permission_modal?: boolean
           height?: number | null
           id?: string
           initial_weight?: number | null
