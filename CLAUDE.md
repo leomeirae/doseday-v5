@@ -17,6 +17,8 @@ Antes de QUALQUER tarefa, você (Claude Code) DEVE ler estes documentos NA ORDEM
 6. **`CONTEXT.md`** (na raiz do repo) — glossário do domínio. Termos como "memória do tratamento", "Movimento 1/2/3", "dose", "persona Mariana". Lido por `grill-with-docs` e `improve-codebase-architecture`
 7. **`docs/handoff/HANDOFF.md`** (se existir) — última sessão. Estado, decisões, próximos passos
 8. **`docs/learnings.md`** — aprendizados acumulados. Ler ANTES de qualquer prompt MID/HIGH (regra obrigatória — ver "Regra obrigatória — consultar aprendizados" abaixo)
+9. **`docs/karpathy.md`** — Karpathy Guidelines completo (regra 22). Carregar em prompts MID/HIGH.
+10. **`docs/working-rules.md`** — Regras operacionais detalhadas. Carregar quando precisar do detalhe operacional.
 
 `docs/PRODUCT.md` e `docs/DESIGN.md` existem e estão finalizados (Prompt 02 — `/impeccable teach`). `docs/archive/design-system-preview-v0.1.md` é o histórico arquivado.
 
@@ -35,71 +37,15 @@ Léo é PO/estrategista — **não escreve código**. Toda execução técnica �
 
 ### Como conversar com Léo (regra permanente)
 
-Léo é PO sênior mas **não tem background técnico em desenvolvimento**. Conceitos como Git worktree, hooks, branches paralelas, edge functions, RLS — são novos pra ele.
+Léo é PO sênior mas **não tem background técnico**. Mantra: **didático sempre, calma > velocidade, guiar passo a passo, confirmar > assumir, sem jargão**. Detalhe completo em [`docs/working-rules.md`](docs/working-rules.md). Aplica-se a Cowork + Claude Code.
 
-| Princípio | Como aplicar |
-|---|---|
-| **Didático sempre** | Antes de ação técnica nova, explicar 1 frase: "isso significa X. Serve pra Y." |
-| **Calma > velocidade** | Uma coisa de cada vez. Sem rajadas de 5 tarefas paralelas |
-| **Guiar passo a passo** | Toda ação que Léo precisa fazer no terminal/IDE vem com checklist numerado |
-| **Anti-sobrescrita explícita** | Cada vez que algo pode gerar conflito de código, parar e avisar antes |
-| **Por que > Como** | Sempre explicar o porquê da decisão antes do como executar |
-| **Confirmação > suposição** | Quando estiver em dúvida, perguntar a Léo antes de assumir |
-| **Sem jargão sem tradução** | Termo técnico novo? 1 frase explicando |
+### Regra obrigatória — consultar aprendizados
 
-Aplica-se tanto a este chat (Cowork) quanto a respostas do Claude Code (IDE).
+Antes de prompts MID/HIGH, ler `docs/learnings.md`. Detalhe operacional em [`docs/working-rules.md`](docs/working-rules.md).
 
-### Regra obrigatória — consultar aprendizados antes de escrever qualquer prompt ou comando
+### Regra obrigatória — mensagem cola Claude Code
 
-Antes de:
-- Escrever escopo de qualquer prompt novo (`docs/prompts/NN-...md`)
-- Sugerir comando shell ao Léo
-- Definir lista de arquivos de uma feature
-
-Cowork DEVE:
-
-1. **Ler `docs/architecture.md` seção "Aprendizados"** (registrada após cada prompt executado)
-2. **Fazer `rtk grep` ou `Grep`** procurando imports do que vai ser modificado (descobrir arquivos afetados que não estavam óbvios no escopo)
-3. **Consultar `docs/handoff/HANDOFF-prompt-XX.md`** mais recente
-
-Razão: erros recorrentes detectados —
-- Sugerido `npx expo start --ios` em vez de `npx expo run:ios` (aprendizado #2 do Prompt 00 já registrado em architecture.md)
-- Esqueci `app/_layout.tsx` no escopo do Prompt 03 (Claude Code pegou por grep)
-
-**Esses erros são evitáveis se Cowork ler os aprendizados antes de instruir Léo ou Claude Code.**
-
-### Regra obrigatória — mensagem que Léo cola no Claude Code
-
-Toda vez que Cowork sugerir uma mensagem pra Léo colar no Claude Code, a mensagem DEVE conter, no mínimo:
-
-1. **Caminho do prompt principal** (ex.: `docs/prompts/NN-...md`)
-2. **Caminho do handoff anterior**, se houver (ex.: `docs/handoff/HANDOFF-prompt-XX.md`)
-3. **Skills obrigatórias** pra esse prompt (lista explícita, não confiar só na seção A do arquivo)
-4. **Inputs principais** (rascunhos, previews, contextos a serem carregados)
-5. **Instrução de "refinar, não recriar"** quando há rascunho pré-existente
-
-Razão: sem reforço explícito, o Claude Code pode ignorar skills, perder contexto do handoff, ou tentar começar do zero. Cole isso na cara dele.
-
-Exemplo correto:
-
-```
-Leia docs/prompts/NN-...md e me apresente o plano de execução.
-
-Antes, leia docs/handoff/HANDOFF-prompt-XX.md.
-
-Use obrigatoriamente:
-- skill A (motivo)
-- skill B (motivo)
-
-Carregue como input principal: docs/Y.md. Refine, não recrie do zero.
-```
-
-**Modus operandi do projeto:** Prompt Factory.
-- Cada feature/área = um prompt versionado em `docs/prompts/`
-- Você (Claude Code) sempre retorna **plano + skills + riscos + arquivos + validação** ANTES de executar
-- Léo aprova
-- Você executa
-- `/impeccable critique` antes de marcar como pronto
+Toda mensagem pra colar no Claude Code DEVE conter: caminho do prompt, handoff anterior, skills obrigatórias, inputs principais. Template completo em [`docs/working-rules.md`](docs/working-rules.md).
 
 ---
 
@@ -124,15 +70,43 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 11. **SEMPRE rodar `/grill-with-docs`** antes de prompts MID/HIGH que toquem domínio (Movimentos IA, schema, fluxo clínico)
 12. **SEMPRE rodar `/handoff`** ao fim de sessão longa ou antes de pausar — salva em `docs/handoff/HANDOFF.md`
 13. **SEMPRE rodar `/improve-codebase-architecture`** a cada janela rolante de 5-10 prompts implementados
-14. **RTK calibrado por tipo de comando** (atualizado em 2026-05-18 após análise de 464 comandos reais — economia média de 31.5%, mas com forte variação). Usar a tabela abaixo. Não forçar `rtk` em tudo: arquivos pequenos e buscas específicas rendem ~3-25% (overhead não compensa). Onde RTK BRILHA (90%+): lint, build, commit, log. Onde RTK MORRE (<10%): leitura de arquivo pequeno, grep com poucos hits. Tabela operacional: ✅ usar RTK em `rtk lint`, `rtk git commit`, `rtk git log`, `rtk git diff` grande, `npm install`, `npm test`, `eas build` — economia 60-97%; ⚠️ usar com critério em `rtk read` (somente arquivo >300 linhas, preferir `-l aggressive`), `rtk grep` (somente busca esperando muitos hits), `rtk git status` (médio ~50%); ❌ NÃO usar RTK em arquivo <200 linhas (usa tool `Read` nativo), grep esperando 1-3 hits (usa tool `Grep` nativo), Glob simples (usa tool `Glob` nativo). Diagnóstico periódico: `rtk gain` a cada 5-10 prompts pra recalibrar
+14. **RTK calibrado por tipo de comando** (detalhe em [`~/.claude/RTK.md`](~/.claude/RTK.md)). Usar em: `rtk lint`, `rtk git commit/log/diff`, `npm install/test`, `eas build` (economia 60-97%). NÃO usar em: arquivos <200 linhas, grep com poucos hits. Recalibrar a cada 5-10 prompts: `rtk gain`
 15. **MODO PADRÃO: Claude Code direto (`claude`) com 1 prompt por vez.** Sequencial, sem worktree, sem dashboard. Mais econômico e simples. Agent View (`claude agents`) fica reservado pra quando precisar paralelizar 2+ prompts em áreas distintas. Branchs criadas manualmente (`git checkout -b feature/NN-...`). Detalhes em `docs/architecture.md` seção 11.0
 16. **Caveman NÃO É USADO no DoseDay V5.** Apesar de instalado, decisão estratégica: economia vem de RTK + boas práticas, sem perder clareza de respostas
 17. **Modelo Haiku 4.5 em prompts LOW.** Sonnet/Opus reservado pra prompts MID/HIGH com decisão arquitetural. Antes de dispatchar prompt LOW no Agent View, trocar via `/model` pra Haiku
 18. **Cleanup imediato** após merge: `Ctrl+X` 2× na sessão concluída do Agent View. Libera worktree e quota
 19. **Peek antes de atachar.** `Space` mostra resumo da sessão. Só atachar (`Enter`) se realmente precisar interagir
-20. **`react-native-devtools-mcp` instalado globalmente.** Claude Code NUNCA delega validação manual repetitiva ao Léo (descomentar linhas, observar logs do Metro, fazer screenshot manual). Usa as 16 ferramentas do MCP `react-native`: `screenshot`, `js_eval`, `get_js_logs`, `tap`, `type_text`, `scroll`, `get_view_hierarchy` etc. Léo só revisa o resultado final no PR. Detalhes em `docs/architecture.md` seção 15. **Screenshots no PR DEVEM ser imagens reais, não descrições textuais.** Quando critério de aceitação pedir "N screenshots no PR", o fluxo correto é: (a) capturar via MCP `screenshot` salvando PNG local em `.impeccable/critique/screenshots/<prompt>-<n>.png`; (b) anexar ao PR via `gh pr comment <PR> --body "![desc](url)"` após upload das imagens, OU mover pra repo (`assets/screenshots/`) e referenciar; (c) embedar no PR description com markdown `![alt](url)`. Texto descrevendo o conteúdo de uma screenshot NÃO cumpre o critério — é "fake screenshot" e fere a verificabilidade do PR. Aprendizado registrado no Prompt 13
+20. **`react-native-devtools-mcp` instalado globalmente.** Claude Code usa as 16 ferramentas (`screenshot`, `js_eval`, `tap`, `scroll`, etc.) para validar, sem delegar ao Léo. **Screenshots no PR DEVEM ser imagens reais (PNG em `assets/screenshots/`), não descrições textuais.** Detalhe em [`docs/working-rules.md`](docs/working-rules.md) + `docs/architecture.md` seção 15
 21. **SEMPRE salvar o plano em arquivo ANTES de executar.** Após Léo aprovar o plano de execução (Skills + Plano + Riscos + Arquivos + Validação), Claude Code DEVE usar a skill `superpowers:writing-plans` para persistir o plano em `docs/superpowers/plans/YYYY-MM-DD-<slug>.md` antes de tocar em código. Sem isso, `/clear` ou perda de sessão = re-planejamento divergente. Plano é fonte-de-verdade no repo, não memória da sessão
-22. **Karpathy Guidelines aplicadas em TODA tarefa não-trivial.** As 4 disciplinas (Think Before Coding / Simplicity First / Surgical Changes / Goal-Driven Execution — detalhe na seção Karpathy Guidelines abaixo) são obrigatórias em qualquer prompt MID/HIGH. Antes do `ok`, no plano apresentado, agente DEVE declarar explicitamente: (a) assumptions feitas, (b) "could 50 lines do this?" — se a resposta for sim, simplificar, (c) "cada linha mudada traceia direto pro pedido?", (d) success criteria verificáveis (tests-first quando aplicável). Em PRs, diff deve ser cirúrgico — zero "drive-by refactoring". Combinado com RTK (regra 14), economia esperada de tokens em prompts MID/HIGH: 50-60% (RTK comprime ferramentas, Karpathy reduz código gerado na raiz)
+22. **Karpathy Guidelines aplicadas em TODA tarefa não-trivial** ([`docs/karpathy.md`](docs/karpathy.md)). No plano, declarar: (a) assumptions, (b) could 50 lines do this?, (c) cada linha traceia ao pedido, (d) success criteria verificáveis. Em PRs, diff cirúrgico — zero "drive-by refactoring"
+23. **`/clear` ao trocar de tarefa.** Depois de mergear um PR, antes de dispatchar o próximo prompt, rodar `/clear` pra liberar messages acumuladas. Sessão nova começa com ~25k baseline em vez de acumular 80-100k. Crítico em prompts MID/HIGH.
+24. **`/compact Focus on <tema>` a cada ~40 mensagens** dentro de uma tarefa longa. Exemplo: `/compact Focus on architectural decisions and current task state`. Preserva decisões, descarta fluff. Salvar o summary resultante em `docs/handoff/HANDOFF-prompt-NN.md` antes de continuar.
+25. **`@file path/to/file.md`** no Claude Code em vez de paste de conteúdo. Carrega arquivo sob demanda, sai do contexto quando não precisa. Paste de arquivo grande no chat vira dead weight pelo resto da sessão. Aplica-se a outputs de bash > 50 linhas também — salvar em arquivo e referenciar.
+26. **`/btw <pergunta>`** pra perguntas laterais durante execução de prompt. Roda em canal paralelo, não injeta resposta na conversa principal. Evita custo de interromper Claude Code no meio de uma tarefa multi-step.
+
+---
+
+## Auxiliares por tipo de tarefa (carregar com `@file`)
+
+Tabela de referência rápida — quando começar uma tarefa, carregue os auxiliares apropriados via `@file` no Claude Code para ter acesso ao detalhe completo sem inflar CLAUDE.md.
+
+| Tipo de tarefa | Carregar via `@file` + skills |
+|---|---|
+| Decisão técnica em prompt MID/HIGH | `@docs/karpathy.md`, `@docs/learnings.md`, handoff anterior |
+| Schema Supabase / migration / RLS | `@docs/architecture.md`, `@docs/learnings.md`, skill `supabase-postgres-best-practices` |
+| UI / tela nova / refazer tela | `@docs/DESIGN.md`, skill `/impeccable craft` ou `/impeccable distill` |
+| Tab bar / toolbar / navegação | `@docs/DESIGN.md`, skill `liquid-glass:liquid-glass` |
+| IA / Edge Function Anthropic SDK | `@docs/architecture.md` (seção IA), `@docs/learnings.md`, skill `claude-api` |
+| Bash longo / leitura de arquivo grande | `@~/.claude/RTK.md` |
+| Glossário do domínio (Mariana, Movimento 1/2/3, dose) | `@CONTEXT.md` |
+| Plano multi-step persistido | `@docs/karpathy.md`, skill `superpowers:writing-plans` |
+| Refresh "como conversar com Léo" | `@docs/working-rules.md` |
+| Escolher skill apropriada | `@docs/skills-stack.md` |
+| Refactor grande isolado | `@docs/working-rules.md` (Agent View + worktrees), skill `superpowers:using-git-worktrees` |
+| Pre-ship a11y/performance | skill `/impeccable audit` |
+| Pre-ship edge cases | skill `/impeccable harden` |
+| Security/LGPD review | skill `security-review` |
+| Fim de sessão / antes de pausar | skill `handoff` |
 
 ---
 
@@ -157,37 +131,9 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 
 ---
 
-## Stack de skills do Claude Code (43 skills)
+## Stack de skills do Claude Code
 
-Detalhe completo em `docs/skills-stack.md`. Resumo de quem usar para o quê:
-
-| Tipo de tarefa | Skill primária |
-|---|---|
-| Brainstorm de feature | `superpowers:brainstorming` |
-| **Alinhar plano com domínio + atualizar docs** | **`grill-with-docs`** (Matt Pocock) |
-| Stress-test puro de plano | `grill-me` (Matt Pocock) |
-| Plano multi-etapa | `superpowers:writing-plans` |
-| Implementar feature ponta-a-ponta | `feature-dev:feature-dev` |
-| UI nova / refazer tela | `/impeccable craft` ou `/impeccable distill` |
-| Brief visual antes de codar | `/impeccable shape` |
-| Onboarding / empty state | `/impeccable onboard` |
-| Tab bar / toolbar / navegação | `liquid-glass:liquid-glass` |
-| RN best practices | `react-native-best-practices` |
-| Query / RLS / migration | `supabase-postgres-best-practices` |
-| Anthropic SDK | `claude-api` |
-| TDD | `superpowers:test-driven-development` |
-| Bug não-óbvio | `superpowers:systematic-debugging` |
-| Refactor grande isolado | `superpowers:using-git-worktrees` |
-| **Identificar débito arquitetural** | **`improve-codebase-architecture`** (Matt Pocock, a cada janela rolante) |
-| Várias tarefas paralelas | `superpowers:dispatching-parallel-agents` |
-| Pre-ship: a11y/perf | `/impeccable audit` |
-| Pre-ship: edge cases | `/impeccable harden` |
-| Code review estrutural | `review` |
-| Security/LGPD | `security-review` |
-| Cortar gordura | `simplify` |
-| Build/Deploy/CI-CD | `antigravity-bundle-expo-react-native:*` |
-| ASO | `antigravity-bundle-expo-react-native:app-store-optimization` |
-| **Fim de sessão / antes de pausar** | **`handoff`** (Matt Pocock) — salva em `docs/handoff/HANDOFF.md` |
+43 skills disponíveis — tabela mestre + uso por tipo de tarefa em [`docs/skills-stack.md`](docs/skills-stack.md).
 
 ---
 
@@ -197,59 +143,15 @@ Detalhe completo em `docs/skills-stack.md`. Resumo de quem usar para o quê:
 
 ---
 
-## Otimização de tokens — RTK (Rust Token Killer)
+## Otimização de tokens — RTK
 
-Hook global instalado em `~/.claude/settings.json` que intercepta toda chamada ao tool `Bash` e comprime a saída em 60-90% antes de chegar no contexto.
-
-**Comandos do nosso stack que RTK otimiza automaticamente (via hook):**
-
-| Comando | Economia esperada |
-|---|---|
-| `git status`, `git diff`, `git log`, `git add/commit/push` | -75 a -92% |
-| `tsc --noEmit` | -80% |
-| `eslint`, `prettier` | -80% |
-| `npm install`, `npm test`, `jest` | -90% |
-| `npx expo start`, `eas build`, `eas submit` | -80 a -90% |
-| `supabase migration list`, `supabase functions list` | -80% |
-
-**Comandos explícitos `rtk *` quando os tools Read/Grep/Glob seriam caros:**
-
-| Tarefa | Em vez de | Usar |
-|---|---|---|
-| Ler arquivo grande (>300 linhas) | `Read` | `rtk read path/to/file.ts` ou `rtk read file.ts -l aggressive` (signatures only) |
-| Buscar padrão em código extenso | `Grep` | `rtk grep "padrão" .` |
-| Listar árvore de diretório | `Glob`/`LS` | `rtk ls .` |
-| Diff entre 2 arquivos | leitura manual | `rtk diff file1 file2` |
-| Resumir comando longo | leitura manual | `rtk summary <command>` |
-
-**Diagnóstico:** rodar `rtk gain` periodicamente pra ver tokens economizados na sessão.
-
-**Anti-padrão:** usar `Read` pra arquivo de 2000 linhas quando `rtk read file.ts -l aggressive` retorna só signatures. Custo de tokens é real.
+Hook global em `~/.claude/settings.json` comprime saída de Bash em 60-90%. Comandos explícitos `rtk read/grep/ls/diff/summary` pra leituras grandes. Detalhe + tabela de calibração em [`~/.claude/RTK.md`](~/.claude/RTK.md). Diagnóstico: `rtk gain`.
 
 ---
 
-## Repositório
+## Repositório + Paralelismo
 
-- GitHub: `github.com/leomeirae/doseday-v5`
-- Local principal: `/Users/leofrancaia/Desktop/dose-day-v5/` (Léo + revisão)
-- Branch padrão: `main` (configurada como default no GitHub)
-- Branches de feature: `feature/NN-area-curta` (criadas automaticamente pelo Agent View)
-- Worktrees: `.claude/worktrees/` (criados automaticamente pelo Agent View, um por sessão)
-
-## Paralelismo via Agent View (`claude agents`)
-
-Substitui o setup manual de worktrees. Dashboard único pra gerenciar várias sessões em background.
-
-| Regra | Aplicação |
-|---|---|
-| 1 aba do terminal só | `claude agents` — todas as sessões aparecem nessa tela |
-| Worktrees automáticos | Cada sessão dispatcheada cria worktree próprio em `.claude/worktrees/` |
-| Léo é o único roteador | Léo decide qual prompt vai pra qual sessão (dispatch via input do Agent View) |
-| Áreas não-sobrepostas | Sessões paralelas só se editam arquivos distintos |
-| Máx 3 sessões em paralelo no início | Quota some rápido se exagerar |
-| Handoff próprio | `/handoff` dentro de cada sessão salva em `docs/handoff/HANDOFF-<nome-sessao>.md` |
-| Skills obrigatórias | `superpowers:dispatching-parallel-agents` (orquestração) |
-| Cheatsheet | `docs/agent-view-cheatsheet.md` — atalhos + comandos |
+Repo: `github.com/leomeirae/doseday-v5` (default branch `main`). Branches feature: `feature/NN-area-curta`. Paralelismo via Agent View (`claude agents`) — detalhe + cheatsheet em [`docs/working-rules.md`](docs/working-rules.md).
 
 ---
 
@@ -269,63 +171,6 @@ Quando Léo colar esse prompt aqui, siga o template:
 ## Histórico
 
 > Tabela de prompts executados movida para [`docs/history.md`](docs/history.md). Atualizar lá.
-
----
-
-## Karpathy Guidelines — Diretrizes Anti-Erros LLM
-
-Derivadas das observações de Andrej Karpathy sobre pitfalls comuns de LLMs em coding.
-
-**Tradeoff:** Estas diretrizes priorizam cautela sobre velocidade. Em tarefas triviais (typo fix, one-liners óbvios), use julgamento — nem toda mudança precisa do rigor completo. O objetivo é reduzir erros custosos em trabalho não-trivial, não desacelerar tarefas simples.
-
-### 1. Think Before Coding
-
-Antes de implementar:
-- Apresente assumptions explicitamente. Se incerto, pergunte.
-- Se múltiplas interpretações existem, apresente-as — não escolha silenciosamente.
-- Se uma abordagem mais simples existe, diga. Questione quando necessário.
-- Se algo está confuso, pare. Nomeie o que está confuso. Pergunte.
-
-### 2. Simplicity First
-
-- Sem features além do que foi pedido.
-- Sem abstrações para código de uso único.
-- Sem "flexibilidade" ou "configurabilidade" não solicitada.
-- Sem error handling para cenários impossíveis.
-- Se você escreveu 200 linhas e poderia ser 50, reescreva.
-
-### 3. Surgical Changes
-
-Ao editar código existente:
-- Não "melhore" código adjacente, comentários ou formatação.
-- Não refatore o que não está quebrado.
-- Mantenha o estilo existente, mesmo que faria diferente.
-- Se notar dead code não relacionado, mencione — não delete.
-
-Quando suas mudanças criarem órfãos:
-- Remova imports/variáveis/funções que SUAS mudanças tornaram unused.
-- Não remova dead code pré-existente sem ser solicitado.
-
-### 4. Goal-Driven Execution
-
-Transforme tarefas em metas verificáveis:
-- "Adicionar validação" → "Escrever testes para inputs inválidos, depois fazê-los passar"
-- "Corrigir o bug" → "Escrever teste que reproduz, depois fazê-lo passar"
-
-Para tarefas multi-step, apresente plano breve antes de executar:
-```
-1. [Passo] → verificar: [critério]
-2. [Passo] → verificar: [critério]
-3. [Passo] → verificar: [critério]
-```
-
-### Project-Specific Guidelines (DoseDay V5)
-
-- TypeScript strict mode em todos os arquivos — zero `as any` sem justificativa
-- Queries Supabase ficam em `lib/supabase/queries/`
-- Hooks React Query ficam em `hooks/`
-- Validação via Zod schemas em `lib/validation/`
-- Seguir padrões de error handling existentes em `lib/supabase/queries/errors.ts`
 
 ---
 
