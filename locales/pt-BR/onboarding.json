@@ -130,6 +130,87 @@
       "required": "Selecione sua caneta"
     }
   },
+  "dose": {
+    "headline": "Qual a sua dose atual?",
+    "subtitle": "A dose que você está aplicando agora. Vamos ajustar o relatório com isso.",
+    "doseLabel": "Dose",
+    "mgSuffix": "mg",
+    "commonDosesLabel": "Doses comuns pra {{medication}}",
+    "errors": {
+      "doseRange": "Dose entre 0,25 e 30 mg",
+      "required": "Informe sua dose"
+    }
+  },
+  "doctorName": {
+    "headline": "Quem te acompanha?",
+    "subtitle": "Médica, médico, nutricionista. Quem você confia no tratamento. Você pode pular se preferir.",
+    "doctorNameLabel": "Nome do profissional",
+    "doctorNamePlaceholder": "Ex: Dra. Ana Costa",
+    "skipNote": "Você pode adicionar isso depois nas configurações."
+  },
+  "medicalSupport": {
+    "headline": "Você tem acompanhamento médico?",
+    "subtitle": "Sem julgamento. Isso nos ajuda a adaptar o conteúdo pra você.",
+    "options": {
+      "yes": {
+        "label": "Sim, regularmente",
+        "caption": "Consultas mensais ou bimestrais"
+      },
+      "sometimes": {
+        "label": "De vez em quando",
+        "caption": "Não tenho frequência fixa"
+      },
+      "no": {
+        "label": "Estou por conta própria",
+        "caption": "Sem acompanhamento agora"
+      }
+    },
+    "errors": {
+      "required": "Selecione uma opção"
+    }
+  },
+  "concerns": {
+    "headline": "O que mais te preocupa?",
+    "subtitle": "Selecione quantas quiser. Vamos ficar de olho nessas áreas. Você pode pular.",
+    "options": {
+      "nausea": "Náusea",
+      "weight": "Peso parado",
+      "side_effects": "Efeitos colaterais",
+      "dose_timing": "Esquecer a dose",
+      "cost": "Custo do tratamento",
+      "appointment": "Lembrar o que falar na consulta",
+      "energy": "Cansaço ou energia baixa",
+      "sleep": "Sono",
+      "mood": "Humor"
+    }
+  },
+  "loading": {
+    "headline": "Estamos organizando seu tratamento.",
+    "subtitle": "Isso leva alguns segundos.",
+    "steps": {
+      "stage": "Identificando o estágio do tratamento",
+      "patterns": "Mapeando padrões esperados pra fase atual",
+      "reminders": "Personalizando lembretes pra sua dose",
+      "memory": "Preparando a memória clínica inicial",
+      "insight": "Criando seu primeiro insight"
+    },
+    "fallback": {
+      "headline": "Pronto.",
+      "subtitle": "Vamos começar."
+    }
+  },
+  "result": {
+    "headline": "Bem-vindo, {{name}}.",
+    "subtitle": "Aqui está o que sabemos do seu tratamento até agora.",
+    "insightFallback": {
+      "treatmentStage": "Você está na semana {{week}} do {{medication}} {{dose}}mg.",
+      "nextDose": "Sua próxima dose recomendada: {{day}}.",
+      "weightGoal": "Meta de peso: {{goal}}kg. Faltam {{delta}}kg.",
+      "support": "Vamos acompanhar isso semana a semana."
+    },
+    "disclaimer": "Isso é uma anotação inteligente, não orientação médica. Sempre fale com um profissional de saúde.",
+    "cta": "Começar a usar"
+  },
   "consent": {
     "title": "Antes de começar",
     "subtitle": "Para usar o Dose Day, precisamos do seu consentimento para processar seus dados de saúde de acordo com a LGPD.",
