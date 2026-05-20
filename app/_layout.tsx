@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@lib/queryClient'
 import { StatusBar } from 'expo-status-bar'
 import Toast from 'react-native-toast-message'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { colors } from '@lib/theme/tokens'
 import { AuthProvider } from '@contexts/AuthContext'
 import { useSession } from '@hooks/useSession'
@@ -86,7 +87,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <StatusBar style="light" />
@@ -100,6 +101,14 @@ export default function RootLayout() {
             >
               <Stack.Screen
                 name="dose/registrar"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+              <Stack.Screen
+                name="peso/historico"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="peso/registrar"
                 options={{ presentation: 'modal', headerShown: false }}
               />
               <Stack.Screen
@@ -119,6 +128,6 @@ export default function RootLayout() {
         </AuthProvider>
       </QueryClientProvider>
       <Toast config={toastConfig} />
-    </>
+    </GestureHandlerRootView>
   )
 }
