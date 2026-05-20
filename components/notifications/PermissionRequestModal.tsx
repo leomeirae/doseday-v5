@@ -67,7 +67,7 @@ export function PermissionRequestModal({ visible, onDismiss }: Props) {
 
           <Text style={styles.title}>Lembre-se da sua dose</Text>
           <Text style={styles.body}>
-            Ative as notificações para que o DoseDay te lembre da dose semanal no horário certo. Nunca mais esqueça.
+            Ative as notificações para receber um lembrete no horário da sua dose semanal.
           </Text>
 
           <Pressable

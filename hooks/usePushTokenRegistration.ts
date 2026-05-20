@@ -21,6 +21,7 @@ async function ensureUserSettingsDefaults(userId: string): Promise<void> {
       notifications_enabled: true,
       notification_time: '20:00:00',
     },
+    // Create defaults only when the row is missing; keep explicit opt-outs intact.
     { onConflict: 'user_id', ignoreDuplicates: true }
   )
 
