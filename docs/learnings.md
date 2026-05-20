@@ -167,3 +167,13 @@ Lista de gaps em `docs/audit/2026-05-19-frontend-paridade.md`.
 **Solução.** Nova Regra 27 anti-pirraça no `CLAUDE.md`: antes de qualquer prompt MID/HIGH de feature nova, Cowork DEVE consultar `docs/audit/2026-05-19-frontend-paridade.md` e confirmar que o gap não está marcado P0/P1. Se está, priorizar o gap antes da feature nova.
 
 **Aprendizado.** (a) Paridade funcional V4 → V5 é pré-condição pra features novas, não item paralelo. Schema Supabase pronto não significa app pronto. (b) Audit de paridade deve ser feito ANTES da primeira onda de prompts de feature em qualquer projeto refactor — não no meio. (c) "App em produção há meses na V4" não significa que features básicas existem na V5 — preciso verificar tela-a-tela. (d) Sequência correta em refactor: paridade primeiro, depois novidades. Sem isso, app fica desbalanceado — feature avançada (push, IA, liquid glass) sem feature básica (onboarding) é pior que sem nenhuma das duas. (e) Audit dura ~30min. Pular o audit custou semanas de prompts focados em features que não conseguem nem ser testadas pelo user real.
+
+## 14.12 Aprendizado 44 — `npm install` pode exigir `--legacy-peer-deps` no Expo 54 + React 19.1
+
+Registrado em 2026-05-20 durante o Prompt 24a (Onboarding Foundation).
+
+**Contexto.** Ao instalar `react-hook-form` e `@hookform/resolvers`, `npm install` falhou antes de resolver os pacotes novos por conflito de peer dependency entre `react-dom@19.2.6` opcional e `react@19.1.0` do Expo/RN.
+
+**Solução.** Repetir o install com `npm install <pacotes> --legacy-peer-deps`, preservando React 19.1.0 e evitando upgrade indireto de `react-dom`.
+
+**Impacto em prompts futuros.** Quando adicionar dependências JS neste projeto e o erro citar `react-dom@19.2.x` vs `react@19.1.0`, usar `--legacy-peer-deps` em vez de `--force` ou upgrade manual de React.
