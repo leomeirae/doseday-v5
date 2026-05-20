@@ -197,3 +197,13 @@ Registrado em 2026-05-20 durante o Prompt 24b (Onboarding telas 1-7).
 **Problema.** O mapper inicial cobria apenas `F → female` e `M → male`; `NB` e `PREFER_NOT` eram enviados literais ao banco e violavam o contrato real da coluna.
 
 **Solução.** Em qualquer enum persistido em Supabase, validar o CHECK constraint real antes de confiar no tipo TS ou no copy do produto. Para `biological_sex`, o contrato canônico app ↔ banco é: `F ↔ female`, `M ↔ male`, `NB ↔ non_binary`, `PREFER_NOT ↔ prefer_not`.
+
+## 14.15 Aprendizado 47 — `user_settings.user_id` agora tem UNIQUE constraint
+
+Registrado em 2026-05-20 antes do PR #25 (fix push notif bugs).
+
+**Contexto.** O fluxo de Push V1 usa `user_settings` como fonte de verdade para `notifications_enabled` e `notification_time`, mas a tabela tinha apenas PK em `id` e FK em `user_id`. Sem constraint unica em `user_id`, `upsert(..., { onConflict: 'user_id' })` nao tinha alvo confiavel.
+
+**Solução.** Cowork aplicou migration com zero duplicatas pre-existentes e adicionou `UNIQUE (user_id)` em `public.user_settings`.
+
+**Impacto em prompts futuros.** `user_settings.user_id` virou UNIQUE constraint em 2026-05-20. `upsert` com `onConflict: 'user_id'` agora e confiavel. Migration via Cowork antes do PR #25 (fix push notif bugs).

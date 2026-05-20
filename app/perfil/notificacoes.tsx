@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  Linking,
   View,
   Text,
   Switch,
@@ -15,6 +16,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSession } from '@hooks/useSession'
 import {
   getPermissionStatus,
+  requestPermissions,
   scheduleTestNotification,
   getAllScheduledDoseNotifications,
   type NotificationPermissionStatus,
@@ -37,9 +39,21 @@ async function getUserSettings(userId: string) {
   }
 }
 
-async function setNotificationsEnabled(userId: string, enabled: boolean): Promise<void> {
+function toDbTime(displayTime: string): string {
+  return displayTime.length === 5 ? `${displayTime}:00` : displayTime
+}
+
+async function setNotificationsEnabled(
+  userId: string,
+  enabled: boolean,
+  notificationTime: string
+): Promise<void> {
   const { error } = await supabase.from('user_settings').upsert(
-    { user_id: userId, notifications_enabled: enabled },
+    {
+      user_id: userId,
+      notifications_enabled: enabled,
+      notification_time: toDbTime(notificationTime),
+    },
     { onConflict: 'user_id' }
   )
   if (error) throw error
@@ -78,7 +92,7 @@ export default function NotificacoesScreen() {
   const { mutate: toggleEnabled } = useMutation({
     mutationFn: (enabled: boolean) => {
       if (!userId) throw new Error('No user')
-      return setNotificationsEnabled(userId, enabled)
+      return setNotificationsEnabled(userId, enabled, settings?.notificationTime ?? '20:00')
     },
     onMutate: async (enabled) => {
       await queryClient.cancelQueries({ queryKey: ['userSettings', userId] })
@@ -89,9 +103,25 @@ export default function NotificacoesScreen() {
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ['userSettings', userId] })
     },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['userSettings', userId] })
+    },
   })
 
+  async function handlePermissionPress() {
+    if (permStatus === 'denied') {
+      await Linking.openSettings()
+      return
+    }
+
+    if (permStatus === 'undetermined') {
+      const status = await requestPermissions()
+      setPermStatus(status)
+    }
+  }
+
   async function handleTestNotification() {
+    if (permStatus !== 'granted') return
     setTestLoading(true)
     try {
       await scheduleTestNotification()
@@ -137,13 +167,47 @@ export default function NotificacoesScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Status card */}
-        <View style={styles.card}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.card,
+            permStatus !== 'granted' && pressed && styles.pressed,
+          ]}
+          onPress={handlePermissionPress}
+          disabled={permStatus === 'granted'}
+          accessibilityRole={permStatus === 'granted' ? undefined : 'button'}
+          accessibilityLabel="Permissão de notificações"
+          accessibilityHint={
+            permStatus === 'denied'
+              ? 'Abre os Ajustes do iOS para reativar notificações'
+              : permStatus === 'undetermined'
+                ? 'Solicita permissão para enviar lembretes de dose'
+                : undefined
+          }
+        >
           <Text style={styles.cardLabel}>STATUS</Text>
           <View style={styles.cardRow}>
-            <Text style={styles.cardRowLabel}>Permissão</Text>
-            <Text style={[styles.cardRowValue, { color: permColor }]}>{permLabel}</Text>
+            <View style={styles.cardRowTextWrap}>
+              <Text style={styles.cardRowLabel}>Permissão</Text>
+              {permStatus !== 'granted' && (
+                <Text style={styles.cardRowHint}>
+                  {permStatus === 'denied'
+                    ? 'Toque para abrir os Ajustes'
+                    : 'Toque para ativar lembretes'}
+                </Text>
+              )}
+            </View>
+            <View style={styles.cardRowTrailing}>
+              <Text style={[styles.cardRowValue, { color: permColor }]}>{permLabel}</Text>
+              {permStatus !== 'granted' && (
+                <SymbolView
+                  name="chevron.right"
+                  size={14}
+                  tintColor={colors.textTertiary}
+                />
+              )}
+            </View>
           </View>
-        </View>
+        </Pressable>
 
         {/* Toggle master switch */}
         {isLoading ? (
@@ -194,14 +258,23 @@ export default function NotificacoesScreen() {
           </Text>
         </View>
 
-        {/* Test notification button */}
-        {permStatus === 'granted' && (
+        {/* Test notification */}
+        <View style={styles.card}>
+          <Text style={styles.cardLabel}>TESTE</Text>
+          <Text style={styles.cardRowHint}>
+            Envia uma notificação local em 5 segundos para confirmar que o lembrete chega.
+          </Text>
           <Pressable
-            style={({ pressed }) => [styles.testButton, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.testButton,
+              permStatus !== 'granted' && styles.testButtonDisabled,
+              pressed && permStatus === 'granted' && styles.pressed,
+            ]}
             onPress={handleTestNotification}
-            disabled={testLoading}
+            disabled={testLoading || permStatus !== 'granted'}
             accessibilityRole="button"
             accessibilityLabel="Testar notificação"
+            accessibilityHint="Agenda uma notificação de teste para daqui a 5 segundos"
           >
             {testLoading ? (
               <ActivityIndicator size="small" color={colors.semanticInfo} />
@@ -212,7 +285,7 @@ export default function NotificacoesScreen() {
               </>
             )}
           </Pressable>
-        )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   )
@@ -258,6 +331,11 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   cardRowTextWrap: { flex: 1, gap: spacing.xxs, marginRight: spacing.sm },
+  cardRowTrailing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   cardRowLabel: { ...typography.body, color: textPrimary },
   cardRowHint: { ...typography.caption, color: textSecondary },
   cardRowValue: { ...typography.body, color: textSecondary },
@@ -276,6 +354,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: `${semanticInfo}30`,
     paddingVertical: spacing.md,
+  },
+  testButtonDisabled: {
+    opacity: 0.45,
   },
   testButtonLabel: { ...typography.label, color: semanticInfo },
   pressed: { opacity: 0.7 },

@@ -19,7 +19,6 @@ import { TextField } from '@components/ui/TextField'
 import { AuthButton } from '@components/ui/AuthButton'
 import { useProfile } from '@hooks/useProfile'
 import { useRegisterDose } from '@hooks/useRegisterDose'
-import { useDoseSummary } from '@hooks/useDoseSummary'
 import { showSuccessToast, showErrorToast } from '@lib/utils/showToast'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 import { format } from 'date-fns'
@@ -37,7 +36,6 @@ import { PermissionRequestModal } from '@components/notifications/PermissionRequ
 export default function RegistrarDoseScreen() {
   const router = useRouter()
   const { data: profile } = useProfile()
-  const { data: doseSummary } = useDoseSummary()
   const { mutate, isPending } = useRegisterDose()
   const [showPermissionModal, setShowPermissionModal] = useState(false)
 
@@ -85,10 +83,10 @@ export default function RegistrarDoseScreen() {
       onSuccess: async () => {
         showSuccessToast('Dose registrada')
 
-        // Trigger permission modal on first dose if permission not yet determined
-        const isFirstDose = (doseSummary?.history.length ?? 0) === 0
+        // Trigger after a saved dose while the user has not seen the permission modal.
+        // This keeps the first-dose flow and also catches existing users with dose history.
         const hasSeenModal = profile?.hasSeenPushPermissionModal ?? false
-        if (isFirstDose && !hasSeenModal) {
+        if (!hasSeenModal) {
           const status = await getPermissionStatus()
           if (status === 'undetermined') {
             setShowPermissionModal(true)
