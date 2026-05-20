@@ -198,7 +198,17 @@ Registrado em 2026-05-20 durante o Prompt 24b (Onboarding telas 1-7).
 
 **Solução.** Em qualquer enum persistido em Supabase, validar o CHECK constraint real antes de confiar no tipo TS ou no copy do produto. Para `biological_sex`, o contrato canônico app ↔ banco é: `F ↔ female`, `M ↔ male`, `NB ↔ non_binary`, `PREFER_NOT ↔ prefer_not`.
 
-## 14.15 Aprendizado 47 — `recordConsent` quebrava a conclusão do onboarding (CHECK constraint)
+## 14.15 Aprendizado 47 — `user_settings.user_id` agora tem UNIQUE constraint
+
+Registrado em 2026-05-20 antes do PR #25 (fix push notif bugs).
+
+**Contexto.** O fluxo de Push V1 usa `user_settings` como fonte de verdade para `notifications_enabled` e `notification_time`, mas a tabela tinha apenas PK em `id` e FK em `user_id`. Sem constraint unica em `user_id`, `upsert(..., { onConflict: 'user_id' })` nao tinha alvo confiavel.
+
+**Solução.** Cowork aplicou migration com zero duplicatas pre-existentes e adicionou `UNIQUE (user_id)` em `public.user_settings`.
+
+**Impacto em prompts futuros.** `user_settings.user_id` virou UNIQUE constraint em 2026-05-20. `upsert` com `onConflict: 'user_id'` agora e confiavel. Migration via Cowork antes do PR #25 (fix push notif bugs).
+
+## 14.16 Aprendizado 48 — `recordConsent` quebrava a conclusão do onboarding (CHECK constraint)
 
 Registrado em 2026-05-20 durante o Prompt 24c (Onboarding telas 8-14 + Loading IA).
 
@@ -210,7 +220,7 @@ Registrado em 2026-05-20 durante o Prompt 24c (Onboarding telas 8-14 + Loading I
 
 **Impacto em prompts futuros.** (a) É a segunda vez que um enum não-validado de 24a quebra produção (ver #46) — auditar TODO `consent_type`/enum persistido contra o CHECK real. (b) `complete()` engole o erro real do Supabase: ao depurar falhas de escrita, logar `JSON.stringify(error)` ou inspecionar o PostgrestError diretamente, não confiar na mensagem reembalada.
 
-## 14.16 Aprendizado 48 — Edge Function de insight do onboarding já existia
+## 14.17 Aprendizado 49 — Edge Function de insight do onboarding já existia
 
 Registrado em 2026-05-20 durante o Prompt 24c.
 
