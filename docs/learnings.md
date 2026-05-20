@@ -229,3 +229,13 @@ Registrado em 2026-05-20 durante o Prompt 24c.
 **Achado (MCP `get_edge_function`).** Já existe `generate-onboarding-insight` dedicada (ativa, v4). Contrato: body `EducationalInsightContext` `{medication, dose_mg, treatment_week, current_weight, initial_weight, goal_weight}` → `{headline, body, disclaimer}`. Usa `auth.getUser()` — sem o bug `user_profiles.id`.
 
 **Impacto.** Validar Edge Functions existentes via `list_edge_functions` + `get_edge_function` ANTES de seguir o payload assumido por um prompt — o prompt pode estar desatualizado em relação ao backend.
+
+## 14.18 Aprendizado 50 — `weight_logs` usa UNIQUE por usuario e data clinica
+
+Registrado em 2026-05-20 durante o Prompt 27 (Tela de Peso Dedicada).
+
+**Contexto.** A tela dedicada de peso registra um peso por data clinica em `weight_logs` e precisa permitir "registrar de novo no mesmo dia" como atualizacao do registro existente, nao duplicata.
+
+**Solução.** A constraint `weight_logs_user_id_date_unique` esta ativa como `UNIQUE (user_id, date)`. Queries de peso devem usar `upsert(..., { onConflict: 'user_id,date' })` para adicionar/substituir o registro do dia e manter parsing date-only local ao meio-dia para display.
+
+**Impacto em prompts futuros.** Qualquer feature que escreva peso deve reutilizar o contrato `user_id + date` e nunca criar deduplicacao manual no frontend. Em dev client Expo, ao adicionar `react-native-gesture-handler`, reconstruir com `npx expo run:ios`; apenas recarregar Metro deixa o app sem `RNGestureHandlerModule`.
