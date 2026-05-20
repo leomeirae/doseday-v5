@@ -1,24 +1,43 @@
+import { useEffect } from 'react'
+import { useRouter, type Href } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { View, Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors, spacing, typography } from '@lib/theme/tokens'
 import { useOnboarding } from '@contexts/OnboardingContext'
 import { getOnboardingStepNumber } from '@lib/validation/onboardingSchemas'
-import { ONBOARDING_STEPS } from '@lib/types/onboarding'
+import { ONBOARDING_STEPS, type OnboardingStep } from '@lib/types/onboarding'
+
+const IMPLEMENTED_ROUTES: Partial<Record<OnboardingStep, Href>> = {
+  welcome: '/(onboarding)/welcome' as Href,
+  'personal-info': '/(onboarding)/personal-info' as Href,
+  weight: '/(onboarding)/weight' as Href,
+  'goal-weight': '/(onboarding)/goal-weight' as Href,
+  'treatment-status': '/(onboarding)/treatment-status' as Href,
+  'treatment-duration': '/(onboarding)/treatment-duration' as Href,
+  medication: '/(onboarding)/medication' as Href,
+}
 
 export default function OnboardingIndexScreen() {
-  const { currentStep } = useOnboarding()
+  const { t } = useTranslation('onboarding')
+  const { state, currentStep } = useOnboarding()
+  const router = useRouter()
   const stepNumber = getOnboardingStepNumber(currentStep)
+
+  useEffect(() => {
+    if (!state.isHydrated) return
+    const route = IMPLEMENTED_ROUTES[currentStep]
+    if (route) router.replace(route)
+  }, [currentStep, router, state.isHydrated])
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.container}>
         <Text style={styles.kicker}>
-          Passo {stepNumber} de {ONBOARDING_STEPS.length}
+          {t('progress.step', { current: stepNumber, total: ONBOARDING_STEPS.length })}
         </Text>
-        <Text style={styles.title}>Boas-vindas</Text>
-        <Text style={styles.body}>
-          Vamos preparar sua memória do tratamento antes de entrar no app.
-        </Text>
+        <Text style={styles.title}>{t('welcome.headline')}</Text>
+        <Text style={styles.body}>{t('welcome.body')}</Text>
       </View>
     </SafeAreaView>
   )

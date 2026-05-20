@@ -1,6 +1,5 @@
 import { supabase } from '@lib/supabase/client'
 import {
-  BIOLOGICAL_SEX_OPTIONS,
   CONCERN_OPTIONS,
   MEDICAL_SUPPORT_OPTIONS,
   MEDICATION_OPTIONS,
@@ -58,17 +57,40 @@ function isConcern(value: string): value is OnboardingConcern {
   return CONCERN_OPTIONS.includes(value as OnboardingConcern)
 }
 
+function mapBiologicalSexFromDatabase(value: string | null): BiologicalSex | null {
+  if (value === 'female') return 'F'
+  if (value === 'male') return 'M'
+  if (value === 'non_binary') return 'NB'
+  if (value === 'prefer_not') return 'PREFER_NOT'
+  return null
+}
+
+function mapBiologicalSexToDatabase(value: BiologicalSex): string {
+  if (value === 'F') return 'female'
+  if (value === 'M') return 'male'
+  if (value === 'NB') return 'non_binary'
+  if (value === 'PREFER_NOT') return 'prefer_not'
+  return value
+}
+
+function mapHeightFromDatabase(value: number): number {
+  return value < 3 ? Math.round(value * 100) : value
+}
+
+function mapHeightToDatabase(value: number): number {
+  return value > 3 ? value / 100 : value
+}
+
 function mapProfileToOnboardingData(profile: OnboardingProfileRow): Partial<OnboardingData> {
   const data: Partial<OnboardingData> = {}
 
   if (profile.full_name !== null) data.full_name = profile.full_name
   if (profile.age !== null) data.age = profile.age
-  if (isOneOf<BiologicalSex>(profile.biological_sex, BIOLOGICAL_SEX_OPTIONS)) {
-    data.biological_sex = profile.biological_sex
-  }
+  const biologicalSex = mapBiologicalSexFromDatabase(profile.biological_sex)
+  if (biologicalSex !== null) data.biological_sex = biologicalSex
   if (profile.initial_weight !== null) data.initial_weight = Number(profile.initial_weight)
   if (profile.current_weight !== null) data.current_weight = Number(profile.current_weight)
-  if (profile.height !== null) data.height = profile.height
+  if (profile.height !== null) data.height = mapHeightFromDatabase(profile.height)
   if (profile.goal_weight !== null) data.goal_weight = Number(profile.goal_weight)
   if (isOneOf<TreatmentStatus>(profile.treatment_status, TREATMENT_STATUS_OPTIONS)) {
     data.treatment_status = profile.treatment_status
@@ -98,10 +120,12 @@ function toProfileUpdate(data: Partial<PersistableOnboardingData>): UserProfileU
 
   if (data.full_name !== undefined) update.full_name = data.full_name.trim()
   if (data.age !== undefined) update.age = data.age
-  if (data.biological_sex !== undefined) update.biological_sex = data.biological_sex
+  if (data.biological_sex !== undefined) {
+    update.biological_sex = mapBiologicalSexToDatabase(data.biological_sex)
+  }
   if (data.initial_weight !== undefined) update.initial_weight = data.initial_weight
   if (data.current_weight !== undefined) update.current_weight = data.current_weight
-  if (data.height !== undefined) update.height = data.height
+  if (data.height !== undefined) update.height = mapHeightToDatabase(data.height)
   if (data.goal_weight !== undefined) update.goal_weight = data.goal_weight
   if (data.treatment_status !== undefined) update.treatment_status = data.treatment_status
   if (data.treatment_duration !== undefined) {
