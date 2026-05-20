@@ -1,23 +1,23 @@
 import { useState } from 'react'
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native'
+import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
-import { colors, typography, spacing, radius } from '@lib/theme/tokens'
-import { AuthButton } from '@components/ui/AuthButton'
+import { useTranslation } from 'react-i18next'
+import { colors, typography, spacing } from '@lib/theme/tokens'
 import { signOut } from '@lib/supabase/auth'
-import { useSession } from '@hooks/useSession'
+import { SettingsSection } from '@components/perfil/SettingsSection'
+import { SettingsRow } from '@components/perfil/SettingsRow'
 
 export default function PerfilScreen() {
-  const { session } = useSession()
   const router = useRouter()
+  const { t } = useTranslation('settings')
   const [loadingSignOut, setLoadingSignOut] = useState(false)
 
   async function handleSignOut() {
     setLoadingSignOut(true)
     try {
       await signOut()
-      // Guard global in _layout.tsx detects session: null and redirects automatically
+      // Auth guard in _layout.tsx detects session: null and redirects automatically
     } finally {
       setLoadingSignOut(false)
     }
@@ -32,40 +32,55 @@ export default function PerfilScreen() {
       >
         <Text style={styles.headline}>Perfil</Text>
 
-        <View
-          style={styles.card}
-          accessibilityLabel={`Conta: ${session?.user.email ?? ''}`}
-        >
-          <Text style={styles.cardLabel}>Conta</Text>
-          <Text style={styles.cardEmail} testID="perfil-email" numberOfLines={1}>
-            {session?.user.email ?? ''}
-          </Text>
-        </View>
-
-        {/* Notificações row */}
-        <Pressable
-          style={({ pressed }) => [styles.notifRow, pressed && styles.notifRowPressed]}
-          onPress={() => router.push('/perfil/notificacoes')}
-          accessibilityRole="button"
-          accessibilityLabel="Configurações de Notificações"
-        >
-          <View style={styles.notifRowLeft}>
-            <SymbolView name="bell.fill" size={18} tintColor={colors.semanticInfo} />
-            <Text style={styles.notifRowLabel}>Notificações</Text>
+        {/* PERFIL DE SAÚDE — placeholder, rows ativas em prompts futuros */}
+        <SettingsSection title={t('sections.healthProfile')}>
+          <View style={styles.placeholder}>
+            <Text style={styles.placeholderText}>Em breve</Text>
           </View>
-          <SymbolView name="chevron.right" size={14} tintColor={colors.textTertiary} />
-        </Pressable>
+        </SettingsSection>
 
-        <View style={styles.spacer} />
+        {/* PREFERÊNCIAS */}
+        <SettingsSection title={t('sections.preferences')}>
+          <SettingsRow
+            icon="bell.fill"
+            iconColor={colors.semanticInfo}
+            label={t('preferences.notifications')}
+            onPress={() => router.push('/perfil/notificacoes')}
+            isLast
+            accessibilityLabel="Configurações de Notificações"
+            testID="perfil-row-notificacoes"
+          />
+        </SettingsSection>
 
-        <AuthButton
-          variant="secondary"
-          label="Sair"
-          onPress={handleSignOut}
-          loading={loadingSignOut}
-          accessibilityLabel="Sair da conta"
-          testID="perfil-signout-button"
-        />
+        {/* SOBRE — placeholder, rows ativas em prompts futuros */}
+        <SettingsSection title={t('sections.about')}>
+          <View style={styles.placeholder}>
+            <Text style={styles.placeholderText}>Em breve</Text>
+          </View>
+        </SettingsSection>
+
+        {/* CONTA */}
+        <SettingsSection title={t('sections.account')}>
+          <SettingsRow
+            icon="person.circle.fill"
+            iconColor={colors.textSecondary}
+            label={t('account.accountSettings')}
+            onPress={() => router.push('/perfil/account')}
+            accessibilityLabel="Configurações da conta"
+            testID="perfil-row-conta"
+          />
+          <SettingsRow
+            icon="rectangle.portrait.and.arrow.right"
+            iconColor={colors.semanticCritical}
+            label={loadingSignOut ? 'Saindo...' : t('account.signOut.confirm')}
+            onPress={handleSignOut}
+            showChevron={false}
+            disabled={loadingSignOut}
+            isLast
+            accessibilityLabel="Sair da conta"
+            testID="perfil-signout-button"
+          />
+        </SettingsSection>
       </ScrollView>
     </SafeAreaView>
   )
@@ -76,9 +91,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bgBase,
   },
-  flex: {
-    flex: 1,
-  },
+  flex: { flex: 1 },
   content: {
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
@@ -90,44 +103,12 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginBottom: spacing.lg,
   },
-  card: {
-    backgroundColor: colors.bgElevated,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    gap: spacing.xs,
-  },
-  cardLabel: {
-    ...typography.label,
-    color: colors.textSecondary,
-  },
-  cardEmail: {
-    ...typography.body,
-    color: colors.textPrimary,
-  },
-  spacer: {
-    flex: 1,
-    minHeight: spacing.xxl,
-  },
-  notifRow: {
-    backgroundColor: colors.bgElevated,
-    borderRadius: radius.md,
+  placeholder: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: spacing.sm,
   },
-  notifRowPressed: {
-    opacity: 0.75,
-  },
-  notifRowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  notifRowLabel: {
+  placeholderText: {
     ...typography.body,
-    color: colors.textPrimary,
+    color: colors.textTertiary,
   },
 })

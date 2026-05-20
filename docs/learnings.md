@@ -239,3 +239,15 @@ Registrado em 2026-05-20 durante o Prompt 27 (Tela de Peso Dedicada).
 **Solução.** A constraint `weight_logs_user_id_date_unique` esta ativa como `UNIQUE (user_id, date)`. Queries de peso devem usar `upsert(..., { onConflict: 'user_id,date' })` para adicionar/substituir o registro do dia e manter parsing date-only local ao meio-dia para display.
 
 **Impacto em prompts futuros.** Qualquer feature que escreva peso deve reutilizar o contrato `user_id + date` e nunca criar deduplicacao manual no frontend. Em dev client Expo, ao adicionar `react-native-gesture-handler`, reconstruir com `npx expo run:ios`; apenas recarregar Metro deixa o app sem `RNGestureHandlerModule`.
+
+## 14.19 Aprendizado 51 — settings.json contém deleteAccount legado V4 (copy dramático obsoleto)
+
+Registrado em 2026-05-20 durante o Prompt 29 (Perfil Menu + Account Settings).
+
+**Contexto.** Ao criar `locales/pt-BR/account.json` com copy sóbrio alinhado ao PRODUCT.md Voice & Tone, foi identificado que `locales/pt-BR/settings.json` já contém `account.deleteAccount.*` com copy da V4: emojis ⚠️, "IRREVERSÍVEL" em caps lock, "NÃO PODE ser desfeita" — violando os 5 adjetivos do Brand Personality e o vocabulário-âncora anti-dramático do PRODUCT.md.
+
+**Situação atual.** As keys `settings:account.deleteAccount.*` estão orphaned (nenhuma tela ativa as usa no Prompt 29). O copy novo sóbrio ficou em `account:delete.*`.
+
+**Follow-up V2 (fora de escopo do PR 29):** Em prompt futuro de polish i18n, remover `account.deleteAccount`, `account.firstAlert`, `account.secondAlert`, `account.success` de `settings.json` (pt-BR + en + es). Essas keys são dead weight da V4.
+
+**Impacto em prompts futuros.** Antes de criar novo namespace i18n, grep por `settings.json` para identificar keys existentes que podem estar duplicando ou usando copy legado incompatível com PRODUCT.md.
