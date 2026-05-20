@@ -15,9 +15,9 @@ export default function OnboardingIndexScreen() {
         <Text style={styles.kicker}>
           Passo {stepNumber} de {ONBOARDING_STEPS.length}
         </Text>
-        <Text style={styles.title}>Onboarding</Text>
+        <Text style={styles.title}>Boas-vindas</Text>
         <Text style={styles.body}>
-          A fundação do fluxo já está pronta. As telas de captura entram nos próximos prompts.
+          Vamos preparar sua memória do tratamento antes de entrar no app.
         </Text>
       </View>
     </SafeAreaView>

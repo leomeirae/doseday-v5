@@ -101,7 +101,12 @@ function getFirstIncompleteStep(completedSteps: Set<OnboardingStep>): Onboarding
 
 function inferCompletedSteps(data: Partial<OnboardingData>): Set<OnboardingStep> {
   const completedSteps = new Set<OnboardingStep>()
-  completedSteps.add('welcome')
+  const hasAnyProgress = Object.values(data).some((value) => {
+    if (Array.isArray(value)) return value.length > 0
+    return value !== undefined && value !== null && value !== ''
+  })
+
+  if (hasAnyProgress) completedSteps.add('welcome')
 
   if (data.full_name && data.age && data.biological_sex) {
     completedSteps.add('personal-info')
