@@ -177,3 +177,13 @@ Registrado em 2026-05-20 durante o Prompt 24a (Onboarding Foundation).
 **Solução.** Repetir o install com `npm install <pacotes> --legacy-peer-deps`, preservando React 19.1.0 e evitando upgrade indireto de `react-dom`.
 
 **Impacto em prompts futuros.** Quando adicionar dependências JS neste projeto e o erro citar `react-dom@19.2.x` vs `react@19.1.0`, usar `--legacy-peer-deps` em vez de `--force` ou upgrade manual de React.
+
+## 14.13 Aprendizado 45 — Onboarding V4/V5 tem unidades legadas no banco
+
+Registrado em 2026-05-20 durante o Prompt 24b (Onboarding telas 1-7).
+
+**Contexto.** A foundation 24a modelou o app com `biological_sex` em códigos clínicos (`F`, `M`, `NB`, `PREFER_NOT`) e `height` em centímetros, mas o banco atual ainda valida `user_profiles.biological_sex` como `female`/`male` e `height` como metros.
+
+**Solução.** Até haver migration canônica, a camada `lib/supabase/queries/onboarding.ts` deve mapear app ↔ banco: `F/M` para `female/male` ao persistir e `female/male` para `F/M` ao hidratar; altura `165` no app vira `1.65` no Supabase e volta como `165`.
+
+**Impacto em prompts futuros.** Ao implementar telas 8-14 ou relatórios que consumam onboarding, validar unidade/enum real do Supabase antes de assumir que o schema TypeScript reflete o contrato de produto.
