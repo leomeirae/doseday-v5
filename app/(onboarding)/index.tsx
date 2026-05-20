@@ -16,6 +16,13 @@ const IMPLEMENTED_ROUTES: Partial<Record<OnboardingStep, Href>> = {
   'treatment-status': '/(onboarding)/treatment-status' as Href,
   'treatment-duration': '/(onboarding)/treatment-duration' as Href,
   medication: '/(onboarding)/medication' as Href,
+  dose: '/(onboarding)/dose' as Href,
+  'doctor-name': '/(onboarding)/doctor-name' as Href,
+  'medical-support': '/(onboarding)/medical-support' as Href,
+  concerns: '/(onboarding)/concerns' as Href,
+  consent: '/(onboarding)/consent' as Href,
+  loading: '/(onboarding)/loading' as Href,
+  result: '/(onboarding)/result' as Href,
 }
 
 export default function OnboardingIndexScreen() {

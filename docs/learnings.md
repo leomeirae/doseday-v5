@@ -208,7 +208,29 @@ Registrado em 2026-05-20 antes do PR #25 (fix push notif bugs).
 
 **Impacto em prompts futuros.** `user_settings.user_id` virou UNIQUE constraint em 2026-05-20. `upsert` com `onConflict: 'user_id'` agora e confiavel. Migration via Cowork antes do PR #25 (fix push notif bugs).
 
-## 14.16 Aprendizado 48 — `weight_logs` usa UNIQUE por usuario e data clinica
+## 14.16 Aprendizado 48 — `recordConsent` quebrava a conclusão do onboarding (CHECK constraint)
+
+Registrado em 2026-05-20 durante o Prompt 24c (Onboarding telas 8-14 + Loading IA).
+
+**Contexto.** A foundation 24a criou `recordConsent` em `lib/supabase/queries/onboarding.ts` inserindo `consent_history` com `consent_type='onboarding_lgpd'`. A coluna `consent_history.consent_type` tem CHECK `('terms','privacy','data_collection')`.
+
+**Problema.** P0 — `'onboarding_lgpd'` violava o CHECK. `complete()` chama `recordConsent` quando `consent_given=true`; o INSERT falhava, a exceção interrompia `completeOnboarding`, e `onboarding_completed_at` nunca era gravado. **Resultado: nenhum usuário conseguia concluir o onboarding.** O bug ficou mascarado porque `complete()` reembala erros não-`Error` (PostgrestError é objeto puro) como genérico "Erro ao concluir onboarding".
+
+**Solução.** `recordConsent` agora insere duas linhas válidas — `terms` e `privacy` — refletindo que o consentimento do onboarding cobre Termos + Política de Privacidade.
+
+**Impacto em prompts futuros.** (a) É a segunda vez que um enum não-validado de 24a quebra produção (ver #46) — auditar TODO `consent_type`/enum persistido contra o CHECK real. (b) `complete()` engole o erro real do Supabase: ao depurar falhas de escrita, logar `JSON.stringify(error)` ou inspecionar o PostgrestError diretamente, não confiar na mensagem reembalada.
+
+## 14.17 Aprendizado 49 — Edge Function de insight do onboarding já existia
+
+Registrado em 2026-05-20 durante o Prompt 24c.
+
+**Contexto.** O prompt 24c assumia invocar `memory-daily-insight` com payload `{userId, onboardingData, requestType}` e alertava sobre um bug `user_profiles.id`.
+
+**Achado (MCP `get_edge_function`).** Já existe `generate-onboarding-insight` dedicada (ativa, v4). Contrato: body `EducationalInsightContext` `{medication, dose_mg, treatment_week, current_weight, initial_weight, goal_weight}` → `{headline, body, disclaimer}`. Usa `auth.getUser()` — sem o bug `user_profiles.id`.
+
+**Impacto.** Validar Edge Functions existentes via `list_edge_functions` + `get_edge_function` ANTES de seguir o payload assumido por um prompt — o prompt pode estar desatualizado em relação ao backend.
+
+## 14.18 Aprendizado 50 — `weight_logs` usa UNIQUE por usuario e data clinica
 
 Registrado em 2026-05-20 durante o Prompt 27 (Tela de Peso Dedicada).
 
