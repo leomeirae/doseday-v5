@@ -1,6 +1,5 @@
 import { supabase } from '@lib/supabase/client'
 import {
-  BIOLOGICAL_SEX_OPTIONS,
   CONCERN_OPTIONS,
   MEDICAL_SUPPORT_OPTIONS,
   MEDICATION_OPTIONS,
@@ -61,12 +60,16 @@ function isConcern(value: string): value is OnboardingConcern {
 function mapBiologicalSexFromDatabase(value: string | null): BiologicalSex | null {
   if (value === 'female') return 'F'
   if (value === 'male') return 'M'
-  return isOneOf<BiologicalSex>(value, BIOLOGICAL_SEX_OPTIONS) ? value : null
+  if (value === 'non_binary') return 'NB'
+  if (value === 'prefer_not') return 'PREFER_NOT'
+  return null
 }
 
 function mapBiologicalSexToDatabase(value: BiologicalSex): string {
   if (value === 'F') return 'female'
   if (value === 'M') return 'male'
+  if (value === 'NB') return 'non_binary'
+  if (value === 'PREFER_NOT') return 'prefer_not'
   return value
 }
 
