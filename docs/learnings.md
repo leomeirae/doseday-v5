@@ -207,3 +207,13 @@ Registrado em 2026-05-20 antes do PR #25 (fix push notif bugs).
 **Solução.** Cowork aplicou migration com zero duplicatas pre-existentes e adicionou `UNIQUE (user_id)` em `public.user_settings`.
 
 **Impacto em prompts futuros.** `user_settings.user_id` virou UNIQUE constraint em 2026-05-20. `upsert` com `onConflict: 'user_id'` agora e confiavel. Migration via Cowork antes do PR #25 (fix push notif bugs).
+
+## 14.16 Aprendizado 48 — `weight_logs` usa UNIQUE por usuario e data clinica
+
+Registrado em 2026-05-20 durante o Prompt 27 (Tela de Peso Dedicada).
+
+**Contexto.** A tela dedicada de peso registra um peso por data clinica em `weight_logs` e precisa permitir "registrar de novo no mesmo dia" como atualizacao do registro existente, nao duplicata.
+
+**Solução.** A constraint `weight_logs_user_id_date_unique` esta ativa como `UNIQUE (user_id, date)`. Queries de peso devem usar `upsert(..., { onConflict: 'user_id,date' })` para adicionar/substituir o registro do dia e manter parsing date-only local ao meio-dia para display.
+
+**Impacto em prompts futuros.** Qualquer feature que escreva peso deve reutilizar o contrato `user_id + date` e nunca criar deduplicacao manual no frontend. Em dev client Expo, ao adicionar `react-native-gesture-handler`, reconstruir com `npx expo run:ios`; apenas recarregar Metro deixa o app sem `RNGestureHandlerModule`.

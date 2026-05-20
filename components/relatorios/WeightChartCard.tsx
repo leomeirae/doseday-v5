@@ -1,7 +1,9 @@
-import { Text, View, StyleSheet, useWindowDimensions } from 'react-native'
+import { Pressable, Text, View, StyleSheet, useWindowDimensions } from 'react-native'
 import { LineChart } from 'react-native-gifted-charts'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useRouter, type Href } from 'expo-router'
+import { SymbolView } from 'expo-symbols'
 import { colors, elevation, radius, spacing, typography } from '@lib/theme/tokens'
 import type { WeightPoint } from '@lib/supabase/queries/reports'
 import { ChartEmptyState } from './ChartEmptyState'
@@ -14,6 +16,7 @@ type Props = {
 }
 
 export function WeightChartCard({ data, isLoading, error, onRetry }: Props) {
+  const router = useRouter()
   const { width } = useWindowDimensions()
   const chartWidth = Math.min(width - spacing.lg * 4, 328)
 
@@ -30,16 +33,21 @@ export function WeightChartCard({ data, isLoading, error, onRetry }: Props) {
   }))
 
   return (
-    <View
-      style={styles.card}
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && !error && styles.cardPressed]}
+      onPress={() => router.push('/peso/historico' as Href)}
+      disabled={!!error}
       accessible
+      accessibilityRole="button"
       accessibilityLabel={latest ? `Peso atual ${latest.weight.toFixed(1)} quilos` : 'Peso ao longo do tempo'}
+      accessibilityHint="Toque para ver histórico completo"
     >
       <View style={styles.headerRow}>
         <View>
           <Text style={styles.title}>Peso</Text>
           <Text style={styles.period}>Últimos 90 dias</Text>
         </View>
+        <SymbolView name="chevron.right" size={16} tintColor={colors.textTertiary} />
       </View>
 
       {isLoading && <View style={styles.skeleton} />}
@@ -107,7 +115,7 @@ export function WeightChartCard({ data, isLoading, error, onRetry }: Props) {
           )}
         </>
       )}
-    </View>
+    </Pressable>
   )
 }
 
@@ -131,6 +139,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.10)',
     marginBottom: spacing.md,
     ...elevation[1],
+  },
+  cardPressed: {
+    opacity: 0.86,
   },
   headerRow: {
     flexDirection: 'row',
