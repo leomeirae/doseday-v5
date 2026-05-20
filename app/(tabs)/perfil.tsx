@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
@@ -14,7 +14,7 @@ export default function PerfilScreen() {
   const { t } = useTranslation('settings')
   const [loadingSignOut, setLoadingSignOut] = useState(false)
 
-  async function handleSignOut() {
+  async function doSignOut() {
     setLoadingSignOut(true)
     try {
       await signOut()
@@ -22,6 +22,17 @@ export default function PerfilScreen() {
     } finally {
       setLoadingSignOut(false)
     }
+  }
+
+  function handleSignOut() {
+    Alert.alert(
+      t('account.signOut.title'),
+      t('account.signOut.message'),
+      [
+        { text: t('account.signOut.cancel'), style: 'cancel' },
+        { text: t('account.signOut.confirm'), onPress: doSignOut },
+      ]
+    )
   }
 
   return (
