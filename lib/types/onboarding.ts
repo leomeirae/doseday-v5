@@ -76,11 +76,14 @@ export type MedicalSupport = (typeof MEDICAL_SUPPORT_OPTIONS)[number]
 
 export const CONCERN_OPTIONS = [
   'nausea',
-  'side-effects',
+  'weight',
+  'side_effects',
+  'dose_timing',
   'cost',
-  'routine',
-  'weight-plateau',
-  'medical-follow-up',
+  'appointment',
+  'energy',
+  'sleep',
+  'mood',
 ] as const
 export type OnboardingConcern = (typeof CONCERN_OPTIONS)[number]
 

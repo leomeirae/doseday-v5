@@ -43,12 +43,6 @@ export type OnboardingProgress = {
   data: Partial<OnboardingData>
 }
 
-type ConsentInput = {
-  consentType?: string
-  version?: string
-  granted?: boolean
-}
-
 function isOneOf<T extends string>(value: string | null, options: readonly T[]): value is T {
   return value !== null && options.includes(value as T)
 }
@@ -201,17 +195,16 @@ export async function completeOnboarding(userId: string): Promise<void> {
   if (error) throw error
 }
 
-export async function recordConsent(
-  userId: string,
-  input: ConsentInput = {}
-): Promise<void> {
-  const row: ConsentHistoryInsert = {
-    user_id: userId,
-    consent_type: input.consentType ?? 'onboarding_lgpd',
-    version: input.version ?? 'v1',
-    granted: input.granted ?? true,
-  }
+// O consentimento LGPD do onboarding cobre Termos de Uso + Política de
+// Privacidade. A coluna consent_type tem CHECK ('terms','privacy','data_collection');
+// por isso registramos uma linha para cada tipo aceito.
+export async function recordConsent(userId: string): Promise<void> {
+  const version = '1.0'
+  const rows: ConsentHistoryInsert[] = [
+    { user_id: userId, consent_type: 'terms', version, granted: true },
+    { user_id: userId, consent_type: 'privacy', version, granted: true },
+  ]
 
-  const { error } = await supabase.from('consent_history').insert(row)
+  const { error } = await supabase.from('consent_history').insert(rows)
   if (error) throw error
 }

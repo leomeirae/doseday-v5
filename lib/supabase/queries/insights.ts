@@ -42,6 +42,27 @@ export async function callGenerateCheckinInsight(
   return data
 }
 
+export type GenerateOnboardingInsightInput = {
+  medication: string | null
+  dose_mg: number | null
+  treatment_week: number | null
+  current_weight: number | null
+  initial_weight: number | null
+  goal_weight: number | null
+}
+
+export async function callGenerateOnboardingInsight(
+  input: GenerateOnboardingInsightInput
+): Promise<CheckinInsightOutput> {
+  const { data, error } = await supabase.functions.invoke<CheckinInsightOutput>(
+    'generate-onboarding-insight',
+    { body: input }
+  )
+  if (error) throw error
+  if (!data) throw new Error('Empty response from generate-onboarding-insight')
+  return data
+}
+
 export async function callMemoryDailyInsight(): Promise<DailyInsightResponse> {
   const { data, error } = await supabase.functions.invoke<{
     id?: string | null
