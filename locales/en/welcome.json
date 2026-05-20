@@ -1,0 +1,26 @@
+{
+  "slides": [
+    {
+      "headline": "Your treatment memory.",
+      "body": "Track how each week goes. DoseDay organizes what matters so you can remember it later."
+    },
+    {
+      "headline": "Ready for your appointment.",
+      "body": "No more arriving at the clinic without remembering the month. We generate a clear report for you to bring."
+    },
+    {
+      "headline": "Let's begin.",
+      "body": "In a few minutes, DoseDay learns about you and prepares your treatment space."
+    }
+  ],
+  "actions": {
+    "createAccount": "Create account",
+    "signIn": "I already have an account"
+  },
+  "accessibility": {
+    "slide": "Screen {{current}} of {{total}}",
+    "createAccountHint": "Marks the introduction as seen and opens sign up",
+    "signInHint": "Marks the introduction as seen and opens sign in",
+    "pageIndicator": "Go to screen {{index}}"
+  }
+}

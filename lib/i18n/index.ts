@@ -17,7 +17,7 @@ import ptBRSettings from '../../locales/pt-BR/settings.json'
 import ptBRSubscription from '../../locales/pt-BR/subscription.json'
 import ptBRWeight from '../../locales/pt-BR/weight.json'
 import ptBRNotifications from '../../locales/pt-BR/notifications.json'
-import ptBRAccount from '../../locales/pt-BR/account.json'
+import ptBRWelcome from '../../locales/pt-BR/welcome.json'
 
 import enAuth from '../../locales/en/auth.json'
 import enCheckin from '../../locales/en/checkin.json'
@@ -34,7 +34,7 @@ import enSettings from '../../locales/en/settings.json'
 import enSubscription from '../../locales/en/subscription.json'
 import enWeight from '../../locales/en/weight.json'
 import enNotifications from '../../locales/en/notifications.json'
-import enAccount from '../../locales/en/account.json'
+import enWelcome from '../../locales/en/welcome.json'
 
 import esAuth from '../../locales/es/auth.json'
 import esCheckin from '../../locales/es/checkin.json'
@@ -51,7 +51,7 @@ import esSettings from '../../locales/es/settings.json'
 import esSubscription from '../../locales/es/subscription.json'
 import esWeight from '../../locales/es/weight.json'
 import esNotifications from '../../locales/es/notifications.json'
-import esAccount from '../../locales/es/account.json'
+import esWelcome from '../../locales/es/welcome.json'
 
 const resources = {
   'pt-BR': {
@@ -70,7 +70,7 @@ const resources = {
     subscription: ptBRSubscription,
     weight: ptBRWeight,
     notifications: ptBRNotifications,
-    account: ptBRAccount,
+    welcome: ptBRWelcome,
   },
   en: {
     auth: enAuth,
@@ -88,7 +88,7 @@ const resources = {
     subscription: enSubscription,
     weight: enWeight,
     notifications: enNotifications,
-    account: enAccount,
+    welcome: enWelcome,
   },
   es: {
     auth: esAuth,
@@ -106,7 +106,7 @@ const resources = {
     subscription: esSubscription,
     weight: esWeight,
     notifications: esNotifications,
-    account: esAccount,
+    welcome: esWelcome,
   },
 }
 

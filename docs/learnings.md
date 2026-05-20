@@ -251,3 +251,15 @@ Registrado em 2026-05-20 durante o Prompt 29 (Perfil Menu + Account Settings).
 **Follow-up V2 (fora de escopo do PR 29):** Em prompt futuro de polish i18n, remover `account.deleteAccount`, `account.firstAlert`, `account.secondAlert`, `account.success` de `settings.json` (pt-BR + en + es). Essas keys são dead weight da V4.
 
 **Impacto em prompts futuros.** Antes de criar novo namespace i18n, grep por `settings.json` para identificar keys existentes que podem estar duplicando ou usando copy legado incompatível com PRODUCT.md.
+
+## 14.20 Aprendizado 52 — AuthGuard com flag local precisa evitar reload por grupo de rota
+
+Registrado em 2026-05-20 durante o Prompt 28 (Welcome Splash Liquid Glass).
+
+**Contexto.** O Welcome pre-auth usa `AsyncStorage` com a flag `has_seen_welcome` para decidir se usuario sem sessao ve `/(welcome)` ou `/(auth)/signin`.
+
+**Problema.** Recarregar a flag em todo `currentGroup` do Expo Router causou RedBox `Maximum update depth exceeded` apos sign-out: a troca de sessao/grupo disparava `setWelcomeSeen(null)` e novo redirect em cascata.
+
+**Solução.** Carregar `has_seen_welcome` apenas quando o estado auth muda para `!session`. Para o caso especial em que a tela Welcome marca a flag e navega para `/(auth)`, o AuthGuard reconsulta a flag somente se estiver sem sessao, sem flag em memoria e ja dentro do grupo `(auth)`.
+
+**Impacto em prompts futuros.** Guards que combinam sessao remota com flag local devem separar "hidratar estado local" de "reagir a mudanca de rota". Incluir teste obrigatorio: sign-out de usuario autenticado, welcome de primeiro acesso, tap em signin/signup, relaunch sem sessao.

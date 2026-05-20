@@ -1,5 +1,5 @@
 import '../lib/i18n'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Stack, useRouter, useSegments, useRootNavigationState, type Href } from 'expo-router'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@lib/queryClient'
@@ -15,6 +15,7 @@ import { toastConfig } from '@components/ui/toastConfig'
 import { useNotifications } from '@hooks/useNotifications'
 import { usePushTokenRegistration } from '@hooks/usePushTokenRegistration'
 import { useScheduleDoseNotifications } from '@hooks/useScheduleDoseNotifications'
+import { hasSeenWelcome } from '@lib/utils/welcomeStorage'
 
 function NotificationBootstrap() {
   const router = useRouter()
@@ -49,36 +50,91 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const segments = useSegments()
   const router = useRouter()
   const navigationState = useRootNavigationState()
+  const currentGroup = String(segments[0] ?? '')
+  const [welcomeSeen, setWelcomeSeen] = useState<boolean | null>(null)
 
   useEffect(() => {
-    if (loading) return
-    if (session && (profileLoading || (profileFetching && profile === undefined))) return
-    if (!navigationState?.key) return // navigator not yet mounted — wait
+    if (loading || session) {
+      setWelcomeSeen(null)
+      return
+    }
 
-    const currentGroup = String(segments[0] ?? '')
+    let cancelled = false
+    setWelcomeSeen((previous) => (previous === null ? previous : null))
+
+    hasSeenWelcome()
+      .then((seen) => {
+        if (!cancelled) setWelcomeSeen(seen)
+      })
+      .catch(() => {
+        if (!cancelled) setWelcomeSeen(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [loading, session])
+
+  useEffect(() => {
+    if (loading) return undefined
+    if (!session && welcomeSeen === null) return undefined
+    if (session && (profileLoading || (profileFetching && profile === undefined))) return undefined
+    if (!navigationState?.key) return undefined // navigator not yet mounted — wait
+
+    const inWelcomeGroup = currentGroup === '(welcome)'
     const inAuthGroup = currentGroup === '(auth)'
     const inOnboardingGroup = currentGroup === '(onboarding)'
     const onboardingCompleted = profile?.onboardingCompletedAt != null
 
-    if (!session && !inAuthGroup) {
+    if (!session && !welcomeSeen && inAuthGroup) {
+      let cancelled = false
+
+      hasSeenWelcome()
+        .then((seen) => {
+          if (cancelled) return
+          if (seen) {
+            setWelcomeSeen(true)
+          } else {
+            router.replace('/(welcome)' as Href)
+          }
+        })
+        .catch(() => {
+          if (!cancelled) router.replace('/(welcome)' as Href)
+        })
+
+      return () => {
+        cancelled = true
+      }
+    }
+
+    if (!session && !welcomeSeen && !inWelcomeGroup) {
+      router.replace('/(welcome)' as Href)
+    } else if (!session && welcomeSeen && !inAuthGroup) {
       router.replace('/(auth)/signin')
     } else if (session && !onboardingCompleted && !inOnboardingGroup) {
       router.replace('/(onboarding)' as Href)
-    } else if (session && onboardingCompleted && (inAuthGroup || inOnboardingGroup)) {
+    } else if (session && onboardingCompleted && (inWelcomeGroup || inAuthGroup || inOnboardingGroup)) {
       router.replace('/(tabs)')
     }
+
+    return undefined
   }, [
+    currentGroup,
     session,
     loading,
+    welcomeSeen,
     profile,
     profileLoading,
     profileFetching,
     navigationState?.key,
-    segments,
     router,
   ])
 
-  if (loading || (session && (profileLoading || (profileFetching && profile === undefined)))) {
+  if (
+    loading ||
+    (!session && welcomeSeen === null) ||
+    (session && (profileLoading || (profileFetching && profile === undefined)))
+  ) {
     return <SplashView />
   }
 
@@ -121,10 +177,6 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="perfil/notificacoes"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="perfil/account"
                 options={{ headerShown: false }}
               />
             </Stack>
