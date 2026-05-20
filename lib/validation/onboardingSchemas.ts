@@ -88,7 +88,7 @@ export const medicalSupportSchema = z.object({
 })
 
 export const concernsSchema = z.object({
-  main_concerns: z.array(z.enum(CONCERN_OPTIONS)).max(3, 'Escolha até 3').optional(),
+  main_concerns: z.array(z.enum(CONCERN_OPTIONS)).optional(),
 })
 
 export const consentSchema = z.object({
