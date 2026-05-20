@@ -1,4 +1,135 @@
 {
+  "common": {
+    "start": "Empezar",
+    "continue": "Continuar",
+    "back": "Volver",
+    "skip": "Saltar este paso",
+    "finish": "Listo"
+  },
+  "progress": {
+    "step": "Paso {{current}} de {{total}}"
+  },
+  "welcome": {
+    "headline": "Vamos a organizar tu tratamiento.",
+    "body": "En unos minutos, DoseDay aprende sobre ti y prepara la memoria de tu tratamiento. Cada pregunta tiene un propósito claro.",
+    "cta": "Empezar"
+  },
+  "personalInfo": {
+    "headline": "¿Cómo te llamas?",
+    "subtitle": "Estos datos se quedan contigo. Los usamos para llamarte por tu nombre y adaptar referencias clínicas.",
+    "fullNameLabel": "Nombre completo",
+    "fullNamePlaceholder": "Cómo deberíamos llamarte",
+    "ageLabel": "Edad",
+    "agePlaceholder": "Años",
+    "biologicalSexLabel": "Sexo biológico",
+    "biologicalSexCaption": "Usado para referencias clínicas más precisas.",
+    "biologicalSexOptions": {
+      "F": "Femenino",
+      "M": "Masculino",
+      "NB": "No binario",
+      "PREFER_NOT": "Prefiero no decir"
+    },
+    "errors": {
+      "fullNameMin": "Nombre muy corto",
+      "ageRange": "Edad entre 18 y 99",
+      "biologicalSexRequired": "Selecciona una opción"
+    }
+  },
+  "weight": {
+    "headline": "Tu camino con el peso.",
+    "subtitle": "Vamos a acompañar la evolución semana a semana. Estos números son privados.",
+    "initialWeightLabel": "Peso al empezar el tratamiento",
+    "initialWeightCaption": "Si aún no has empezado, usa tu peso actual.",
+    "currentWeightLabel": "Peso hoy",
+    "heightLabel": "Altura",
+    "kgSuffix": "kg",
+    "cmSuffix": "cm",
+    "errors": {
+      "weightRange": "Peso entre 30 y 300 kg",
+      "heightRange": "Altura entre 120 y 220 cm"
+    }
+  },
+  "goalWeight": {
+    "headline": "¿A dónde quieres llegar?",
+    "subtitle": "Tu meta de peso para este tratamiento. Ni correcto ni incorrecto — solo una referencia.",
+    "goalWeightLabel": "Meta de peso",
+    "kgSuffix": "kg",
+    "delta": {
+      "loss": "Perder {{amount}} kg",
+      "gain": "Ganar {{amount}} kg",
+      "maintain": "Mantener el peso actual"
+    },
+    "errors": {
+      "weightRange": "Meta entre 30 y 300 kg"
+    }
+  },
+  "treatmentStatus": {
+    "headline": "¿En qué momento estás?",
+    "subtitle": "Para entender dónde estás en el camino.",
+    "options": {
+      "starting": {
+        "label": "Empezando ahora",
+        "caption": "Primera aplicación fue esta semana"
+      },
+      "ongoing": {
+        "label": "En tratamiento",
+        "caption": "Llevo un tiempo tomándolo"
+      },
+      "restart": {
+        "label": "Retomando",
+        "caption": "Paré y estoy volviendo"
+      },
+      "planning": {
+        "label": "Empezaré pronto",
+        "caption": "Aún no he tomado la primera dosis"
+      }
+    },
+    "errors": {
+      "required": "Selecciona una opción"
+    }
+  },
+  "treatmentDuration": {
+    "headline": "¿Hace cuánto tiempo?",
+    "subtitle": "Para entender en qué fase del tratamiento estás.",
+    "options": {
+      "<1m": "Menos de 1 mes",
+      "1-3m": "1 a 3 meses",
+      "3-6m": "3 a 6 meses",
+      "6m+": "Más de 6 meses"
+    },
+    "errors": {
+      "required": "Selecciona una duración"
+    }
+  },
+  "medication": {
+    "headline": "¿Cuál es tu pluma?",
+    "subtitle": "Para organizar recordatorios correctos y el informe clínico.",
+    "options": {
+      "Mounjaro": {
+        "label": "Mounjaro",
+        "caption": "Tirzepatida"
+      },
+      "Ozempic": {
+        "label": "Ozempic",
+        "caption": "Semaglutida"
+      },
+      "Wegovy": {
+        "label": "Wegovy",
+        "caption": "Semaglutida"
+      },
+      "Saxenda": {
+        "label": "Saxenda",
+        "caption": "Liraglutida"
+      },
+      "Trulicity": {
+        "label": "Trulicity",
+        "caption": "Dulaglutida"
+      }
+    },
+    "errors": {
+      "required": "Selecciona tu pluma"
+    }
+  },
   "consent": {
     "title": "Antes de empezar",
     "subtitle": "Para usar Dose Day, necesitamos tu consentimiento para procesar tus datos de salud de acuerdo con la LGPD.",

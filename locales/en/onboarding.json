@@ -1,4 +1,135 @@
 {
+  "common": {
+    "start": "Start",
+    "continue": "Continue",
+    "back": "Back",
+    "skip": "Skip this step",
+    "finish": "Done"
+  },
+  "progress": {
+    "step": "Step {{current}} of {{total}}"
+  },
+  "welcome": {
+    "headline": "Let's organize your treatment.",
+    "body": "In a few minutes, DoseDay learns about you and builds the memory of your treatment. Every question has a clear purpose.",
+    "cta": "Start"
+  },
+  "personalInfo": {
+    "headline": "What's your name?",
+    "subtitle": "This data stays with you. We use it to call you by name and tailor clinical references.",
+    "fullNameLabel": "Full name",
+    "fullNamePlaceholder": "How should we call you",
+    "ageLabel": "Age",
+    "agePlaceholder": "Years",
+    "biologicalSexLabel": "Biological sex",
+    "biologicalSexCaption": "Used for more accurate clinical references.",
+    "biologicalSexOptions": {
+      "F": "Female",
+      "M": "Male",
+      "NB": "Non-binary",
+      "PREFER_NOT": "Prefer not to say"
+    },
+    "errors": {
+      "fullNameMin": "Name too short",
+      "ageRange": "Age between 18 and 99",
+      "biologicalSexRequired": "Select an option"
+    }
+  },
+  "weight": {
+    "headline": "Your weight journey.",
+    "subtitle": "We'll track progress week by week. These numbers are private.",
+    "initialWeightLabel": "Weight when you started treatment",
+    "initialWeightCaption": "If you haven't started yet, use your current weight.",
+    "currentWeightLabel": "Weight today",
+    "heightLabel": "Height",
+    "kgSuffix": "kg",
+    "cmSuffix": "cm",
+    "errors": {
+      "weightRange": "Weight between 30 and 300 kg",
+      "heightRange": "Height between 120 and 220 cm"
+    }
+  },
+  "goalWeight": {
+    "headline": "Where do you want to go?",
+    "subtitle": "Your weight goal for this treatment. No right or wrong — just a reference.",
+    "goalWeightLabel": "Weight goal",
+    "kgSuffix": "kg",
+    "delta": {
+      "loss": "Lose {{amount}} kg",
+      "gain": "Gain {{amount}} kg",
+      "maintain": "Maintain current weight"
+    },
+    "errors": {
+      "weightRange": "Goal between 30 and 300 kg"
+    }
+  },
+  "treatmentStatus": {
+    "headline": "Where are you right now?",
+    "subtitle": "To understand where you are on the journey.",
+    "options": {
+      "starting": {
+        "label": "Just starting",
+        "caption": "First dose was this week"
+      },
+      "ongoing": {
+        "label": "In treatment",
+        "caption": "I've been on it for a while"
+      },
+      "restart": {
+        "label": "Restarting",
+        "caption": "I stopped and I'm coming back"
+      },
+      "planning": {
+        "label": "Starting soon",
+        "caption": "Haven't taken the first dose yet"
+      }
+    },
+    "errors": {
+      "required": "Select an option"
+    }
+  },
+  "treatmentDuration": {
+    "headline": "For how long?",
+    "subtitle": "To understand what phase of treatment you're in.",
+    "options": {
+      "<1m": "Less than 1 month",
+      "1-3m": "1 to 3 months",
+      "3-6m": "3 to 6 months",
+      "6m+": "More than 6 months"
+    },
+    "errors": {
+      "required": "Select a duration"
+    }
+  },
+  "medication": {
+    "headline": "Which pen are you using?",
+    "subtitle": "To organize accurate reminders and the clinical report.",
+    "options": {
+      "Mounjaro": {
+        "label": "Mounjaro",
+        "caption": "Tirzepatide"
+      },
+      "Ozempic": {
+        "label": "Ozempic",
+        "caption": "Semaglutide"
+      },
+      "Wegovy": {
+        "label": "Wegovy",
+        "caption": "Semaglutide"
+      },
+      "Saxenda": {
+        "label": "Saxenda",
+        "caption": "Liraglutide"
+      },
+      "Trulicity": {
+        "label": "Trulicity",
+        "caption": "Dulaglutide"
+      }
+    },
+    "errors": {
+      "required": "Select your pen"
+    }
+  },
   "consent": {
     "title": "Before we begin",
     "subtitle": "To use Dose Day, we need your consent to process your health data in accordance with LGPD.",
