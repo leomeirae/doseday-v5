@@ -1,6 +1,6 @@
 import '../lib/i18n'
 import { useEffect } from 'react'
-import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router'
+import { Stack, useRouter, useSegments, useRootNavigationState, type Href } from 'expo-router'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from '@lib/queryClient'
 import { StatusBar } from 'expo-status-bar'
@@ -8,6 +8,7 @@ import Toast from 'react-native-toast-message'
 import { colors } from '@lib/theme/tokens'
 import { AuthProvider } from '@contexts/AuthContext'
 import { useSession } from '@hooks/useSession'
+import { useProfile } from '@hooks/useProfile'
 import { SplashView } from '@components/auth/SplashView'
 import { toastConfig } from '@components/ui/toastConfig'
 import { useNotifications } from '@hooks/useNotifications'
@@ -43,24 +44,40 @@ function NotificationBootstrap() {
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { session, loading } = useSession()
+  const { data: profile, isLoading: profileLoading, isFetching: profileFetching } = useProfile()
   const segments = useSegments()
   const router = useRouter()
   const navigationState = useRootNavigationState()
 
   useEffect(() => {
     if (loading) return
+    if (session && (profileLoading || (profileFetching && profile === undefined))) return
     if (!navigationState?.key) return // navigator not yet mounted — wait
 
-    const inAuthGroup = segments[0] === '(auth)'
+    const currentGroup = String(segments[0] ?? '')
+    const inAuthGroup = currentGroup === '(auth)'
+    const inOnboardingGroup = currentGroup === '(onboarding)'
+    const onboardingCompleted = profile?.onboardingCompletedAt != null
 
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/signin')
-    } else if (session && inAuthGroup) {
+    } else if (session && !onboardingCompleted && !inOnboardingGroup) {
+      router.replace('/(onboarding)' as Href)
+    } else if (session && onboardingCompleted && (inAuthGroup || inOnboardingGroup)) {
       router.replace('/(tabs)')
     }
-  }, [session, loading, navigationState?.key, segments, router])
+  }, [
+    session,
+    loading,
+    profile,
+    profileLoading,
+    profileFetching,
+    navigationState?.key,
+    segments,
+    router,
+  ])
 
-  if (loading) {
+  if (loading || (session && (profileLoading || (profileFetching && profile === undefined)))) {
     return <SplashView />
   }
 

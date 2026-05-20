@@ -9,13 +9,14 @@ export type Profile = {
   currentWeight: number | null
   initialWeight: number | null
   goalWeight: number | null
+  onboardingCompletedAt: string | null
   hasSeenPushPermissionModal: boolean
 }
 
 export async function getProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, full_name, current_medication, current_dose, treatment_start_date, current_weight, initial_weight, goal_weight, has_seen_push_permission_modal')
+    .select('id, full_name, current_medication, current_dose, treatment_start_date, current_weight, initial_weight, goal_weight, onboarding_completed_at, has_seen_push_permission_modal')
     .eq('user_id', userId)
     .maybeSingle()
 
@@ -31,6 +32,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
     currentWeight: data.current_weight !== null ? Number(data.current_weight) : null,
     initialWeight: data.initial_weight !== null ? Number(data.initial_weight) : null,
     goalWeight: data.goal_weight !== null ? Number(data.goal_weight) : null,
+    onboardingCompletedAt: data.onboarding_completed_at,
     hasSeenPushPermissionModal: data.has_seen_push_permission_modal ?? false,
   }
 }
