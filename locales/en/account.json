@@ -1,0 +1,31 @@
+{
+  "header": { "title": "Account" },
+  "name": {
+    "label": "Name",
+    "placeholder": "What should we call you",
+    "saveButton": "Save",
+    "savingButton": "Saving...",
+    "savedToast": "Name updated",
+    "errors": {
+      "minLength": "Name is too short",
+      "saveFailed": "Could not save. Please try again."
+    }
+  },
+  "email": {
+    "label": "Email",
+    "readonlyHint": "To change your email, contact support."
+  },
+  "delete": {
+    "label": "Delete account",
+    "description": "This action is permanent. All your data will be removed immediately — including doses, weight, symptoms and reports.",
+    "button": "Delete my account",
+    "loadingButton": "Deleting...",
+    "confirmTitle": "Delete account?",
+    "confirmMessage": "You will lose all your treatment data. This action cannot be undone.",
+    "confirmCancel": "Cancel",
+    "confirmDelete": "Yes, delete",
+    "errors": {
+      "deleteFailed": "Could not delete the account. Try again or contact support."
+    }
+  }
+}

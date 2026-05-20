@@ -1,0 +1,31 @@
+{
+  "header": { "title": "Conta" },
+  "name": {
+    "label": "Nome",
+    "placeholder": "Como devemos te chamar",
+    "saveButton": "Salvar",
+    "savingButton": "Salvando...",
+    "savedToast": "Nome atualizado",
+    "errors": {
+      "minLength": "Nome muito curto",
+      "saveFailed": "Não consegui salvar. Tente novamente."
+    }
+  },
+  "email": {
+    "label": "E-mail",
+    "readonlyHint": "Para alterar o e-mail, fale com o suporte."
+  },
+  "delete": {
+    "label": "Apagar conta",
+    "description": "Esta ação é permanente. Todos os seus dados serão removidos imediatamente — incluindo doses, peso, sintomas e relatórios.",
+    "button": "Apagar minha conta",
+    "loadingButton": "Apagando...",
+    "confirmTitle": "Apagar conta?",
+    "confirmMessage": "Você perderá todos os dados do seu tratamento. Esta ação não pode ser desfeita.",
+    "confirmCancel": "Cancelar",
+    "confirmDelete": "Sim, apagar",
+    "errors": {
+      "deleteFailed": "Não consegui apagar a conta. Tente novamente ou contate o suporte."
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "header": { "title": "Cuenta" },
+  "name": {
+    "label": "Nombre",
+    "placeholder": "¿Cómo te llamamos?",
+    "saveButton": "Guardar",
+    "savingButton": "Guardando...",
+    "savedToast": "Nombre actualizado",
+    "errors": {
+      "minLength": "El nombre es muy corto",
+      "saveFailed": "No se pudo guardar. Inténtalo de nuevo."
+    }
+  },
+  "email": {
+    "label": "Correo",
+    "readonlyHint": "Para cambiar el correo, contacta con soporte."
+  },
+  "delete": {
+    "label": "Eliminar cuenta",
+    "description": "Esta acción es permanente. Todos tus datos serán eliminados de inmediato — incluyendo dosis, peso, síntomas e informes.",
+    "button": "Eliminar mi cuenta",
+    "loadingButton": "Eliminando...",
+    "confirmTitle": "¿Eliminar cuenta?",
+    "confirmMessage": "Perderás todos los datos de tu tratamiento. Esta acción no se puede deshacer.",
+    "confirmCancel": "Cancelar",
+    "confirmDelete": "Sí, eliminar",
+    "errors": {
+      "deleteFailed": "No se pudo eliminar la cuenta. Inténtalo de nuevo o contacta con soporte."
+    }
+  }
+}

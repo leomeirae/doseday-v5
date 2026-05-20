@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
+import type { Href } from 'expo-router'
 import { colors, typography, spacing } from '@lib/theme/tokens'
 import { signOut } from '@lib/supabase/auth'
 import { SettingsSection } from '@components/perfil/SettingsSection'
@@ -65,7 +66,7 @@ export default function PerfilScreen() {
             icon="person.circle.fill"
             iconColor={colors.textSecondary}
             label={t('account.accountSettings')}
-            onPress={() => router.push('/perfil/account')}
+            onPress={() => router.push('/perfil/account' as Href)}
             accessibilityLabel="Configurações da conta"
             testID="perfil-row-conta"
           />
