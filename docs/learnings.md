@@ -296,3 +296,29 @@ Registrado em 2026-05-20 durante a preparação do Prompt 33.
 - Não implementar auth manual com parse de header — duplica trabalho do Supabase e é fonte de bug
 
 **Impacto em prompts futuros.** Qualquer prompt que crie ou refatore Edge Function deve assumir `verify_jwt=true` por padrão. Exceções (webhook público, cron interno, callback de RevenueCat/Apple) precisam ser justificadas em ADR.
+
+## 14.23 Aprendizado 55 — Regra de UX temporal sempre precisa de branch de saída
+
+Registrado em 2026-05-21 durante o Prompt 34 (piso de 5s no Loading do onboarding).
+
+**Contexto.** A tela `app/(onboarding)/loading.tsx` aplica um piso temporal de 5s antes de navegar pro Result, pra que o usuário perceba o app organizando dados reais e a tela não "pisque" em conexão rápida.
+
+**Achado.** O piso de 5s defende contra a UX de "piscou", mas quando o insight já está cacheado no React Query (`staleTime/gcTime: Infinity`, re-visita da tela na mesma sessão) o mesmo piso vira UX de "parou" — 5s numa tela sem processamento real acontecendo. A regra que protege num cenário prejudica no outro.
+
+**Solução.** Skip explícito em cache-hit. O cache-hit é **inferido do estado inicial do `useQuery`** no 1º render (`insight.isFetched && insight.data && !insight.isFetching`), capturado uma única vez via `useState(() => ...)` — sem adicionar flag nova à superfície do hook `useOnboardingInsight`. Em cache-hit, `minElapsed` e `stepIndex` já nascem no estado final: os micro-steps renderizam, só sem espera temporal entre eles.
+
+**Princípio.** Regra de UX temporal (piso, debounce, delay artificial) nunca é incondicional — sempre tem que ter um branch de saída pro caso em que não há processamento real pra mascarar. A pergunta a fazer ao desenhar qualquer espera artificial: "e quando não houver nada acontecendo de verdade?".
+
+**Bônus de padrão.** Estado derivado de cache pode ser inferido do próprio React Query (`isFetched`/`isFetching`/`data`) sem inflar a API do hook. Preferir inferência a flag nova quando o estado já existe na lib.
+
+## 14.24 Aprendizado 56 — Contrato D015 reaproveitado na Home sem chamar Edge Function de novo
+
+Registrado em 2026-05-21 durante o Prompt 32 (Home continuidade D0/D1+).
+
+**Contexto.** O onboarding gera o `OnboardingInsightContract` via Edge Function `generate-onboarding-insight` e persiste o contrato completo em `educational_insights.context.output` (jsonb, ADR 0002). A Home D0 precisa mostrar esse mesmo insight.
+
+**Achado.** A Home não deve chamar a Edge Function de novo — o insight já existe no banco. Leitura direta de `educational_insights.context.output` via hook (`useOnboardingInsightFromDB`) + validação Zod (`onboardingInsightContractSchema.safeParse`) economiza uma invocação de Edge Function por sessão e o cold start associado. A validação Zod garante que dado corrompido no DB retorne `null` (cai no fallback estático) em vez de quebrar a UI.
+
+**Princípio.** Edge Function só pra **gerar**; DB pra **reaproveitar**. Qualquer tela que mostre conteúdo já gerado deve ler do DB, não da Edge Function. Hook de geração (Edge) e hook de leitura (DB) são APIs separadas com o mesmo tipo de retorno.
+
+**Bônus de padrão.** Quando um componente tem dois modos de fonte de dados (`source: 'onboarding' | 'daily'`), passar `enabled` condicional pros hooks de cada fonte evita disparar a fonte cara (Edge Function) no modo que não a usa.
