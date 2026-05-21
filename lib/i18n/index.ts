@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import * as Localization from 'expo-localization'
 
+import ptBRAccount from '../../locales/pt-BR/account.json'
 import ptBRAuth from '../../locales/pt-BR/auth.json'
 import ptBRCheckin from '../../locales/pt-BR/checkin.json'
 import ptBRCommon from '../../locales/pt-BR/common.json'
@@ -19,6 +20,7 @@ import ptBRWeight from '../../locales/pt-BR/weight.json'
 import ptBRNotifications from '../../locales/pt-BR/notifications.json'
 import ptBRWelcome from '../../locales/pt-BR/welcome.json'
 
+import enAccount from '../../locales/en/account.json'
 import enAuth from '../../locales/en/auth.json'
 import enCheckin from '../../locales/en/checkin.json'
 import enCommon from '../../locales/en/common.json'
@@ -36,6 +38,7 @@ import enWeight from '../../locales/en/weight.json'
 import enNotifications from '../../locales/en/notifications.json'
 import enWelcome from '../../locales/en/welcome.json'
 
+import esAccount from '../../locales/es/account.json'
 import esAuth from '../../locales/es/auth.json'
 import esCheckin from '../../locales/es/checkin.json'
 import esCommon from '../../locales/es/common.json'
@@ -55,6 +58,7 @@ import esWelcome from '../../locales/es/welcome.json'
 
 const resources = {
   'pt-BR': {
+    account: ptBRAccount,
     auth: ptBRAuth,
     checkin: ptBRCheckin,
     common: ptBRCommon,
@@ -73,6 +77,7 @@ const resources = {
     welcome: ptBRWelcome,
   },
   en: {
+    account: enAccount,
     auth: enAuth,
     checkin: enCheckin,
     common: enCommon,
@@ -91,6 +96,7 @@ const resources = {
     welcome: enWelcome,
   },
   es: {
+    account: esAccount,
     auth: esAuth,
     checkin: esCheckin,
     common: esCommon,
