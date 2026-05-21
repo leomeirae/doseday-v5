@@ -1,14 +1,18 @@
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { ExpandableContextSection } from '@components/onboarding/ExpandableContextSection'
 import { InsightCard } from '@components/onboarding/InsightCard'
+import { InsightGoalCard } from '@components/onboarding/InsightGoalCard'
+import { InsightStageCard } from '@components/onboarding/InsightStageCard'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
+import { InsightDisclaimer } from '@components/ui/InsightDisclaimer'
 import { useOnboarding } from '@contexts/OnboardingContext'
 import {
   buildOnboardingInsightInput,
   shouldRequestInsight,
   useOnboardingInsight,
 } from '@hooks/useOnboardingInsight'
-import { colors, spacing, typography } from '@lib/theme/tokens'
+import { spacing, typography, colors } from '@lib/theme/tokens'
 
 export default function ResultScreen() {
   const { t } = useTranslation('onboarding')
@@ -63,7 +67,6 @@ export default function ResultScreen() {
       stepNumber={14}
       totalSteps={14}
       headline={t('result.headline', { name: firstName })}
-      subtitle={t('result.subtitle')}
       showBack={false}
       primaryCTA={{
         label: t('result.cta'),
@@ -75,54 +78,61 @@ export default function ResultScreen() {
       <View style={styles.stack}>
         {insight.data ? (
           <>
-            <InsightCard
-              headline={insight.data.stageLabel}
-              body={insight.data.shortInsight}
-              disclaimer={insight.data.disclaimer}
-              testID="result-ai-insight"
+            <InsightStageCard
+              stageLabel={insight.data.stageLabel}
+              medicationLabel={insight.data.medicationLabel}
             />
-            <InsightCard
-              headline={insight.data.medicationLabel}
-              body={`${insight.data.goalLabel}\n${insight.data.deltaLabel}`}
-              testID="result-ai-labels"
+            <InsightGoalCard
+              cardLabel={t('result.goalCardLabel')}
+              goalWeight={state.data.goal_weight}
+              goalLabel={insight.data.goalLabel}
+              deltaLabel={insight.data.deltaLabel}
             />
-            <InsightCard
-              headline={t('result.nextStepTitle')}
-              body={insight.data.nextStep}
-              testID="result-ai-next-step"
+            <View style={styles.narrative}>
+              <Text style={styles.shortInsight}>{insight.data.shortInsight}</Text>
+              <Text style={styles.nextStep}>{insight.data.nextStep}</Text>
+            </View>
+            <ExpandableContextSection
+              label={t('result.contextSectionLabel')}
+              bullets={insight.data.contextBullets}
             />
-            {insight.data.contextBullets.map((bullet, index) => (
-              <InsightCard
-                key={index}
-                body={bullet}
-                testID={`result-ai-context-${index}`}
-              />
-            ))}
+            <InsightDisclaimer
+              text={insight.data.disclaimer}
+              style={styles.disclaimerFull}
+            />
           </>
-        ) : null}
-
-        {insight.data
-          ? null
-          : facts.map((fact, index) => (
+        ) : (
+          <>
+            {facts.map((fact, index) => (
               <InsightCard key={index} body={fact} testID={`result-fact-${index}`} />
             ))}
-
-        {!insight.data ? (
-          <Text style={styles.disclaimer}>{t('result.disclaimer')}</Text>
-        ) : null}
+            <InsightDisclaimer
+              text={t('result.disclaimer')}
+              style={styles.disclaimerFull}
+            />
+          </>
+        )}
       </View>
     </OnboardingShell>
   )
 }
 
 const styles = StyleSheet.create({
-  stack: {
+  disclaimerFull: {
+    alignSelf: 'stretch',
+  },
+  narrative: {
     gap: spacing.sm,
   },
-  disclaimer: {
-    ...typography.caption,
-    color: colors.textTertiary,
-    fontStyle: 'italic',
-    marginTop: spacing.sm,
+  nextStep: {
+    ...typography.bodyClinical,
+    color: colors.textSecondary,
+  },
+  shortInsight: {
+    ...typography.body,
+    color: colors.textPrimary,
+  },
+  stack: {
+    gap: spacing.sm,
   },
 })
