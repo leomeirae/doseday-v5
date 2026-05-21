@@ -107,7 +107,9 @@ export default function ResultScreen() {
               <InsightCard key={index} body={fact} testID={`result-fact-${index}`} />
             ))}
 
-        <Text style={styles.disclaimer}>{t('result.disclaimer')}</Text>
+        {!insight.data ? (
+          <Text style={styles.disclaimer}>{t('result.disclaimer')}</Text>
+        ) : null}
       </View>
     </OnboardingShell>
   )
