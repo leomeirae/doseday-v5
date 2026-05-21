@@ -51,7 +51,7 @@ Toda mensagem pra colar no Claude Code DEVE conter: caminho do prompt, handoff a
 
 ## Estado do produto (1 parágrafo)
 
-DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em produção). A V4 falhou por baixa retenção (D7 ~6%, 1 pagante em 96 cadastros). V5 reposiciona o produto como **memória inteligente do tratamento com canetas emagrecedoras (GLP-1)** para paciente e médico. Stack: Expo SDK 54+ React Native + Liquid Glass iOS 26+, Supabase mantido, RevenueCat com trial 14d configurado em produção, IA via Edge Functions Anthropic SDK. Bundle ID `com.doseday.premium` preservado. App Store listing também.
+DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em produção). A V4 falhou por baixa retenção (D7 ~6%, 1 pagante em 96 cadastros). V5 reposiciona o produto como **memória inteligente do tratamento com canetas emagrecedoras (GLP-1)** para paciente e médico. Stack: Expo SDK 54+ React Native + Liquid Glass iOS 26+, Supabase mantido, RevenueCat com trial 14d configurado em produção, IA via Edge Functions OpenAI SDK (provedor mantido da V4 — ver Aprendizado #53 + ADR 0003). Bundle ID `com.doseday.premium` preservado. App Store listing também.
 
 ---
 
@@ -88,6 +88,8 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 
 28. **Bash pra Léo SEMPRE em bloco limpo, sem comentários inline.** Léo copia-cola comandos no terminal. Linhas com `#` quebram o paste OU obrigam Léo a editar manualmente. Regra: cada bloco ```bash contém só comandos executáveis em sequência, separados por `&&` ou em linhas próprias. Zero `# comentário`. Se precisa explicar o porquê, escreva ANTES do bloco em texto normal — não dentro do bloco. Aplica-se a Cowork → Léo, sempre. (Pedido explícito Léo 2026-05-20.)
 
+29. **Cowork EXECUTA via MCP por default. Não pede pra Léo rodar comandos.** Léo é PO, não operador de terminal. Sempre que Cowork tem MCP disponível (GitHub, Supabase, react-native-devtools, workspace bash sandbox), DEVE usar diretamente em vez de gerar bloco bash pra Léo. Bash pra Léo é último recurso — só quando o comando exige credencial local ou ambiente que MCP não acessa (ex: `npx expo run:ios` no device físico, `gh auth login`). Antes de pedir qualquer comando a Léo, perguntar: "consigo fazer via MCP?". Se sim, fazer. Operações que SEMPRE são via MCP: ler/escrever arquivo no repo, criar branch, push, abrir PR, mergear PR, executar SQL, deploy edge function, list MCP tools. (Pedido explícito Léo 2026-05-21 após repetir 3+ vezes.)
+
 ---
 
 ## Auxiliares por tipo de tarefa (carregar com `@file`)
@@ -100,7 +102,7 @@ Tabela de referência rápida — quando começar uma tarefa, carregue os auxili
 | Schema Supabase / migration / RLS | `@docs/architecture.md`, `@docs/learnings.md`, skill `supabase-postgres-best-practices` |
 | UI / tela nova / refazer tela | `@docs/DESIGN.md`, skill `/impeccable craft` ou `/impeccable distill` |
 | Tab bar / toolbar / navegação | `@docs/DESIGN.md`, skill `liquid-glass:liquid-glass` |
-| IA / Edge Function Anthropic SDK | `@docs/architecture.md` (seção IA), `@docs/learnings.md`, skill `claude-api` |
+| IA / Edge Function OpenAI SDK | `@docs/architecture.md` (seção IA), `@docs/learnings.md`, OpenAI Structured Outputs docs |
 | Bash longo / leitura de arquivo grande | `@~/.claude/RTK.md` |
 | Glossário do domínio (Mariana, Movimento 1/2/3, dose) | `@CONTEXT.md` |
 | Plano multi-step persistido | `@docs/karpathy.md`, skill `superpowers:writing-plans` |
@@ -126,7 +128,7 @@ Tabela de referência rápida — quando começar uma tarefa, carregue os auxili
 | Estado cliente | Context API |
 | Validação | Zod |
 | Backend | Supabase (project `pjesgdczasumgjzqyzzk`) |
-| IA | Anthropic SDK via Edge Function Deno |
+| IA | OpenAI SDK via Edge Function Deno (Structured Outputs com json_schema) |
 | Pagamento | RevenueCat (project `proj521a5bc0`, trial 14d) |
 | Push | Expo Notifications |
 | i18n | i18next (pt-BR padrão, en/es opt-in) |
