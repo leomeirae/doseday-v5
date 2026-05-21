@@ -429,6 +429,70 @@ Aparece no rodapé de TODO output gerado por IA:
 
 ---
 
+## Onboarding como ativo de captação
+
+O onboarding do DoseDay **não é fluxo administrativo de coleta de dados** — é o primeiro produto que o user experimenta. Estratégia validada por monitoramento de apps do segmento (Noom, Cal AI, Calm) e formalizada nesta seção.
+
+### Lógica do funil
+
+| Etapa | O que acontece | Por que importa |
+|---|---|---|
+| Telas 1-12 | Captura progressiva (perfil + peso + tratamento + medicamento + dose + consent) | Investimento gradual — cada step preenchido aumenta custo psicológico de abandonar |
+| **Tela 13 — loading IA** | IA processa os dados em tempo real e mostra que está organizando o tratamento. 5 etapas visuais com check + animação central. Mínimo 5s, máximo 15s | **Gatilho de valor.** Cria percepção "o app já fez algo por mim" antes de pedir qualquer coisa |
+| Tela 14 — result | Mostra 3-4 insights personalizados gerados pela IA com dados reais do user | Prova entrega — não é coaching genérico |
+| Paywall (V5.1+) | Aparece depois do result com trial 14d transparente | User chega aquecido, com prova de valor recente |
+
+### Regras dessa estratégia
+
+**O que pode (não é dark pattern):**
+- IA processar dados REAIS do user durante loading (não é placebo)
+- Mostrar etapas com timing deliberado (5s mínimo) — sinaliza esforço computacional
+- Animação visual no centro da tela durante processamento (Vital Mint exclusivo, regra única na tela)
+- Result mostrar insights únicos do user (semana atual do tratamento, dose, padrões esperados)
+
+**O que NÃO pode (vira dark pattern):**
+- ❌ Loading falso — animação rodando sem nada acontecendo no backend
+- ❌ Insights genéricos disfarçados de personalizados ("Você é incrível!")
+- ❌ Timing >15s sem fallback — frustra
+- ❌ Skip permitido só após assinatura — bloqueio coercitivo
+- ❌ Loading antes de captação de dados — sem dados, não há o que processar (pré-paywall sim, pré-onboarding não)
+- ❌ Ignorar `prefersReducedMotion` na animação
+
+### Voice & Tone específico do onboarding
+
+Mantém os 5 adjetivos da seção Brand Personality (calmo, direto, cuidadoso, sério, atento) com **camada extra de presença**: cada step reconhece que o user está investindo tempo.
+
+| Situação | Copy correto | Copy errado |
+|---|---|---|
+| Welcome | "Vamos organizar seu tratamento." | "Bem-vindo ao DoseDay! 🎉" (entusiasmo falso) |
+| Pergunta sensível (peso) | "Esse dado fica só com você. Vamos usar pra acompanhar a evolução." | "Não se preocupe, é confidencial." (defensivo) |
+| Loading | "Estamos organizando seu tratamento." | "Por favor aguarde..." (genérico) |
+| Result | "Bem-vindo, Mariana. Aqui está o que sabemos do seu tratamento até agora." | "Parabéns! Você completou o onboarding! 🎉" (gamificação) |
+
+### Métricas de sucesso do onboarding
+
+| Métrica | Target | Por quê |
+|---|---|---|
+| Conclusão telas 1-7 | ≥85% | Captura dados básicos. Drop acima de 15% indica fricção excessiva |
+| Conclusão telas 8-12 | ≥75% | Doctor-name e concerns são opcionais — drop esperado |
+| Conclusão loading IA | ≥95% | Se cair aqui, IA falhou ou animação travou |
+| Conclusão result + abertura do app | ≥90% | Result tem que entregar valor convincente |
+| D7 retenção (V4: 6%) | ≥25% | North star da V5 |
+
+### Skills aplicáveis ao onboarding
+
+| Skill | Onde aplica |
+|---|---|
+| `design:ux-copy` | Refinar copy de cada step preservando Voice & Tone |
+| `ios-liquid-glass-expo` | Confirmar zero glass em conteúdo (apenas tab bar e header de navegação fora do onboarding) |
+| `mobile-product-critic` | Critique multi-perspectiva pré-merge dos PRs 24b/24c |
+| `/impeccable craft` | UI das telas |
+| `/impeccable harden` | Edge cases (IA timeout, consent rejected, network offline) |
+| `go-to-market-architect` | V5.1 — refinar funil pós-result com paywall otimizado |
+| `appstore-creative-designer` | V5.1 — usar telas do onboarding como screenshots da App Store
+
+---
+
 ## Como esta PRODUCT.md é usada
 
 Cada skill do Claude Code lê este arquivo antes de gerar saída:
