@@ -1,26 +1,13 @@
 {
-  "slides": [
-    {
-      "headline": "Sua memória do tratamento.",
-      "body": "Anote como cada semana foi indo. O DoseDay organiza tudo pra você lembrar do que importa."
-    },
-    {
-      "headline": "Pronto pra consulta.",
-      "body": "Chega de chegar no consultório sem lembrar do mês. Geramos um relatório claro pra você levar."
-    },
-    {
-      "headline": "Vamos começar.",
-      "body": "Em alguns minutos, o DoseDay aprende sobre você e prepara o ambiente do seu tratamento."
-    }
-  ],
+  "headline": "Sua memória do tratamento.",
+  "subtitle": "Anote como cada semana foi indo. Leve pra consulta.",
   "actions": {
     "createAccount": "Criar conta",
-    "signIn": "Já tenho uma conta"
+    "signIn": "Já tenho conta"
   },
   "accessibility": {
-    "slide": "Tela {{current}} de {{total}}",
+    "intro": "Sua memória do tratamento. Anote como cada semana foi indo. Leve pra consulta.",
     "createAccountHint": "Marca a apresentação como vista e abre o cadastro",
-    "signInHint": "Marca a apresentação como vista e abre a tela de entrada",
-    "pageIndicator": "Ir para a tela {{index}}"
+    "signInHint": "Marca a apresentação como vista e abre a tela de entrada"
   }
 }
