@@ -2,9 +2,9 @@
 
 **Instância de destino:** Aba 1 (principal) — Claude Code direto
 **Branch a criar:** `feature/33b-onboarding-insight-hardening`
-**Modelo recomendado:** Sonnet 4.6 (HIGH — decisão arquitetural sobre fallback policy + duplicação de schema client/server)
+**Modelo recomendado:** Sonnet 4.6 (HIGH — decisão arquitetural sobre fallback policy + 2-step parse + duplicação de schema client/server)
 **Esforço estimado:** 3-5h
-**Origem estratégica:** Auditoria do Codex App após PRs #36/#46/#47. Codex identificou 2 P1 no contrato do onboarding insight (ver `docs/interacao-claude-codex/` histórico recente). Este prompt fecha ambos antes da Fase 2.
+**Origem estratégica:** Auditoria do Codex App após PRs #36/#46/#47. Codex identificou 2 P1 no contrato do onboarding insight. Este prompt fecha ambos antes da Fase 2. Revisado por Léo em 2026-05-21 com 5 ajustes incorporados.
 
 ---
 
@@ -32,69 +32,164 @@
 Fechar os **2 achados P1** do Codex App sobre o contrato `OnboardingInsightContract` (PR #36) antes de avançar pra Fase 2:
 
 1. **`schemaVersion: 'onboarding_insight_v2'`** — versionamento explícito do contrato no campo do payload (client + Edge Function + persistência). Hoje só existe `context.contract_version: 'v2'` no jsonb, **não no contrato propriamente dito**. Reader da Home não checa versão — aceita qualquer shape válido.
-2. **Fallback seguro em vez de 500** — Edge Function hoje retorna `status: 500` quando OpenAI falha, JSON vem inválido, output contém termo proibido, ou Zod não passa. Cliente cai no `catch` e o onboarding fica sem insight estruturado (apenas fallback estático do client). O caminho seguro é: Edge Function **retorna 200 com contrato fallback seguro** que respeita as mesmas garantias legais, mantendo a experiência emocional do Result.
+2. **Fallback seguro em vez de 500** — Edge Function hoje retorna `status: 500` quando OpenAI falha, JSON vem inválido, output contém termo proibido, ou Zod não passa. Cliente cai no `catch` e o onboarding fica sem insight estruturado. O caminho seguro é: Edge Function **retorna 200 com contrato fallback seguro** que respeita as mesmas garantias legais, mantendo a experiência emocional do Result.
 
 Ambos sustentam o Prompt 32 (Home D0 reaproveita contrato direto do DB) e qualquer evolução futura do contrato (v3, etc).
+
+---
+
+## Estratégia de parse em 2 etapas (ajuste 1 do Léo)
+
+Servidor não pode confiar no `schemaVersion` que o LLM devolver. Mas também não pode quebrar quando o LLM devolve `schemaVersion` errado, porque a sobrescrita determinística acontece **depois** do parse. Solução em 2 etapas:
+
+```
+Etapa A — RAW PARSE
+  Schema Zod "raw" (sem schemaVersion):
+    onboardingInsightRawSchema = onboardingInsightContractSchema.omit({ schemaVersion: true })
+  parsedRaw = onboardingInsightRawSchema.parse({ ...openaiOutput, ...deterministicLabels })
+  (Aqui o schemaVersion do LLM é ignorado — omit não exige nem rejeita.)
+
+Etapa B — CONTRATO CANON
+  contract = onboardingInsightContractSchema.parse({
+    ...parsedRaw,
+    schemaVersion: 'onboarding_insight_v2',   // servidor injeta
+  })
+  (Aqui o canon valida tudo, incluindo schemaVersion literal.)
+```
+
+Resultado: LLM pode mandar `schemaVersion: 'banana'` — é descartado em A; canon em B só vê o literal correto que o servidor injetou. Se LLM omitir, idem. Se LLM mandar shape inválido em outro campo, A falha (vai pro fallback path).
+
+Mesma estratégia no fallback path: `buildFallbackContract` retorna shape `raw` + injeta schemaVersion + valida com canon. Garante que **um único schema canon** é verdade.
 
 ---
 
 ## Critérios de aceitação
 
 - [ ] `OnboardingInsightContract` em `types/api.ts` ganha `schemaVersion: z.literal('onboarding_insight_v2')` (campo obrigatório, não opcional)
-- [ ] Schema Zod local da Edge Function espelha exatamente a definição do client (mesma constante exportada se viável, ou comment apontando o mirror)
-- [ ] `ONBOARDING_INSIGHT_RESPONSE_FORMAT.schema.properties` inclui `schemaVersion` no JSON Schema enviado pra OpenAI
+- [ ] `onboardingInsightRawSchema` exportado em `types/api.ts` como `onboardingInsightContractSchema.omit({ schemaVersion: true })` — único schema sem schemaVersion, usado SO em parse interno do servidor (não exposto pro client da Home)
+- [ ] Schema Zod local da Edge Function espelha exatamente as definições do client (mesmas constantes exportadas se viável via duplicação consciente, ou comment apontando o mirror)
+- [ ] `ONBOARDING_INSIGHT_RESPONSE_FORMAT.schema.properties` inclui `schemaVersion` no JSON Schema enviado pra OpenAI (LLM continua sendo orientado a emitir o campo, mesmo que servidor sobrescreva depois — evita JSON malformado por campo desconhecido)
 - [ ] `ONBOARDING_INSIGHT_RESPONSE_FORMAT.schema.required` inclui `'schemaVersion'`
-- [ ] Servidor preenche `schemaVersion: 'onboarding_insight_v2'` deterministicamente (não confia no LLM pra essa string) — sobrescreve o que vier do modelo
+- [ ] **Parse 2-step**: raw schema parsing **antes** da injeção de `schemaVersion` determinístico; canon schema parsing **depois**. Mesma estratégia no path do LLM e no path do fallback
 - [ ] Persistência em `educational_insights`:
   - `context.schemaVersion = 'onboarding_insight_v2'`
   - `context.output.schemaVersion = 'onboarding_insight_v2'` (redundante mas intencional — garante leitura mesmo se alguém ler só `output`)
   - `context.contract_version` permanece (`'v2'`) por compat com qualquer leitor antigo, MAS marcado como deprecated no comment
 - [ ] **Edge Function nunca retorna 500 em erro LLM-side.** Define-se 3 caminhos:
-  - **Auth fail** (`resolveAuthenticatedUserId` joga) → mantém `401` (não é erro do LLM, é erro do client)
-  - **Input inválido** (Zod `EducationalInsightContextSchema.parse` joga) → mantém `400` (client mandou payload errado)
-  - **OpenAI fail / JSON inválido / output Zod fail / forbidden text / upsert fail** → **`200`** com contrato fallback seguro (ver "Contrato fallback" abaixo)
+  - **Auth fail** (`resolveAuthenticatedUserId` joga) → mantém `401`
+  - **Input inválido** (Zod `EducationalInsightContextSchema.parse` joga) → mantém `400`
+  - **OpenAI fail / JSON inválido / output raw Zod fail / forbidden text / upsert fail** → **`200`** com contrato fallback seguro
 - [ ] **Contrato fallback** é montado por função pura `buildFallbackContract(ctx, reason)`:
-  - `schemaVersion: 'onboarding_insight_v2'`
+  - `schemaVersion: 'onboarding_insight_v2'` (servidor injeta via mesmo 2-step parse)
   - `stageLabel`, `medicationLabel`, `goalLabel`, `deltaLabel`: reusa `deriveDeterministicLabels(ctx)` (já existe)
-  - `shortInsight`: string fixa min 40 chars, calma, sem claim. Sugestão: `"Vamos organizar seu tratamento e acompanhar dia a dia. Seu DoseDay já está pronto pra ajudar."` (88 chars)
-  - `nextStep`: string fixa min 20 chars. Sugestão: `"Registre sua primeira dose pra começar a memória do tratamento."` (64 chars)
-  - `contextBullets`: 2 bullets fixos. Sugestão: `["Anote a dose da semana e sintomas leves do dia.", "Leve essa memória pra consulta com seu médico."]` (12-180 chars cada)
+  - `shortInsight` (string fixa, 121 chars):
+    > `"Vamos organizar seu tratamento e acompanhar sua rotina com calma. O DoseDay já está pronto para registrar o que importa."`
+  - `nextStep` (string fixa, 70 chars):
+    > `"Registre sua próxima dose para começar a memória do tratamento no app."`
+  - `contextBullets` (2 strings fixas):
+    > `["Anote a dose da semana e sintomas do dia.", "Use essa memória para conversar melhor em consulta."]`
   - `disclaimer`: `FIXED_DISCLAIMER` (já existe)
-- [ ] **Fallback passa pelos mesmos bloqueios legais** que o output do LLM — chamada a `containsForbiddenText(fallback)` no setup tempo de módulo (não em runtime), via teste unitário que valida que o fallback não viola nenhuma das listas
-- [ ] Quando fallback é emitido, `console.warn` registra a razão (`openai_fail|json_invalid|zod_fail|forbidden_text|upsert_fail`) sem PHI — nunca logar peso, dose, input completo ou output completo
+- [ ] **Fallback passa pelos mesmos bloqueios legais** que o output do LLM — teste unitário chama `containsForbiddenText(fallback)` e verifica que retorna `null`
+- [ ] Quando fallback é emitido, `console.warn` registra a razão (`openai_fail|json_invalid|raw_zod_fail|forbidden_text|upsert_fail`) sem PHI — nunca logar peso, dose, input completo ou output completo
 - [ ] Quando fallback é emitido, o upsert em `educational_insights` ainda acontece, com `context.fallback_reason` populado pra auditoria. Se o próprio upsert falhar, retorna 200 com fallback mesmo assim (client não pode ficar travado) e loga `console.error` da falha de DB
-- [ ] **Reader Home** (`getOnboardingInsightContract` em `lib/supabase/queries/insights.ts`) aceita **apenas** `schemaVersion === 'onboarding_insight_v2'`. Versão ausente ou diferente → retorna `null` (cai no fallback estático do `InsightCard` já implementado no PR #46)
+- [ ] **Reader Home** (`getOnboardingInsightContract` em `lib/supabase/queries/insights.ts`) aceita **apenas** `schemaVersion === 'onboarding_insight_v2'` no contrato lido. Versão ausente ou diferente → retorna `null` (cai no fallback estático do `InsightCard` já implementado no PR #46)
 - [ ] **Bloqueios legais intactos**: `FORBIDDEN_OUTPUT_PATTERNS` (SURMOUNT/SURPASS/STEP/clinical trial/estudo clínico) e `FORBIDDEN_PHRASES` (motivacional/prescritivo/alarmista/percentuais/população) **não são tocadas**, ou são **expandidas** com novas entradas se aparecer gap — nunca encolhidas
 - [ ] Persistência legacy mantém `headline` / `body` / `disclaimer` derivados (compat V4) — ADR 0002 segue válido
-- [ ] **Zero mudança em UI** além do necessário pra `tsc --noEmit` passar (ex: passar `schemaVersion` em algum mock de teste, etc). Não alterar `result.tsx`, `InsightCard.tsx`, `useOnboardingInsightFromDB.ts`, nada que mexa visual
+- [ ] **Zero mudança em UI** além do necessário pra `tsc --noEmit` passar. Não alterar `result.tsx`, `InsightCard.tsx`, `useOnboardingInsightFromDB.ts`, nada que mexa visual
 - [ ] `npx tsc --noEmit` PASS
 - [ ] `npm run lint` PASS
 - [ ] `deno check --config supabase/functions/generate-onboarding-insight/deno.json supabase/functions/generate-onboarding-insight/index.ts` PASS
 - [ ] Edge Function deployada via MCP `deploy_edge_function` em versão nova (v9 ou superior), com `verify_jwt=true` mantido
 - [ ] Invoke autenticado de cenário **success**: payload válido → contrato retornado tem `schemaVersion === 'onboarding_insight_v2'`. Row em `educational_insights` tem `context.schemaVersion` e `context.output.schemaVersion`. Verificar via Supabase MCP `execute_sql`
-- [ ] Teste unitário Deno (em `supabase/functions/generate-onboarding-insight/index.test.ts`):
-  - `buildFallbackContract(ctx)` retorna contrato Zod-válido pra `ctx` com todos campos preenchidos
-  - `buildFallbackContract({})` (todos campos undefined) retorna contrato Zod-válido com labels genéricos
-  - Fallback passa por `containsForbiddenText` sem flag
-- [ ] **Sem screenshots** (sem impacto visual — fallback do servidor continua renderizando o mesmo `InsightCard` no client com fallback estático já implementado)
+- [ ] Testes Deno (ver "Estratégia de testes" abaixo): mínimo 4 casos, todos PASS
+- [ ] **Sem screenshots** (sem impacto visual)
 - [ ] Aprendizado #57 registrado em `docs/learnings.md`
-- [ ] ADR 0004 criado em `docs/adr/0004-fallback-seguro-edge-onboarding-insight.md` documentando a decisão de retornar 200 em vez de 500 em erros LLM-side
+- [ ] ADR 0004 criado em `docs/adr/0004-fallback-seguro-edge-onboarding-insight.md`
 
 ---
 
 ## Restrições explícitas
 
 - **Karpathy regra 22:** mudança cirúrgica em 3 arquivos de código (`types/api.ts`, Edge Function, reader em `insights.ts`) + 1 arquivo de teste novo + ADR + aprendizado. Zero "drive-by refactoring" em UI ou hooks consumidores
-- **Não tocar** em `app/(onboarding)/result.tsx`, `components/home/InsightCard.tsx`, `hooks/useOnboardingInsightFromDB.ts`, `hooks/useOnboardingInsight.ts` — nenhuma mudança visual
-- **Não alterar** RLS de `educational_insights` (já validada em PR #46)
-- **Não renomear** `context.contract_version` no jsonb (manter pra compat, marcar como deprecated em comentário)
-- **Não expandir** `OnboardingInsightContract` com campos novos além de `schemaVersion` — esse é outro PR se for o caso
-- **Não encolher** os bloqueios legais (`FORBIDDEN_OUTPUT_PATTERNS` + `FORBIDDEN_PHRASES`)
-- **Não usar** `as any`, `// @ts-ignore`, `// eslint-disable`
-- **Não trocar** modelo `gpt-5` nem provedor OpenAI (Aprendizado #53)
-- **Não desligar** `verify_jwt=true` (ADR 0003)
-- **Não expor** `OPENAI_API_KEY` nem `SUPABASE_SERVICE_ROLE_KEY` ao client
-- **Fallback shortInsight/nextStep/contextBullets** são strings **fixas em código**, nunca geradas dinamicamente por LLM (toda a defesa do fallback é ser determinístico)
+- **NÃO TOCAR** em `app/(onboarding)/result.tsx`, `components/home/InsightCard.tsx`, `hooks/useOnboardingInsightFromDB.ts`, `hooks/useOnboardingInsight.ts` — nenhuma mudança visual
+- **NÃO ALTERAR** RLS de `educational_insights` (já validada em PR #46)
+- **NÃO RENOMEAR** `context.contract_version` no jsonb (manter pra compat, marcar como deprecated em comentário)
+- **NÃO EXPANDIR** `OnboardingInsightContract` com campos novos além de `schemaVersion`
+- **NÃO ENCOLHER** os bloqueios legais (`FORBIDDEN_OUTPUT_PATTERNS` + `FORBIDDEN_PHRASES`)
+- **NÃO USAR** `as any`, `// @ts-ignore`, `// eslint-disable`
+- **NÃO TROCAR** modelo `gpt-5` nem provedor OpenAI (Aprendizado #53)
+- **NÃO DESLIGAR** `verify_jwt=true` (ADR 0003)
+- **NÃO EXPOR** `OPENAI_API_KEY` nem `SUPABASE_SERVICE_ROLE_KEY` ao client
+- **NÃO MEXER em `OPENAI_API_KEY` de produção sob nenhuma hipótese** — simular falha apenas via teste unitário com injeção de dependência ou mock (ver "Estratégia de testes")
+- **Fallback shortInsight/nextStep/contextBullets** são **strings fixas em código**, nunca geradas dinamicamente por LLM
+
+---
+
+## Estratégia de testes (ajuste 3 do Léo)
+
+**Problema a evitar:** importar `index.ts` em um arquivo de teste executa `Deno.serve` no top-level, prejudicando testabilidade headless.
+
+**Solução:** extrair funções puras testaveis para um módulo separado `supabase/functions/generate-onboarding-insight/handler.ts` que **não** chama `Deno.serve`. O `index.ts` vira um wrapper fino:
+
+```ts
+// index.ts (só amarra Deno.serve ao handler):
+import { handleRequest } from './handler.ts'
+Deno.serve(handleRequest)
+```
+
+```ts
+// handler.ts (puro, testável):
+export function buildFallbackContract(ctx, reason) { ... }
+export function containsForbiddenText(contract) { ... }
+export function deriveDeterministicLabels(ctx) { ... }
+export const SYSTEM_PROMPT = '...'
+export const FIXED_DISCLAIMER = '...'
+export const FORBIDDEN_OUTPUT_PATTERNS = [...]
+export const FORBIDDEN_PHRASES = [...]
+
+// Handler exportado para teste. Recebe dependencies via parâmetro
+// (openai, supabase) para permitir mock.
+export async function handleRequest(req: Request, deps?: HandlerDeps): Promise<Response> { ... }
+
+export type HandlerDeps = {
+  openai?: { chat: { completions: { create: (...) => Promise<...> } } }
+  serviceClient?: SupabaseClient
+  // defaults: cria via createClient + Deno.env
+}
+```
+
+**Casos de teste em `handler.test.ts`:**
+
+1. `buildFallbackContract({ medication: 'Mounjaro', dose_mg: 5, treatment_week: 8, current_weight: 90, initial_weight: 100, goal_weight: 80 }, 'openai_fail')` → contrato Zod-válido com `schemaVersion === 'onboarding_insight_v2'`, labels determinísticos preenchidos, shortInsight/nextStep/contextBullets exatamente iguais às strings fixas.
+2. `buildFallbackContract({}, 'json_invalid')` → contrato Zod-válido mesmo com ctx vazio (labels genericos: "Fase inicial do tratamento", "GLP-1 em acompanhamento", "Meta ainda não informada", "Variação ainda não calculada").
+3. `containsForbiddenText(buildFallbackContract({ medication: 'Mounjaro', dose_mg: 5 }, 'forbidden_text'))` → `null` (fallback não bate em nenhuma das listas).
+4. `handleRequest(req, { openai: { chat: { completions: { create: () => { throw new Error('OpenAI down') } } } } })` com req autenticado e payload válido → response.status === 200, body contém fallback contract com `schemaVersion === 'onboarding_insight_v2'`, body não tem `error` key.
+
+O arquivo de teste **não importa `index.ts`** — importa só `handler.ts`, evitando o side-effect do `Deno.serve`.
+
+---
+
+## Validador anti-citação (ajuste 2 do Léo)
+
+**Problema a evitar:** grep simples `git diff --staged | grep -E "SURMOUNT|SURPASS|STEP"` retorna match porque esses termos aparecem **legitimamente** na blocklist (`FORBIDDEN_OUTPUT_PATTERNS`). Inválido como gate.
+
+**Solução:** validar **apenas as strings user-facing** que vão pra UI/persistência, **excluindo** as listas proibitivas. Lista explícita:
+
+- `SYSTEM_PROMPT` (template enviado pra OpenAI) — grep manual
+- Strings fixas do fallback (`shortInsight`, `nextStep`, `contextBullets`) — teste unitário (caso 3 acima)
+- Outputs reais retornados na invocação autenticada de teste — inspecionar response body
+- Strings fixas que viram body legado (`buildLegacyBody`) — derivam do fallback ou do contrato real, já passam por `containsForbiddenText`
+
+**NÃO grepar** a Edge Function como um todo — a blocklist mora lá.
+
+Grep canon a usar manualmente (no SYSTEM_PROMPT específico):
+```bash
+awk '/^const SYSTEM_PROMPT = `/,/^`$/' supabase/functions/generate-onboarding-insight/handler.ts \
+  | grep -Ev '^(const SYSTEM_PROMPT|`)' \
+  | grep -E 'SURMOUNT|SURPASS|STEP|clinical trial|estudo clínico' \
+  && echo 'FAIL: forbidden term in SYSTEM_PROMPT' \
+  || echo 'PASS: SYSTEM_PROMPT clean'
+```
 
 ---
 
@@ -105,88 +200,93 @@ Ambos sustentam o Prompt 32 (Home D0 reaproveita contrato direto do DB) e qualqu
 | Fase | Skill | Por quê |
 |---|---|---|
 | Planejamento | `superpowers:writing-plans` | Persistir plano em `docs/superpowers/plans/2026-05-21-onboarding-insight-hardening.md` (regra 21) |
-| Planejamento | `grill-with-docs` | Stress-test contra ADRs 0001/0002/0003 e D015. Confirmar se renomear `contract_version` → `schemaVersion` ou manter ambos. Atualizar ADR 0002 com a decisão |
+| Planejamento | `grill-with-docs` | Stress-test contra ADRs 0001/0002/0003 e D015. Confirmar decisão de coexistência `contract_version` vs `schemaVersion`. Atualizar ADR 0002 |
 | Planejamento | `karpathy-guidelines` | Cada linha do diff traceia a um critério de aceitação. Diff cirúrgico |
 | Implementação | `supabase` | Deploy via MCP `deploy_edge_function`. Verificação de persistência via `execute_sql` |
 | Validação | `security-review` | Confirmar que fallback não expande superfície de PHI em logs e que `service_role` continua restrito ao upsert |
 
 ### B) Plano de execução
 
-1. **Ler estado atual** das 4 fontes (types/api.ts, Edge Function, reader, ADRs). Confirmar onde adicionar `schemaVersion` e onde adicionar `buildFallbackContract`. Checkpoint: Léo aprova diagrama de fluxo (Edge → success/fail → contrato v2 → DB → reader → client).
-2. **Persistir plano** via `superpowers:writing-plans` em `docs/superpowers/plans/2026-05-21-onboarding-insight-hardening.md`.
-3. **`grill-with-docs`**: stress-test do schemaVersion vs contract_version. Atualizar `docs/adr/0002-persistencia-hibrida-educational-insights.md` com nota sobre coexistência (legado `contract_version` mantido por compat, canon é `schemaVersion`).
-4. **Criar ADR 0004** em `docs/adr/0004-fallback-seguro-edge-onboarding-insight.md` documentando a política de fallback (200 em vez de 500 em erros LLM-side, razões legais e de UX).
-5. **Editar `types/api.ts`**: adicionar `schemaVersion: z.literal('onboarding_insight_v2')` ao schema Zod. Tipo `OnboardingInsightContract` reexportado.
-6. **Editar Edge Function** `supabase/functions/generate-onboarding-insight/index.ts`:
-   - a. Adicionar `schemaVersion` no schema Zod local + JSON Schema enviado pra OpenAI
-   - b. Criar função pura `buildFallbackContract(ctx, reason)` no topo do arquivo
-   - c. Refatorar try/catch:
-     - Auth fail: rethrow como `AuthError` com status 401
-     - Input parse fail: rethrow como `InputError` com status 400
-     - OpenAI/JSON/Zod/forbidden/upsert fails: cair em fallback — montar contrato fallback, tentar upsert (best-effort), retornar 200 com fallback
-   - d. Servidor sempre sobrescreve `schemaVersion` no contrato final (não confia no LLM)
-   - e. Logs: warn na razão do fallback, sem PHI
-   - f. `context.schemaVersion` + `context.output.schemaVersion` + `context.fallback_reason?` quando aplicável
-7. **Criar testes Deno** em `supabase/functions/generate-onboarding-insight/index.test.ts`:
-   - `buildFallbackContract` produz contrato Zod-válido pra ctx completo, parcial e vazio
-   - Fallback não aciona `containsForbiddenText`
-   - Resposta de fallback tem status 200 (testar via função exportada que simula resposta sem subir o servidor)
-8. **Editar reader** `lib/supabase/queries/insights.ts`:
-   - `getOnboardingInsightContract` valida `schemaVersion === 'onboarding_insight_v2'` antes de retornar. Versão ausente ou diferente → `null`.
-9. **Validar localmente**: `tsc --noEmit`, `lint`, `deno check`, rodar testes Deno.
-10. **Deploy** via MCP `deploy_edge_function`. Confirmar v9+ e `verify_jwt=true`.
-11. **Invoke autenticado** real com fixture válida. Verificar response contém `schemaVersion`. Verificar DB row tem `context.schemaVersion` E `context.output.schemaVersion` via `execute_sql`.
-12. **Cenário fallback**: documentar como simular (opções: trocar `OPENAI_API_KEY` pra inválida em deploy de teste temporário, OU validar via teste unitário só — Léo decide).
-13. **`security-review`**: confirmar service_role restrito ao upsert, logs sem PHI, não-leak de chave em fallback path.
-14. **Aprendizado #57** em `docs/learnings.md`.
-15. **Abrir PR** `feature/33b-onboarding-insight-hardening`.
+1. **Ler estado atual** das 4 fontes (types/api.ts, Edge Function, reader, ADRs). Mapear pontos de injeção do 2-step parse + buildFallbackContract. Checkpoint: Léo aprova diagrama de fluxo final.
+2. **Persistir plano** via `superpowers:writing-plans`.
+3. **`grill-with-docs`** + atualizar ADR 0002 com nota sobre coexistência (legado `contract_version` mantido, canon é `schemaVersion` no payload).
+4. **Criar ADR 0004** em `docs/adr/0004-fallback-seguro-edge-onboarding-insight.md` documentando a política de fallback (200 em vez de 500 em erros LLM-side).
+5. **Editar `types/api.ts`**: adicionar `schemaVersion: z.literal('onboarding_insight_v2')` ao schema canon. Exportar `onboardingInsightRawSchema = onboardingInsightContractSchema.omit({ schemaVersion: true })`.
+6. **Extrair handler.ts** de `index.ts`. Mover funcoes puras e constantes (FORBIDDEN_*, SYSTEM_PROMPT, FIXED_DISCLAIMER, deriveDeterministicLabels, containsForbiddenText, buildLegacyBody, schemas locais) pra `handler.ts`. `index.ts` vira `Deno.serve(handleRequest)`. Imports do `handler.ts` não disparam `Deno.serve`.
+7. **Adicionar 2-step parse** em `handler.ts`:
+   - a. `onboardingInsightRawSchema` (sem schemaVersion) parsing do output do LLM
+   - b. `onboardingInsightContractSchema` (com schemaVersion literal) parsing final após servidor injetar `schemaVersion: 'onboarding_insight_v2'`
+8. **Adicionar `buildFallbackContract`** em `handler.ts` (função pura). Strings fixas do fallback (shortInsight/nextStep/contextBullets) viram `const FALLBACK_*` no topo. Mesmo 2-step parse no path do fallback.
+9. **Refatorar `handleRequest`** em `handler.ts`:
+   - Auth fail: 401
+   - Input parse fail: 400
+   - OpenAI/JSON/Zod raw/forbidden/upsert fails: cair em fallback path — montar via `buildFallbackContract`, upsert best-effort com `fallback_reason`, retornar 200
+   - Aceitar `HandlerDeps` opcional pra injeção de mock em teste
+10. **Criar `handler.test.ts`** com mínimo 4 casos (ver "Estratégia de testes").
+11. **Editar reader** `lib/supabase/queries/insights.ts`: `getOnboardingInsightContract` valida `schemaVersion === 'onboarding_insight_v2'`. Versão ausente ou diferente → `null`.
+12. **Validar localmente**: `tsc --noEmit`, `lint`, `deno check`, `deno test`.
+13. **Deploy** via MCP `deploy_edge_function`. Confirmar v9+ e `verify_jwt=true`.
+14. **Invoke autenticado** real com fixture válida (caminho happy). Verificar via Supabase MCP `execute_sql` que `context.schemaVersion = 'onboarding_insight_v2'` E `context.output.schemaVersion = 'onboarding_insight_v2'`.
+15. **Caminho fallback validado APENAS via teste unitário do passo 10** (decisão Léo). Sem mexer em OPENAI_API_KEY de produção sob nenhuma hipótese.
+16. **`security-review`**: confirmar service_role restrito ao upsert, logs sem PHI, fallback path não expande superfície de leak.
+17. **Aprendizado #57** em `docs/learnings.md`.
+18. **Abrir PR** `feature/33b-onboarding-insight-hardening`.
 
 ### C) Riscos identificados
 
 | Risco | Severidade | Mitigação |
 |---|---|---|
-| Insights existentes em DB sem `schemaVersion` (pré-PR #36 ou gerados em versão intermediária) | Média | Reader rejeita → client cai no fallback estático já implementado. Aceitável pré-launch. Documentar em aprendizado #57 que **redeploy do PR 33b invalida cache de insights existentes** — usuários de QA precisam refazer onboarding pra ver contrato v2 |
-| Fallback só com labels determinísticos quebra UX da Home (D0 sem `shortInsight`/`nextStep` significativos) | Alta | Fallback **sempre** preenche todos os 8 campos. `shortInsight` + `nextStep` são strings fixas no código, calmas, sem claim. Cobrem o caminho de erro sem deixar UI vazia |
-| Duplicação de schema Zod entre client e Edge Function pode divergir no tempo | Média | Documentar no título do schema da Edge Function que ele é "mirror de types/api.ts". Critério de aceitação pede comentário explícito no código |
-| LLM pode gerar `schemaVersion` errado e quebrar Zod parse | Baixa | Servidor sobrescreve `schemaVersion` **depois** do parse com `'onboarding_insight_v2'`. LLM só preenche o campo pra cumprir o JSON Schema; o valor final é sempre do servidor |
-| Upsert fail no fallback path silenciosamente perde insight no DB | Média | Log `console.error` específico + retorna 200 com fallback mesmo assim. Próxima invocação tenta de novo. Aceitável porque cliente fica funcional |
-| `FORBIDDEN_PHRASES` cresce e bate em algum campo fallback | Baixa | Teste unitário valida no CI. Se um dia adicionar phrase que bate no fallback, o teste falha antes do deploy |
-| Edge Function versão nova quebra invocações em voo | Baixa | Deploy idempotente. Invocações em curso terminam na versão antiga; próximas usam v9 |
-| ADR 0002 fica desatualizado (menciona `contract_version`) | Baixa | Etapa 3 do plano atualiza ADR com nota sobre coexistência |
-| Resposta de fallback ter `disclaimer` diferente do gerado quebra teste visual da Home | Baixa | `disclaimer` sempre vem de `FIXED_DISCLAIMER` (igual no path success e no path fallback) |
+| Insights existentes em DB sem `schemaVersion` no payload | Média | Reader rejeita → client cai no fallback estático já implementado. Aceitável pré-launch. Documentar em #57: redeploy do PR 33b invalida cache de insights existentes — usuários de QA precisam refazer onboarding |
+| LLM devolve `schemaVersion` errado ou ausente | Baixa | Resolvido pelo 2-step parse: raw schema ignora o campo, servidor injeta literal, canon valida |
+| Fallback só com labels determinísticos quebra UX da Home | Média | Fallback **sempre** preenche todos os 8 campos. Strings fixas calmas, sem claim, sem motivacional |
+| Duplicação de schema Zod entre client e Edge Function pode divergir no tempo | Média | Comment explícito "mirror de types/api.ts" no schema da Edge Function. Considerar `import { ... } from '../../../types/api.ts'` se Deno aceitar (testar localmente) |
+| `index.ts` fica frame minimal mas `Deno.serve` ainda é lançado em deploy | Esperado | Confirmação pós-deploy via invocação autenticada. `handler.test.ts` valida lógica sem Deno.serve |
+| Upsert fail no fallback path silenciosamente perde insight no DB | Média | Log `console.error` específico + retorna 200 com fallback mesmo assim. Próxima invocação tenta de novo |
+| `FORBIDDEN_PHRASES` cresce e bate em algum campo fallback | Baixa | Teste 3 valida. Se adicionar phrase que bate, teste falha antes do deploy |
+| Edge Function versão nova quebra invocações em voo | Baixa | Deploy idempotente. Invocações em curso terminam na versão antiga; próximas usam v9+ |
+| ADR 0002 fica desatualizado | Baixa | Etapa 3 do plano atualiza |
+| Mock de OpenAI em teste exige tipos compatíveis com `npm:openai@4.x` | Média | Definir `HandlerDeps['openai']` como interface mínima (só `chat.completions.create`), não tipo total da lib |
 
 ### D) Arquivos que vai criar/editar
 
 | Arquivo | Ação | Resumo |
 |---|---|---|
-| `types/api.ts` | editar | +1 linha: `schemaVersion: z.literal('onboarding_insight_v2')` |
-| `supabase/functions/generate-onboarding-insight/index.ts` | editar | +`buildFallbackContract`, +`schemaVersion` no schema/JSON Schema/upsert, refator try/catch (~50 linhas alteradas) |
-| `supabase/functions/generate-onboarding-insight/index.test.ts` | criar | Testes Deno do fallback (~80 linhas) |
+| `types/api.ts` | editar | +`schemaVersion` no canon + export `onboardingInsightRawSchema` via `.omit()` (~3 linhas) |
+| `supabase/functions/generate-onboarding-insight/handler.ts` | criar | Extração de index.ts: handler + funções puras + constantes + 2-step parse + buildFallbackContract (~300 linhas movidas + ~50 linhas novas) |
+| `supabase/functions/generate-onboarding-insight/index.ts` | editar | Reduzir a `Deno.serve(handleRequest)` + imports (~5 linhas) |
+| `supabase/functions/generate-onboarding-insight/handler.test.ts` | criar | Testes Deno do fallback + 2-step parse + handler com mock (~120 linhas) |
 | `lib/supabase/queries/insights.ts` | editar | +verificação `schemaVersion === 'onboarding_insight_v2'` no reader (~5 linhas) |
-| `docs/adr/0002-persistencia-hibrida-educational-insights.md` | editar | Nota sobre coexistência `contract_version` (legado) vs `schemaVersion` (canon) |
-| `docs/adr/0004-fallback-seguro-edge-onboarding-insight.md` | criar | Decisão de retornar 200 em vez de 500 em erros LLM-side. Alternativas + consequências + reversibilidade |
+| `docs/adr/0002-persistencia-hibrida-educational-insights.md` | editar | Nota sobre coexistência `contract_version` (legado) vs `schemaVersion` (canon no payload) |
+| `docs/adr/0004-fallback-seguro-edge-onboarding-insight.md` | criar | Decisão de retornar 200 em vez de 500 em erros LLM-side |
 | `docs/superpowers/plans/2026-05-21-onboarding-insight-hardening.md` | criar | Plano persistido |
 | `docs/learnings.md` | editar | Aprendizado #57 |
 
 **Não tocar em:**
-- `app/(onboarding)/result.tsx` (UI Result)
-- `components/home/InsightCard.tsx` (UI Home)
-- `hooks/useOnboardingInsightFromDB.ts` (consumer Home, não muda)
-- `hooks/useOnboardingInsight.ts` (consumer Result, não muda)
+- `app/(onboarding)/result.tsx`, `components/home/InsightCard.tsx`
+- `hooks/useOnboardingInsightFromDB.ts`, `hooks/useOnboardingInsight.ts`
 - Qualquer outra Edge Function
 - RevenueCat, push, schema do Supabase (sem migration)
 
 ### E) Como vai validar
 
-- [ ] `npx tsc --noEmit` PASS sem erros novos
-- [ ] `npm run lint` PASS (warnings preexistentes aceitos)
+- [ ] `npx tsc --noEmit` PASS
+- [ ] `npm run lint` PASS
 - [ ] `deno check --config supabase/functions/generate-onboarding-insight/deno.json supabase/functions/generate-onboarding-insight/index.ts` PASS
-- [ ] `deno test supabase/functions/generate-onboarding-insight/index.test.ts` PASS (3+ casos)
+- [ ] `deno check --config .../deno.json .../handler.ts` PASS
+- [ ] `deno test supabase/functions/generate-onboarding-insight/handler.test.ts` PASS (4+ casos)
 - [ ] Edge Function v9+ deployada, `verify_jwt=true` confirmado via MCP
-- [ ] Invoke autenticado com fixture válida → response.schemaVersion === 'onboarding_insight_v2'
-- [ ] `execute_sql`: `select context->>'schemaVersion', context->'output'->>'schemaVersion' from educational_insights where user_id=$1 and trigger_source='onboarding' order by created_at desc limit 1` → ambos retornam `onboarding_insight_v2`
-- [ ] Grep anti-citação no diff: `git diff --staged | grep -E "SURMOUNT|SURPASS|STEP|clinical trial|estudo clínico"` retorna 0
-- [ ] Reader Home com fixture sem schemaVersion (row legado) → retorna null (testar via `execute_sql` que insere row sem schemaVersion + abrir Home no simulador → cai no fallback estático)
+- [ ] Invoke autenticado real (caminho happy): response.schemaVersion === 'onboarding_insight_v2'
+- [ ] `execute_sql`: 
+  ```sql
+  SELECT context->>'schemaVersion', context->'output'->>'schemaVersion'
+  FROM educational_insights
+  WHERE user_id = $1 AND trigger_source = 'onboarding'
+  ORDER BY created_at DESC LIMIT 1
+  ```
+  → ambos retornam `onboarding_insight_v2`
+- [ ] Caminho fallback validado APENAS via teste unitário (`handler.test.ts` caso 4). NÃO simular em produção.
+- [ ] **Anti-citação** (ajuste 2 do Léo): grep apenas em SYSTEM_PROMPT + strings fixas de fallback + outputs retornados em testes/invocação real. **NÃO** grepar `handler.ts` inteiro (`FORBIDDEN_*` contém os termos legitimamente)
+- [ ] Reader Home com row sem `schemaVersion` (simular via `execute_sql` que insere row com `context = {output: {...sem schemaVersion}}`) → retorna `null` no client. Limpar a row depois
 - [ ] `security-review` PASS — `service_role` restrito ao upsert; logs não vazam PHI; `OPENAI_API_KEY` não exposto
 - [ ] **Sem screenshots** (sem impacto visual)
 - [ ] Aprendizado #57 registrado
@@ -198,10 +298,10 @@ Arquivos a ler:
 - `types/api.ts` (~20 linhas) — Read direto
 - `supabase/functions/generate-onboarding-insight/index.ts` (~340 linhas) — Read em janelas via `offset`/`limit`, ou `rtk read`
 - `lib/supabase/queries/insights.ts` (~140 linhas) — Read direto
-- `docs/adr/0001*.md` + `0002*.md` + `0003*.md` — Read direto cada (todos <100 linhas)
-- `docs/PRODUCT.md` (~600 linhas) — `rtk read` apenas na seção de Voice & Tone se precisar consultar guardrail de copy do fallback
+- ADRs 0001/0002/0003 — Read direto cada (todos <100 linhas)
+- `docs/PRODUCT.md` — `rtk read` apenas na seção de Voice & Tone se precisar revalidar fallback copy
 
-Greps anti-citação pós-implementação são curtos — Grep direto OK.
+Greps anti-citação pós-implementação são curtos — Grep direto OK (mas SEM grepar `handler.ts` inteiro).
 
 ---
 
@@ -262,26 +362,17 @@ return onboardingInsightContractSchema.safeParse(output).data ?? null
                           /          \
                     success         fail (any reason)
                        │                  │
-                    Zod parse        buildFallback(ctx, reason)
-                    /        \               │
-               valid       forbidden       valid by construction
-                  │             │               │
-            servidor sobrescreve schemaVersion       ←───────┘
-                  │                                      
+              RAW Zod parse        buildFallbackContract(ctx, reason)
+              (sem schemaVersion)         │
+                    │                     │
+            servidor injeta schemaVersion = 'onboarding_insight_v2'
+                    │                     │
+            CANON Zod parse ←───────┘
+            (com schemaVersion literal)
+                    │
             upsert(context.schemaVersion + output.schemaVersion + ?fallback_reason)
-                  │
+                    │
               200 { contrato v2 }
-```
-
-Em cliente:
-```
-useOnboardingInsightFromDB → getOnboardingInsightContract
-  → if context.schemaVersion !== 'onboarding_insight_v2': return null
-  → if !output: return null
-  → if safeParse fail: return null
-  → return contract
-InsightCard:
-  source='onboarding' → contract OR fallback estático
 ```
 
 ### Política de fallback (resumo pra ADR 0004)
@@ -292,7 +383,7 @@ InsightCard:
 | Input ctx inválido | 400 | 400 (inalterado) |
 | OpenAI fetch falha | 500 | 200 + fallback |
 | OpenAI retorna JSON inválido | 500 | 200 + fallback |
-| Output viola Zod | 500 | 200 + fallback |
+| Output viola RAW Zod | 500 | 200 + fallback |
 | Output contém termo proibido | 500 | 200 + fallback |
 | Upsert falha | 500 | 200 + fallback (log error) |
 
@@ -314,26 +405,34 @@ antigos sem quebrar o reader. (2) 500 quebra a promessa emocional do Result/
 Home — onboarding fica sem insight estruturado por uma razão LLM, que o usuário
 não tem como entender nem agir.
 
-Solução. (1) schemaVersion como campo Zod no contrato (client e Edge Function),
-servidor sobrescreve determinísticamente. Persistido em context.schemaVersion E
-context.output.schemaVersion. Reader Home rejeita qualquer versão diferente.
-(2) Edge Function diferencia auth/input (4xx, erro do cliente) de OpenAI/Zod/
-forbidden/upsert (200 com fallback determinístico, erro do servidor). Fallback
-shortInsight/nextStep/contextBullets são strings fixas no código, passam pelos
-mesmos bloqueios legais, calmas, sem claim.
+Solução. (1) schemaVersion como campo Zod literal no contrato canon. Servidor
+faz 2-step parse: raw schema (sem schemaVersion) processa output do LLM,
+servidor injeta schemaVersion determinístico, canon schema valida. LLM pode
+mandar schemaVersion errado ou omitir — sempre cai no literal injetado.
+Persistido em context.schemaVersion E context.output.schemaVersion. Reader
+Home rejeita qualquer versão diferente. (2) Edge Function diferencia
+auth/input (4xx, erro do cliente) de OpenAI/Zod/forbidden/upsert (200 com
+fallback determinístico, erro do servidor que cliente não pode resolver).
+Fallback shortInsight/nextStep/contextBullets são strings fixas no código,
+passam pelos mesmos bloqueios legais, calmas, sem claim.
 
-Princípio. Contrato com LLM precisa de duas camadas: (a) schemaVersion no
-próprio payload pra reader poder rejeitar versões antigas; (b) fallback
+Princípio. Contrato com LLM precisa de três camadas: (a) schemaVersion no
+próprio payload pra reader poder rejeitar versões antigas; (b) 2-step parse
+no servidor pra não confiar no LLM pra string canônica; (c) fallback
 determínistico no servidor pra erros LLM-side não virarem 5xx pro cliente.
-5xx é pra erro do servidor que cliente não pode resolver — erro de LLM cabe em
-200 + fallback, porque o cliente *tem* alternativa (fallback estático) e não
-há nada que fazer (retry idempotente).
+5xx é pra erro do servidor que cliente não pode resolver — erro de LLM cabe
+em 200 + fallback, porque o cliente *tem* alternativa (fallback estático) e
+não há nada que fazer (retry idempotente não conserta LLM mal-comportado).
 
-Bônus. Auth fail e input invalido são erros do cliente, mantêm 4xx. Só falhas
-LLM-side viram 200 com fallback. Distinção clara entre "erro do cliente" e
-"erro do servidor que cliente não pode resolver".
+Bônus 1. Auth fail e input invalido são erros do cliente, mantêm 4xx. Só
+falhas LLM-side viram 200 com fallback. Distinção clara entre "erro do
+cliente" e "erro do servidor que cliente não pode resolver".
+
+Bônus 2. Edge Function dividida em `index.ts` (só `Deno.serve(handleRequest)`)
++ `handler.ts` (puro, testável, com injeção de dep). Pattern aplicável a
+qualquer Edge Function que precise de testes Deno sem disparar listener.
 ```
 
 ---
 
-**Fim do Prompt 33b.**
+**Fim do Prompt 33b (revisado com 5 ajustes do Léo em 2026-05-21).**
