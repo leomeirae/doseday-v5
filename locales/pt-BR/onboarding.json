@@ -208,6 +208,7 @@
       "weightGoal": "Meta de peso: {{goal}}kg. Faltam {{delta}}kg.",
       "support": "Vamos acompanhar isso semana a semana."
     },
+    "nextStepTitle": "Próximo passo",
     "disclaimer": "Isso é uma anotação inteligente, não orientação médica. Sempre fale com um profissional de saúde.",
     "cta": "Começar a usar"
   },

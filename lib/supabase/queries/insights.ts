@@ -1,4 +1,8 @@
 import { supabase } from '@lib/supabase/client'
+import {
+  onboardingInsightContractSchema,
+  type OnboardingInsightContract,
+} from '../../../types/api'
 
 export type { MoodValue } from '@lib/validation/diarioSchemas'
 export { emotionalStateToMood } from '@lib/validation/diarioSchemas'
@@ -53,14 +57,14 @@ export type GenerateOnboardingInsightInput = {
 
 export async function callGenerateOnboardingInsight(
   input: GenerateOnboardingInsightInput
-): Promise<CheckinInsightOutput> {
-  const { data, error } = await supabase.functions.invoke<CheckinInsightOutput>(
+): Promise<OnboardingInsightContract> {
+  const { data, error } = await supabase.functions.invoke<unknown>(
     'generate-onboarding-insight',
     { body: input }
   )
   if (error) throw error
   if (!data) throw new Error('Empty response from generate-onboarding-insight')
-  return data
+  return onboardingInsightContractSchema.parse(data)
 }
 
 export async function callMemoryDailyInsight(): Promise<DailyInsightResponse> {
