@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+  useReducedMotion,
+} from 'react-native-reanimated'
 import { SymbolView } from 'expo-symbols'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 
@@ -11,11 +16,18 @@ const EXIT = FadeOut.duration(150)
 
 export function ExpandableContextSection({ label, bullets }: Props) {
   const [expanded, setExpanded] = useState(false)
+  const reducedMotion = useReducedMotion()
+  const containerAnimation = reducedMotion ? {} : { layout: LinearTransition }
+  const bulletAnimation = reducedMotion ? {} : { entering: ENTER, exiting: EXIT }
 
   if (bullets.length === 0) return null
 
   return (
-    <Animated.View style={styles.container} layout={LinearTransition} collapsable={false}>
+    <Animated.View
+      style={styles.container}
+      collapsable={false}
+      {...containerAnimation}
+    >
       <Pressable
         style={styles.header}
         onPress={() => setExpanded(prev => !prev)}
@@ -32,7 +44,10 @@ export function ExpandableContextSection({ label, bullets }: Props) {
         <Text style={styles.label}>{label}</Text>
       </Pressable>
       {expanded && (
-        <Animated.View entering={ENTER} exiting={EXIT} style={styles.bulletsContainer}>
+        <Animated.View
+          style={styles.bulletsContainer}
+          {...bulletAnimation}
+        >
           {bullets.map((bullet, index) => (
             <View key={index} style={styles.bulletRow}>
               <View style={styles.dot} />

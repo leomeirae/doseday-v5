@@ -296,3 +296,13 @@ Registrado em 2026-05-20 durante a preparação do Prompt 33.
 - Não implementar auth manual com parse de header — duplica trabalho do Supabase e é fonte de bug
 
 **Impacto em prompts futuros.** Qualquer prompt que crie ou refatore Edge Function deve assumir `verify_jwt=true` por padrão. Exceções (webhook público, cron interno, callback de RevenueCat/Apple) precisam ser justificadas em ADR.
+
+## 14.23 Aprendizado 55 — Structured Outputs ainda precisam de reparo/retry semântico
+
+Registrado em 2026-05-21 durante o Prompt 31 (Result IA redesign).
+
+**Contexto.** Ao validar a tela Result IA no simulador, a primeira invocação autenticada de `generate-onboarding-insight` caiu no fallback porque a Edge Function retornou `500` depois que o Zod rejeitou `nextStep` com menos de 20 caracteres.
+
+**Achado.** Mesmo usando OpenAI Structured Outputs com JSON Schema, campos textuais com restrição semântica/local (`min(20)`, copy em PT-BR, tom clínico) podem sair válidos para JSON mas inválidos para o schema Zod de runtime. A segunda invocação passou e gerou contrato válido, confirmando comportamento intermitente do modelo, não falha fixa de auth ou do client.
+
+**Impacto em prompts futuros.** Edge Functions com contrato IA devem ter caminho de reparo/retry server-side quando o Zod rejeita saída estruturada: re-prompt curto com erro de schema, ou fallback determinístico que respeite o contrato. Não deixar erro de validação do modelo virar `500` direto para o app quando a UI depende do contrato para screenshot/ativação.
