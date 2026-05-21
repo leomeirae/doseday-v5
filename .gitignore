@@ -57,3 +57,9 @@ android/
 
 # Impeccable critique binaries (screenshots ficam no PR via raw URL)
 .impeccable/critique/screenshots/
+
+# Graphify build artifacts (cache local, não rastreado)
+graphify-out/
+
+# Impeccable critique reports (gerados localmente, não comitados)
+.impeccable/critique/

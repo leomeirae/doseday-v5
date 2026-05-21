@@ -27,12 +27,20 @@ export default function LoadingScreen() {
   const isPlanning = state.data.treatment_status === 'planning'
   const insight = useOnboardingInsight(state.data, !isPlanning)
 
-  const [stepIndex, setStepIndex] = useState(0)
-  const [minElapsed, setMinElapsed] = useState(false)
+  // Insight já estava no cache do React Query no 1º render: pula o piso
+  // temporal. Sem esse branch, a tela vira UX de "parou" — 5s sem nada real
+  // acontecendo. Os micro-steps ainda renderizam, só sem espera entre eles.
+  const [cacheHit] = useState(
+    () => insight.isFetched && !!insight.data && !insight.isFetching,
+  )
+
+  const [stepIndex, setStepIndex] = useState(cacheHit ? STEP_KEYS.length : 0)
+  const [minElapsed, setMinElapsed] = useState(cacheHit)
   const [maxElapsed, setMaxElapsed] = useState(false)
   const navigatedRef = useRef(false)
 
   useEffect(() => {
+    if (cacheHit) return
     const stepTimer = setInterval(() => {
       setStepIndex((index) => (index >= STEP_KEYS.length ? index : index + 1))
     }, STEP_INTERVAL_MS)
@@ -43,7 +51,7 @@ export default function LoadingScreen() {
       clearTimeout(minTimer)
       clearTimeout(maxTimer)
     }
-  }, [])
+  }, [cacheHit])
 
   const aiSettled = isPlanning || insight.isSuccess || insight.isError || maxElapsed
   const stepsDone = stepIndex >= STEP_KEYS.length
