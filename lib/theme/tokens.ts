@@ -45,6 +45,7 @@ export const typography = {
   label:        { fontSize: 16, fontWeight: '600' as const, lineHeight: 20 },
   caption:      { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
   tabLabel:     { fontSize: 11, fontWeight: '500' as const, lineHeight: 14 },
+  numberHero:   { fontSize: 48, fontWeight: '700' as const, lineHeight: 54 }, // Hero number — usado APENAS em NextDoseCard D1+ (Vital Mint Rarity)
   numberLarge:  { fontSize: 40, fontWeight: '700' as const, lineHeight: 48 },
   numberMedium: { fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
   monoData:     { fontFamily: 'SF Mono, monospace', fontSize: 14, fontWeight: '400' as const, lineHeight: 20 },

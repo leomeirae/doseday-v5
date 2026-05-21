@@ -116,3 +116,26 @@ export async function getLatestEducationalInsight(
 
   return { headline: data.headline, body: data.body, disclaimer: data.disclaimer }
 }
+
+// Lê o contrato completo gerado no onboarding direto do DB (jsonb context.output).
+// Não chama a Edge Function de novo — o insight já foi gerado e persistido (ADR 0002).
+// Zod garante que dado corrompido no DB retorne null em vez de quebrar a UI.
+export async function getOnboardingInsightContract(
+  userId: string
+): Promise<OnboardingInsightContract | null> {
+  const { data, error } = await supabase
+    .from('educational_insights')
+    .select('context')
+    .eq('user_id', userId)
+    .eq('trigger_source', 'onboarding')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw error
+
+  const output = (data?.context as { output?: unknown } | null)?.output
+  if (output == null) return null
+
+  return onboardingInsightContractSchema.safeParse(output).data ?? null
+}
