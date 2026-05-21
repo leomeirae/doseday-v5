@@ -1,13 +1,20 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { InsightDisclaimer } from '@components/ui/InsightDisclaimer'
 import { useDailyInsight } from '@hooks/useDailyInsight'
+import { useOnboardingInsightFromDB } from '@hooks/useOnboardingInsightFromDB'
 import { colors, typography, spacing, radius } from '@lib/theme/tokens'
 
-const FREE_PLACEHOLDER = 'Insight do dia disponível no Premium. Toque pra saber mais.'
-const ERROR_FALLBACK = 'Acompanhamento do tratamento'
+const STATIC_FALLBACK = 'Vamos acompanhar seu tratamento dia a dia.'
 
-export function InsightCard() {
-  const { data, isLoading, isError } = useDailyInsight()
+interface Props {
+  source: 'onboarding' | 'daily'
+}
+
+export function InsightCard({ source }: Props) {
+  const onboarding = useOnboardingInsightFromDB()
+  const daily = useDailyInsight({ enabled: source === 'daily' })
+
+  const isLoading = source === 'onboarding' ? onboarding.isLoading : daily.isLoading
 
   function renderContent() {
     if (isLoading) {
@@ -19,11 +26,22 @@ export function InsightCard() {
       )
     }
 
-    if (isError || !data) {
-      return <Text style={styles.insightText}>{ERROR_FALLBACK}</Text>
+    if (source === 'onboarding') {
+      const contract = onboarding.data
+      if (!contract) {
+        return <Text style={styles.insightText}>{STATIC_FALLBACK}</Text>
+      }
+      return (
+        <>
+          <InsightDisclaimer text={contract.disclaimer} />
+          <Text style={styles.insightText}>{contract.shortInsight}</Text>
+          <Text style={styles.nextStep}>{contract.nextStep}</Text>
+        </>
+      )
     }
 
-    if (data.kind === 'premium') {
+    const data = daily.data
+    if (data && (data.kind === 'premium' || data.kind === 'fallback') && data.insightText) {
       return (
         <>
           <InsightDisclaimer />
@@ -32,40 +50,33 @@ export function InsightCard() {
       )
     }
 
-    if (data.kind === 'free_placeholder') {
-      return (
-        <>
-          <InsightDisclaimer />
-          <Text style={styles.insightText}>{FREE_PLACEHOLDER}</Text>
-        </>
-      )
-    }
-
-    // fallback
-    return <Text style={styles.insightText}>{data.insightText}</Text>
+    return <Text style={styles.insightText}>{STATIC_FALLBACK}</Text>
   }
 
   return (
-    <View
-      accessible
-      accessibilityLabel={
-        isLoading
-          ? 'Insight do dia carregando'
-          : isError || !data
-          ? ERROR_FALLBACK
-          : data.kind === 'free_placeholder'
-          ? FREE_PLACEHOLDER
-          : 'insightText' in data
-          ? data.insightText
-          : ERROR_FALLBACK
-      }
-    >
+    <View accessible accessibilityLabel={buildA11yLabel(source, isLoading, onboarding.data, daily.data)}>
       <Text style={styles.sectionTitle}>Insight do dia</Text>
       <View style={styles.card}>
         <View style={styles.cardContent}>{renderContent()}</View>
       </View>
     </View>
   )
+}
+
+function buildA11yLabel(
+  source: Props['source'],
+  isLoading: boolean,
+  onboarding: ReturnType<typeof useOnboardingInsightFromDB>['data'],
+  daily: ReturnType<typeof useDailyInsight>['data']
+): string {
+  if (isLoading) return 'Insight do dia carregando'
+  if (source === 'onboarding') {
+    return onboarding ? `${onboarding.shortInsight} ${onboarding.nextStep}` : STATIC_FALLBACK
+  }
+  if (daily && (daily.kind === 'premium' || daily.kind === 'fallback') && daily.insightText) {
+    return daily.insightText
+  }
+  return STATIC_FALLBACK
 }
 
 const styles = StyleSheet.create({
@@ -86,6 +97,10 @@ const styles = StyleSheet.create({
   },
   insightText: {
     ...typography.body,
+    color: colors.textPrimary,
+  },
+  nextStep: {
+    ...typography.label,
     color: colors.textPrimary,
   },
   skeletonLine: {

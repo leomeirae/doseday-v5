@@ -18,7 +18,7 @@ function formatScheduledDate(date: Date): string {
 }
 
 function getDaysLabel(daysUntil: number): string {
-  if (daysUntil === 0) return 'Sua dose é hoje!'
+  if (daysUntil === 0) return 'sua próxima dose'
   if (daysUntil === 1) return 'dia até sua próxima dose'
   return 'dias até sua próxima dose'
 }
@@ -30,7 +30,7 @@ export function NextDoseCard({ nextDose, isLoading, error, onRetry }: Props) {
       <View style={styles.card}>
         {isLoading && (
           <View style={styles.stateContainer}>
-            <ActivityIndicator size="small" color={colors.brand} />
+            <ActivityIndicator size="small" color={colors.textSecondary} />
           </View>
         )}
 
@@ -43,28 +43,16 @@ export function NextDoseCard({ nextDose, isLoading, error, onRetry }: Props) {
           </View>
         )}
 
-        {!isLoading && !error && !nextDose && (
-          <View style={styles.stateContainer}>
-            <Text style={styles.emptyTitle}>Nenhuma dose registrada</Text>
-            <Text style={styles.emptySubtitle}>
-              Sua próxima dose vai aparecer aqui depois do primeiro registro
-            </Text>
-          </View>
-        )}
-
         {!isLoading && !error && nextDose && (
           <>
-            {(nextDose.isOverdue || nextDose.daysUntil > 0) && (
-              <Text
-                style={[
-                  styles.daysNumber,
-                  nextDose.isOverdue ? styles.daysNumberOverdue : styles.daysNumberNormal,
-                ]}
-              >
-                {nextDose.isOverdue ? nextDose.overdueBy : nextDose.daysUntil}
+            {nextDose.isOverdue ? (
+              <Text style={[styles.hero, styles.heroOverdue]}>{nextDose.overdueBy}</Text>
+            ) : (
+              <Text style={[styles.hero, styles.heroNormal]}>
+                {nextDose.daysUntil === 0 ? 'Hoje' : nextDose.daysUntil}
               </Text>
             )}
-            <Text style={[styles.daysLabel, nextDose.daysUntil === 0 && !nextDose.isOverdue && styles.daysLabelToday]}>
+            <Text style={styles.daysLabel}>
               {nextDose.isOverdue
                 ? nextDose.overdueBy === 1 ? 'dia de atraso' : 'dias de atraso'
                 : getDaysLabel(nextDose.daysUntil)}
@@ -100,17 +88,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.sm,
   },
-  daysNumber: {
-    ...typography.numberLarge,
+  hero: {
+    ...typography.numberHero,
   },
-  daysNumberNormal: {
+  heroNormal: {
     color: colors.brand,
   },
-  daysNumberOverdue: {
+  heroOverdue: {
+    ...typography.numberLarge,
     color: colors.semanticWarning,
   },
   daysLabel: {
-    ...typography.body,
+    ...typography.bodyClinical,
     color: colors.textSecondary,
     marginTop: spacing.xxs,
   },
@@ -146,24 +135,8 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
   },
-  daysLabelToday: {
-    ...typography.subtitle,
-    color: colors.brand,
-    marginTop: 0,
-  },
   retryText: {
     ...typography.label,
-    color: colors.brand,
-  },
-  emptyTitle: {
-    ...typography.subtitle,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  emptySubtitle: {
-    ...typography.caption,
-    color: colors.textTertiary,
-    textAlign: 'center',
+    color: colors.textPrimary,
   },
 })
