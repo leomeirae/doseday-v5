@@ -19,6 +19,7 @@ Antes de QUALQUER tarefa, você (Claude Code) DEVE ler estes documentos NA ORDEM
 8. **`docs/learnings.md`** — aprendizados acumulados. Ler ANTES de qualquer prompt MID/HIGH (regra obrigatória — ver "Regra obrigatória — consultar aprendizados" abaixo)
 9. **`docs/karpathy.md`** — Karpathy Guidelines completo (regra 22). Carregar em prompts MID/HIGH.
 10. **`docs/working-rules.md`** — Regras operacionais detalhadas. Carregar quando precisar do detalhe operacional.
+11. **Memórias auto-injetadas via `claude-mem`** (regra 30) — sempre que houver contexto auto-injetado no início da sessão, **leia primeiro**. Antes de prompts MID/HIGH, rodar `npx claude-mem search "<tópico>"` pra trazer memórias relevantes manualmente.
 
 `docs/PRODUCT.md` e `docs/DESIGN.md` existem e estão finalizados (Prompt 02 — `/impeccable teach`). `docs/archive/design-system-preview-v0.1.md` é o histórico arquivado.
 
@@ -90,6 +91,15 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 
 29. **Cowork EXECUTA via MCP por default. Não pede pra Léo rodar comandos.** Léo é PO, não operador de terminal. Sempre que Cowork tem MCP disponível (GitHub, Supabase, react-native-devtools, workspace bash sandbox), DEVE usar diretamente em vez de gerar bloco bash pra Léo. Bash pra Léo é último recurso — só quando o comando exige credencial local ou ambiente que MCP não acessa (ex: `npx expo run:ios` no device físico, `gh auth login`). Antes de pedir qualquer comando a Léo, perguntar: "consigo fazer via MCP?". Se sim, fazer. Operações que SEMPRE são via MCP: ler/escrever arquivo no repo, criar branch, push, abrir PR, mergear PR, executar SQL, deploy edge function, list MCP tools. (Pedido explícito Léo 2026-05-21 após repetir 3+ vezes.)
 
+30. **`claude-mem` ativo e obrigatório em todas as sessões** (Cowork + Claude Code). Plugin instalado em 2026-05-21. Captura Reads/Edits/Bashs como observações comprimidas, resume ao fim da sessão, auto-injeta contexto relevante a partir da 2ª sessão em diante. Dados local em `~/.claude-mem` (não sai do Mac além do provedor de compressão configurado). **Regras operacionais:**
+   - **NUNCA ignorar contexto auto-injetado** no início da sessão. Se aparece, ler primeiro (vai antes dos 11 docs canon).
+   - **ANTES de prompts MID/HIGH**, Cowork OU Claude Code roda `npx claude-mem search "<tópico>"` via Bash pra trazer memórias relevantes ao contexto atual. Exemplo: antes do Prompt 33b, rodar `npx claude-mem search "onboarding insight contract"` pra puxar trabalho prévio do PR #36.
+   - **EM BRANCH NOVA OU WORKTREE FRESH** (clone, `git worktree add`, ou primeira sessão de feature isolada), rodar `/learn-codebase` pra front-load do repo em memória (~5 min, executar uma vez).
+   - **AO FIM DE SESSÃO LONGA**, garantir que o session-end disparou compressão. Se a sessão crashou ou foi interrompida, rodar `npx claude-mem compact` manualmente.
+   - **Cowork também consulta** via `mcp__workspace__bash` rodando `npx claude-mem search` quando faz análise técnica que pode ter precedente em sessão anterior — evita re-descobrir decisões.
+   - **NUNCA desinstalar sem aviso**. Se precisar troubleshoot, abrir issue antes. Uninstall limpo via `npx claude-mem uninstall` apaga `~/.claude-mem` inteiro.
+   - Detalhe completo de funcionamento via skill `/claude-mem:how-it-works`. (Pedido explícito Léo 2026-05-21 após instalar o plugin.)
+
 ---
 
 ## Auxiliares por tipo de tarefa (carregar com `@file`)
@@ -98,7 +108,7 @@ Tabela de referência rápida — quando começar uma tarefa, carregue os auxili
 
 | Tipo de tarefa | Carregar via `@file` + skills |
 |---|---|
-| Decisão técnica em prompt MID/HIGH | `@docs/karpathy.md`, `@docs/learnings.md`, handoff anterior |
+| Decisão técnica em prompt MID/HIGH | `@docs/karpathy.md`, `@docs/learnings.md`, handoff anterior, **`npx claude-mem search` no tópico** |
 | Schema Supabase / migration / RLS | `@docs/architecture.md`, `@docs/learnings.md`, skill `supabase-postgres-best-practices` |
 | UI / tela nova / refazer tela | `@docs/DESIGN.md`, skill `/impeccable craft` ou `/impeccable distill` |
 | Tab bar / toolbar / navegação | `@docs/DESIGN.md`, skill `liquid-glass:liquid-glass` |
@@ -113,6 +123,8 @@ Tabela de referência rápida — quando começar uma tarefa, carregue os auxili
 | Pre-ship edge cases | skill `/impeccable harden` |
 | Security/LGPD review | skill `security-review` |
 | Fim de sessão / antes de pausar | skill `handoff` |
+| Memória persistente entre sessões / consultar trabalho passado | **skill `/claude-mem:how-it-works` + `/claude-mem:mem-search`** (regra 30) |
+| Branch nova / worktree fresh / clone | **`/learn-codebase` front-load (regra 30)** |
 
 ---
 
@@ -134,12 +146,13 @@ Tabela de referência rápida — quando começar uma tarefa, carregue os auxili
 | i18n | i18next (pt-BR padrão, en/es opt-in) |
 | Analytics | PostHog |
 | Crash | Sentry (entra antes do beta) |
+| **Memória entre sessões** | **`claude-mem` plugin (regra 30) — dados local em `~/.claude-mem`** |
 
 ---
 
 ## Stack de skills do Claude Code
 
-43 skills disponíveis — tabela mestre + uso por tipo de tarefa em [`docs/skills-stack.md`](docs/skills-stack.md).
+43 skills disponíveis + skills do plugin `claude-mem` (regra 30) — tabela mestre + uso por tipo de tarefa em [`docs/skills-stack.md`](docs/skills-stack.md).
 
 ---
 
@@ -163,7 +176,7 @@ Repo: `github.com/leomeirae/doseday-v5` (default branch `main`). Branches featur
 
 ## Próximo prompt a executar
 
-**`docs/prompts/00-MID-bootstrap-projeto-expo.md`** — bootstrapar projeto Expo do zero.
+**`docs/prompts/33b-HIGH-onboarding-insight-contract-hardening.md`** — hardening do contrato do onboarding insight (schemaVersion + fallback seguro). Fecha P1 da auditoria do Codex App antes da Fase 2.
 
 Quando Léo colar esse prompt aqui, siga o template:
 1. Retorne tabela de Skills + Plano + Riscos + Arquivos + Validação
