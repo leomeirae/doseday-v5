@@ -201,7 +201,8 @@
   },
   "result": {
     "headline": "Bem-vindo, {{name}}.",
-    "subtitle": "Aqui está o que sabemos do seu tratamento até agora.",
+    "goalCardLabel": "Meta de peso",
+    "contextSectionLabel": "Como o DoseDay vai acompanhar",
     "insightFallback": {
       "treatmentStage": "Você está na semana {{week}} do {{medication}} {{dose}}mg.",
       "nextDose": "Sua próxima dose recomendada: {{day}}.",
