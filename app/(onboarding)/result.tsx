@@ -74,16 +74,38 @@ export default function ResultScreen() {
     >
       <View style={styles.stack}>
         {insight.data ? (
-          <InsightCard
-            headline={insight.data.headline}
-            body={insight.data.body}
-            testID="result-ai-insight"
-          />
+          <>
+            <InsightCard
+              headline={insight.data.stageLabel}
+              body={insight.data.shortInsight}
+              disclaimer={insight.data.disclaimer}
+              testID="result-ai-insight"
+            />
+            <InsightCard
+              headline={insight.data.medicationLabel}
+              body={`${insight.data.goalLabel}\n${insight.data.deltaLabel}`}
+              testID="result-ai-labels"
+            />
+            <InsightCard
+              headline={t('result.nextStepTitle')}
+              body={insight.data.nextStep}
+              testID="result-ai-next-step"
+            />
+            {insight.data.contextBullets.map((bullet, index) => (
+              <InsightCard
+                key={index}
+                body={bullet}
+                testID={`result-ai-context-${index}`}
+              />
+            ))}
+          </>
         ) : null}
 
-        {facts.map((fact, index) => (
-          <InsightCard key={index} body={fact} testID={`result-fact-${index}`} />
-        ))}
+        {insight.data
+          ? null
+          : facts.map((fact, index) => (
+              <InsightCard key={index} body={fact} testID={`result-fact-${index}`} />
+            ))}
 
         <Text style={styles.disclaimer}>{t('result.disclaimer')}</Text>
       </View>
