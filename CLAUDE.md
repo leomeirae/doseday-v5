@@ -86,6 +86,8 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 
 27. **Paridade V4 → V5 antes de feature nova.** Antes de qualquer prompt MID/HIGH, Cowork DEVE consultar [`docs/audit/2026-05-19-frontend-paridade.md`](docs/audit/2026-05-19-frontend-paridade.md) e confirmar que o gap não está marcado P0/P1. Se está, priorizar o gap antes da feature nova. Schema Supabase pronto NÃO significa app pronto — verificar tela-a-tela. Sequência canônica em refactor: paridade primeiro, novidades depois (ver Aprendizado #43).
 
+28. **Bash pra Léo SEMPRE em bloco limpo, sem comentários inline.** Léo copia-cola comandos no terminal. Linhas com `#` quebram o paste OU obrigam Léo a editar manualmente. Regra: cada bloco ```bash contém só comandos executáveis em sequência, separados por `&&` ou em linhas próprias. Zero `# comentário`. Se precisa explicar o porquê, escreva ANTES do bloco em texto normal — não dentro do bloco. Aplica-se a Cowork → Léo, sempre. (Pedido explícito Léo 2026-05-20.)
+
 ---
 
 ## Auxiliares por tipo de tarefa (carregar com `@file`)
