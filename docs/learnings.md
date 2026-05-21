@@ -263,3 +263,36 @@ Registrado em 2026-05-20 durante o Prompt 28 (Welcome Splash Liquid Glass).
 **Solução.** Carregar `has_seen_welcome` apenas quando o estado auth muda para `!session`. Para o caso especial em que a tela Welcome marca a flag e navega para `/(auth)`, o AuthGuard reconsulta a flag somente se estiver sem sessao, sem flag em memoria e ja dentro do grupo `(auth)`.
 
 **Impacto em prompts futuros.** Guards que combinam sessao remota com flag local devem separar "hidratar estado local" de "reagir a mudanca de rota". Incluir teste obrigatorio: sign-out de usuario autenticado, welcome de primeiro acesso, tap em signin/signup, relaunch sem sessao.
+
+## 14.21 Aprendizado 53 — Edge Function de IA do DoseDay usa OpenAI, NÃO Anthropic
+
+Registrado em 2026-05-20 durante a preparação do Prompt 33 (contrato estruturado do onboarding insight).
+
+**Contexto.** Toda a documentação estratégica anterior (`docs/interacao-claude-codex/08-direcao-visual-primeiros-3-minutos.md` §10, mensagens internas de planejamento) assumia que a Edge Function `generate-onboarding-insight` usava Anthropic SDK. Cowork havia sugerido inclusive a skill `claude-api` como referência durante a implementação.
+
+**Achado (resposta direta de Léo).** A Edge Function **usa OpenAI/GPT** desde a V4 e a key `OPENAI_API_KEY` já está parametrizada como secret no Supabase. Decisão de Léo: **manter OpenAI**, não trocar por Anthropic. Razões: continuidade, key já configurada, custo previsível, sem risco de regressão.
+
+**Impacto em prompts futuros.**
+- Para qualquer Edge Function de IA do DoseDay V5: usar **OpenAI SDK Deno** + **Structured Outputs** (`response_format: { type: 'json_schema' }`) para garantir contrato tipado.
+- Skill de referência: documentação oficial OpenAI (`platform.openai.com/docs`), não `claude-api`.
+- `OPENAI_API_KEY` é o único secret de LLM ativo no projeto (servidor-side via `Deno.env.get('OPENAI_API_KEY')`).
+- Documentação a corrigir retroativamente: `docs/architecture.md` seção IA, `docs/interacao-claude-codex/08-direcao-visual-primeiros-3-minutos.md` §10, qualquer prompt futuro que mencione provedor.
+
+**Princípio anti-pirraça.** Antes de propor stack/provedor pra Edge Function, conferir no codebase atual (V4 ou remoto via Supabase MCP `get_edge_function`) qual provedor já está em produção. Não assumir baseado em "DoseDay é Claude-first no fluxo de desenvolvimento" — desenvolvimento ≠ runtime.
+
+## 14.22 Aprendizado 54 — Edge Functions devem usar `verify_jwt=true` + Supabase Auth nativo
+
+Registrado em 2026-05-20 durante a preparação do Prompt 33.
+
+**Contexto.** A Edge Function `generate-onboarding-insight` da V4 estava configurada com `verify_jwt=false` e implementava auth manual interna (parse de header Bearer + validação custom). Plano inicial do Prompt 33 considerava preservar esse comportamento.
+
+**Decisão de Léo.** O DoseDay V5 já tem **Supabase Auth funcional em produção (V4 na App Store)**, com Google Sign-In e Sign in with Apple configurados. Usar Supabase Auth nativo é o caminho — eliminar duplicação de auth manual.
+
+**Padrão canônico pra Edge Functions do DoseDay V5:**
+- `verify_jwt = true` na config (`supabase/functions/<name>/.toml` ou via Supabase Dashboard)
+- Cliente invoca via `supabase.functions.invoke(<name>, { body })` — JWT enviado automaticamente
+- Dentro da function, `Deno.env.get('SUPABASE_ANON_KEY')` + `createClient` com o JWT do request resolve identidade do user
+- **Service role apenas em operações de escrita server-side** que precisam contornar RLS (ex: upsert em `educational_insights`) — nunca expor service role no client
+- Não implementar auth manual com parse de header — duplica trabalho do Supabase e é fonte de bug
+
+**Impacto em prompts futuros.** Qualquer prompt que crie ou refatore Edge Function deve assumir `verify_jwt=true` por padrão. Exceções (webhook público, cron interno, callback de RevenueCat/Apple) precisam ser justificadas em ADR.

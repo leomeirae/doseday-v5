@@ -8,7 +8,7 @@
 
 ## 1. Visão geral
 
-DoseDay V5 é um app mobile iOS-first construído em React Native + Expo, com backend Supabase (mantido da V4), pagamento via RevenueCat (trial 14d configurado em produção) e IA via Anthropic SDK em Edge Functions.
+DoseDay V5 é um app mobile iOS-first construído em React Native + Expo, com backend Supabase (mantido da V4), pagamento via RevenueCat (trial 14d configurado em produção) e IA via **OpenAI SDK** em Edge Functions Deno (provedor mantido da V4 — ver Aprendizado #53 + ADR 0003).
 
 A V5 é **refatoração completa do código** mas mantém **infraestrutura, marca e distribuição**. Bundle ID, App Store listing, Supabase project, RevenueCat project — tudo preservado.
 
@@ -26,7 +26,7 @@ A V5 é **refatoração completa do código** mas mantém **infraestrutura, marc
 | Estado de cliente | Context API + hooks | nativo |
 | Validação de schema | Zod | última |
 | Backend | Supabase (mantido) | Postgres 15 + Edge Functions Deno |
-| IA | Anthropic SDK (Claude) via Edge Function | última |
+| IA | **OpenAI SDK** via Edge Function Deno (Structured Outputs com `response_format: json_schema`) | gpt-4o-mini / gpt-4o |
 | Pagamento | RevenueCat SDK | última |
 | Push | Expo Notifications | nativo Expo |
 | i18n | i18next + react-i18next | última |
@@ -324,8 +324,8 @@ EXPO_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 # Sentry (entra antes do beta)
 EXPO_PUBLIC_SENTRY_DSN=
 
-# Anthropic / OpenAI — APENAS no backend (Edge Functions). NUNCA no app
-ANTHROPIC_API_KEY=
+# OpenAI — APENAS no backend (Edge Functions). NUNCA no app.
+# Único provedor LLM ativo no projeto (decisão Léo 2026-05-20). Anthropic NÃO é usado em runtime.
 OPENAI_API_KEY=
 ```
 
@@ -377,7 +377,7 @@ Schemas existentes que serão preservados:
 |---|---|
 | Entrada | `user_id`, `checkin_id` (opcional) |
 | Lê | `profiles`, `user_medications`, `doses`, `daily_checkins`, `symptom_logs` |
-| Chama | Anthropic SDK com system prompt em `lib/ai/prompts.ts` |
+| Chama | **OpenAI SDK** (`gpt-4o-mini`) com Structured Outputs (`response_format: json_schema`). System prompt em `lib/ai/prompts.ts`. Labels determinísticos (semana, dose, meta) calculados em código antes da chamada — ver ADR 0001 |
 | Devolve | `{ text, severity: 'normal'|'attention', disclaimer }` |
 | Cacheia | em `ai_insights` por 24h |
 | LGPD | log em `audit_logs` |
@@ -388,7 +388,7 @@ Schemas existentes que serão preservados:
 |---|---|
 | Entrada | `user_id` |
 | Lê | `consultation_questions` (status='pending') |
-| Faz | agrupa, prioriza, deduplica via Claude |
+| Faz | agrupa, prioriza, deduplica via OpenAI (gpt-4o) |
 | Devolve | checklist estruturado + PDF |
 
 ### 6.3 `relatorio-bilingue` (Movimento 3)
