@@ -42,6 +42,7 @@ const insight = {
   body: `${contract.shortInsight}\n\n${contract.nextStep}\n\n${contract.contextBullets.join('\n')}`,
   disclaimer: contract.disclaimer,
   context: {
+    schemaVersion: 'onboarding_insight_v2',
     contract_version: 'v2',
     input,
     output: contract,
@@ -54,6 +55,12 @@ Estratégia de leitura:
 - Cliente novo (Result V5 + Home V5) lê `context.output` jsonb e renderiza contrato estruturado
 - Código legacy V4 (se existir em algum cache local de migração) continua lendo `headline/body/disclaimer` e funciona
 - Schema TypeScript do client trata `context.output` como `OnboardingInsightContract | null` — fallback pra `{headline, body, disclaimer}` se `context.output` for null
+
+### Atualização 2026-05-21 — `schemaVersion` canônico
+
+O Prompt 33b adiciona `schemaVersion: 'onboarding_insight_v2'` ao próprio payload `context.output`. A versão canônica do contrato passa a ser o campo dentro do payload, porque é isso que os readers do app validam antes de renderizar.
+
+`context.schemaVersion` também é gravado no wrapper para auditoria rápida. `context.contract_version = 'v2'` permanece por compatibilidade com registros e readers intermediários, mas está deprecated: novos readers devem usar `context.output.schemaVersion` e rejeitar versão ausente ou diferente.
 
 ## Alternativas consideradas
 

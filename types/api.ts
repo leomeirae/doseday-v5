@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const onboardingInsightContractSchema = z
   .object({
+    schemaVersion: z.literal('onboarding_insight_v2'),
     stageLabel: z.string().trim().min(1),
     medicationLabel: z.string().trim().min(1),
     goalLabel: z.string().trim().min(1),
@@ -13,6 +14,8 @@ export const onboardingInsightContractSchema = z
   })
   .strict()
 
-export type OnboardingInsightContract = z.infer<
-  typeof onboardingInsightContractSchema
->
+export const onboardingInsightRawSchema = onboardingInsightContractSchema.omit({
+  schemaVersion: true,
+})
+
+export type OnboardingInsightContract = z.infer<typeof onboardingInsightContractSchema>
