@@ -131,11 +131,12 @@
     }
   },
   "dose": {
-    "headline": "Qual a sua dose atual?",
-    "subtitle": "A dose que você está aplicando agora. Vamos ajustar o relatório com isso.",
+    "headline": "Você já sabe a dose inicial?",
+    "subtitle": "Se ainda não souber, você pode ajustar depois.",
     "doseLabel": "Dose",
     "mgSuffix": "mg",
     "commonDosesLabel": "Doses comuns pra {{medication}}",
+    "skipDose": "Ainda não sei",
     "errors": {
       "doseRange": "Dose entre 0,25 e 30 mg",
       "required": "Informe sua dose"

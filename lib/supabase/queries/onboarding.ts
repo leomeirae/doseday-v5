@@ -95,7 +95,7 @@ function mapProfileToOnboardingData(profile: OnboardingProfileRow): Partial<Onbo
   if (isOneOf<OnboardingMedication>(profile.current_medication, MEDICATION_OPTIONS)) {
     data.current_medication = profile.current_medication
   }
-  if (profile.current_dose !== null) data.current_dose = Number(profile.current_dose)
+  data.current_dose = profile.current_dose !== null ? Number(profile.current_dose) : null
   if (profile.doctor_name !== null) data.doctor_name = profile.doctor_name
   if (isOneOf<MedicalSupport>(profile.has_medical_support, MEDICAL_SUPPORT_OPTIONS)) {
     data.has_medical_support = profile.has_medical_support

@@ -97,7 +97,7 @@ export interface OnboardingData {
   treatment_status: TreatmentStatus
   treatment_duration?: TreatmentDuration | null
   current_medication: OnboardingMedication
-  current_dose: number
+  current_dose?: number | null
   doctor_name?: string
   has_medical_support: MedicalSupport
   main_concerns?: OnboardingConcern[]

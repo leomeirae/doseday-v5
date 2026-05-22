@@ -29,7 +29,7 @@ export default function DoseScreen() {
 
   const defaultValues = useMemo<DefaultValues<DoseInput>>(
     () => ({
-      ...(state.data.current_dose !== undefined ? { current_dose: state.data.current_dose } : {}),
+      ...(state.data.current_dose != null ? { current_dose: state.data.current_dose } : {}),
     }),
     [state.data.current_dose]
   )
@@ -49,6 +49,11 @@ export default function DoseScreen() {
     router.replace('/(onboarding)/doctor-name' as Href)
   })
 
+  async function handleSkipDose() {
+    await submitStep('dose', { current_dose: null })
+    router.replace('/(onboarding)/doctor-name' as Href)
+  }
+
   function handleBack() {
     goBack()
     router.replace('/(onboarding)/medication' as Href)
@@ -67,6 +72,10 @@ export default function DoseScreen() {
         onPress: onSubmit,
         disabled: !formState.isValid || !state.isHydrated,
         loading: formState.isSubmitting,
+      }}
+      secondaryCTA={{
+        label: t('dose.skipDose'),
+        onPress: handleSkipDose,
       }}
     >
       <Controller
