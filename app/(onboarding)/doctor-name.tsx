@@ -10,7 +10,7 @@ import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { colors, spacing, typography } from '@lib/theme/tokens'
 import { doctorNameSchema, type DoctorNameInput } from '@lib/validation/onboardingSchemas'
 
-const NEXT: Href = '/(onboarding)/medical-support' as Href
+const NEXT: Href = '/(onboarding)/concerns' as Href
 
 export default function DoctorNameScreen() {
   const { t } = useTranslation('onboarding')
@@ -45,13 +45,13 @@ export default function DoctorNameScreen() {
 
   function handleBack() {
     goBack()
-    router.replace('/(onboarding)/dose' as Href)
+    router.replace('/(onboarding)/medical-support' as Href)
   }
 
   return (
     <OnboardingShell
       step="doctor-name"
-      stepNumber={9}
+      stepNumber={10}
       totalSteps={14}
       headline={t('doctorName.headline')}
       subtitle={t('doctorName.subtitle')}

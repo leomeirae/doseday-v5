@@ -42,18 +42,22 @@ export default function MedicalSupportScreen() {
   const onSubmit = handleSubmit(async (data) => {
     const payload = medicalSupportSchema.parse(data)
     await submitStep('medical-support', payload)
-    router.replace('/(onboarding)/concerns' as Href)
+    if (payload.has_medical_support === 'no') {
+      router.replace('/(onboarding)/concerns' as Href)
+    } else {
+      router.replace('/(onboarding)/doctor-name' as Href)
+    }
   })
 
   function handleBack() {
     goBack()
-    router.replace('/(onboarding)/doctor-name' as Href)
+    router.replace('/(onboarding)/dose' as Href)
   }
 
   return (
     <OnboardingShell
       step="medical-support"
-      stepNumber={10}
+      stepNumber={9}
       totalSteps={14}
       headline={t('medicalSupport.headline')}
       subtitle={t('medicalSupport.subtitle')}
