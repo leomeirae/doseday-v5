@@ -3,12 +3,12 @@ import { useRouter, type Href } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useReducedMotion } from 'react-native-reanimated'
+import Animated, { FadeIn, useReducedMotion } from 'react-native-reanimated'
 import {
   LoadingStepIndicator,
   type LoadingStepStatus,
 } from '@components/onboarding/LoadingStepIndicator'
-import { PulseAnimation } from '@components/onboarding/PulseAnimation'
+import { ProcessingOrbit } from '@components/onboarding/ProcessingOrbit'
 import { useOnboarding } from '@contexts/OnboardingContext'
 import { useOnboardingInsight } from '@hooks/useOnboardingInsight'
 import { colors, spacing, typography } from '@lib/theme/tokens'
@@ -70,28 +70,39 @@ export default function LoadingScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <View style={styles.center}>
-        <PulseAnimation reducedMotion={reducedMotion} />
-        <View style={styles.copy}>
-          <Text style={styles.headline}>{headline}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+      <Animated.View
+        style={styles.content}
+        {...(reducedMotion ? {} : { entering: FadeIn.duration(400) })}
+      >
+        <View style={styles.center}>
+          <ProcessingOrbit reducedMotion={reducedMotion} />
+          <View style={styles.copy}>
+            <Text style={styles.headline}>{headline}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.steps}>
-        {STEP_KEYS.map((key, index) => {
-          const status: LoadingStepStatus =
-            index < stepIndex ? 'done' : index === stepIndex ? 'active' : 'pending'
-          return (
-            <LoadingStepIndicator
-              key={key}
-              label={t(`loading.steps.${key}`)}
-              status={status}
-              reducedMotion={reducedMotion}
-            />
-          )
-        })}
-      </View>
+        <View style={styles.steps}>
+          {STEP_KEYS.map((key, index) => {
+            const status: LoadingStepStatus =
+              index < stepIndex
+                ? 'done'
+                : index === stepIndex
+                  ? 'active'
+                  : 'pending'
+            return (
+              <LoadingStepIndicator
+                key={key}
+                label={t(`loading.steps.${key}`)}
+                status={status}
+                reducedMotion={reducedMotion}
+                isLast={index === STEP_KEYS.length - 1}
+                connectorFilled={status === 'done'}
+              />
+            )
+          })}
+        </View>
+      </Animated.View>
     </SafeAreaView>
   )
 }
@@ -100,6 +111,9 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.bgBase,
+  },
+  content: {
+    flex: 1,
   },
   center: {
     flex: 1,
@@ -125,6 +139,5 @@ const styles = StyleSheet.create({
   steps: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
-    gap: spacing.sm,
   },
 })
