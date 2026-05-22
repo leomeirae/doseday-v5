@@ -21,13 +21,15 @@ export function useRegisterDose() {
       )
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['doseSummary'] })
-
-      // Cancel old T0 notification and reschedule based on new nextDose
       await cancelDoseNotifications()
 
       const userId = session?.user?.id
-      const updatedSummary = queryClient.getQueryData<DoseSummary>(['doseSummary', userId])
+      const doseSummaryKey = ['doseSummary', userId] as const
+
+      // refetch ensures fresh data (invalidate only marks stale + fires background refetch)
+      await queryClient.refetchQueries({ queryKey: doseSummaryKey })
+
+      const updatedSummary = queryClient.getQueryData<DoseSummary>(doseSummaryKey)
       if (updatedSummary?.nextDose) {
         const userSettings = queryClient.getQueryData<{ notificationsEnabled: boolean; notificationTime: string }>(
           ['userSettings', userId]
