@@ -19,6 +19,7 @@ import ptBRSubscription from '../../locales/pt-BR/subscription.json'
 import ptBRWeight from '../../locales/pt-BR/weight.json'
 import ptBRNotifications from '../../locales/pt-BR/notifications.json'
 import ptBRWelcome from '../../locales/pt-BR/welcome.json'
+import ptBRHome from '../../locales/pt-BR/home.json'
 
 import enAccount from '../../locales/en/account.json'
 import enAuth from '../../locales/en/auth.json'
@@ -37,6 +38,7 @@ import enSubscription from '../../locales/en/subscription.json'
 import enWeight from '../../locales/en/weight.json'
 import enNotifications from '../../locales/en/notifications.json'
 import enWelcome from '../../locales/en/welcome.json'
+import enHome from '../../locales/en/home.json'
 
 import esAccount from '../../locales/es/account.json'
 import esAuth from '../../locales/es/auth.json'
@@ -55,6 +57,7 @@ import esSubscription from '../../locales/es/subscription.json'
 import esWeight from '../../locales/es/weight.json'
 import esNotifications from '../../locales/es/notifications.json'
 import esWelcome from '../../locales/es/welcome.json'
+import esHome from '../../locales/es/home.json'
 
 const resources = {
   'pt-BR': {
@@ -75,6 +78,7 @@ const resources = {
     weight: ptBRWeight,
     notifications: ptBRNotifications,
     welcome: ptBRWelcome,
+    home: ptBRHome,
   },
   en: {
     account: enAccount,
@@ -94,6 +98,7 @@ const resources = {
     weight: enWeight,
     notifications: enNotifications,
     welcome: enWelcome,
+    home: enHome,
   },
   es: {
     account: esAccount,
@@ -113,6 +118,7 @@ const resources = {
     weight: esWeight,
     notifications: esNotifications,
     welcome: esWelcome,
+    home: esHome,
   },
 }
 
