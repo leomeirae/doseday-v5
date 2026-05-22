@@ -3,22 +3,65 @@ import { colors, typography, spacing, radius } from '@lib/theme/tokens'
 
 interface Props {
   onPressRegister: () => void
+  treatmentStatus?: string | null | undefined
+  medicationName?: string | null | undefined
+  currentDose?: number | null | undefined
 }
 
-export function EmptyDoseStateCard({ onPressRegister }: Props) {
+type Content = { headline: string; body: string; ctaLabel: string }
+
+function getContent(
+  treatmentStatus: string | null | undefined,
+  medicationName: string | null | undefined,
+  currentDose: number | null | undefined
+): Content {
+  if (treatmentStatus === 'planning') {
+    return {
+      headline: 'Nenhuma dose anotada ainda.',
+      body: 'Você vai começar em breve. Quando fizer a primeira aplicação, registre aqui.',
+      ctaLabel: 'Registrar primeira dose quando começar',
+    }
+  }
+
+  if (medicationName) {
+    const medLine =
+      currentDose != null
+        ? `${medicationName} ${currentDose}mg`
+        : medicationName
+    const suffix = currentDose == null ? ' Dose pode ser completada depois.' : ''
+    return {
+      headline: 'Sua dose ainda não foi anotada.',
+      body: `Registre quando foi a última aplicação de ${medLine}.${suffix}`,
+      ctaLabel: 'Registrar minha última dose',
+    }
+  }
+
+  return {
+    headline: 'Sua dose ainda não foi anotada.',
+    body: 'Registre quando foi sua última aplicação.',
+    ctaLabel: 'Registrar minha última dose',
+  }
+}
+
+export function EmptyDoseStateCard({
+  onPressRegister,
+  treatmentStatus,
+  medicationName,
+  currentDose,
+}: Props) {
+  const { headline, body, ctaLabel } = getContent(treatmentStatus, medicationName, currentDose)
+
   return (
     <View style={styles.card}>
-      <Text style={styles.headline}>Comece sua jornada</Text>
-      <Text style={styles.body}>
-        Registre sua primeira dose pra começar a memória do tratamento.
-      </Text>
+      <Text style={styles.headline}>{headline}</Text>
+      <Text style={styles.body}>{body}</Text>
       <Pressable
         onPress={onPressRegister}
         accessibilityRole="button"
-        accessibilityLabel="Registrar dose"
+        accessibilityLabel={ctaLabel}
         style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
       >
-        <Text style={styles.ctaLabel}>Registrar dose</Text>
+        <Text style={styles.ctaLabel}>{ctaLabel}</Text>
       </Pressable>
     </View>
   )
@@ -43,14 +86,16 @@ const styles = StyleSheet.create({
   },
   cta: {
     backgroundColor: colors.brand,
-    height: 52,
+    minHeight: 52,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: spacing.md,
     marginTop: spacing.xs,
   },
   ctaPressed: {
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.97 }],
+    backgroundColor: colors.brandDim,
   },
   ctaLabel: {
     ...typography.label,
