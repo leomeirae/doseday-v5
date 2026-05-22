@@ -322,3 +322,22 @@ Registrado em 2026-05-21 durante o Prompt 32 (Home continuidade D0/D1+).
 **Princípio.** Edge Function só pra **gerar**; DB pra **reaproveitar**. Qualquer tela que mostre conteúdo já gerado deve ler do DB, não da Edge Function. Hook de geração (Edge) e hook de leitura (DB) são APIs separadas com o mesmo tipo de retorno.
 
 **Bônus de padrão.** Quando um componente tem dois modos de fonte de dados (`source: 'onboarding' | 'daily'`), passar `enabled` condicional pros hooks de cada fonte evita disparar a fonte cara (Edge Function) no modo que não a usa.
+
+## 14.25 Aprendizado 57 — Contrato de IA versionado + fallback seguro no servidor
+
+Registrado em 2026-05-21 durante o Prompt 33b (hardening do onboarding insight).
+
+**Contexto.** PR #36 deixou `OnboardingInsightContract` sem `schemaVersion` no próprio payload; a Edge Function retornava `500` em qualquer falha downstream (OpenAI, Zod, termo proibido, upsert). Codex App auditou e elevou ambos pra P1.
+
+**Achado.** Versionar payload no payload é diferente de versionar persistência no wrapper. `context.contract_version` vive no jsonb externo, mas o app lê `context.output`; sem `schemaVersion` dentro de `output`, o reader não consegue rejeitar contratos antigos com segurança. Além disso, `500` para erro LLM-side quebra a promessa emocional do Result/Home por uma razão que o usuário não entende nem resolve.
+
+**Solução.** `schemaVersion` virou campo Zod literal no contrato canônico. Servidor faz parse em duas etapas: destructuring descarta `schemaVersion` vindo do LLM, raw schema processa o output, servidor injeta o literal canônico e o schema final valida. Pegadinha: `.omit()` herda `.strict()`, então sem destructuring explícito o raw parse rejeitaria `schemaVersion: 'banana'` antes da sobrescrita. Falhas LLM-side agora retornam `200` com fallback determinístico seguro; auth e input inválidos continuam `401`/`400`.
+
+**Princípio.** Contrato com LLM precisa de quatro camadas:
+
+1. `schemaVersion` no próprio payload.
+2. Descarte explícito de campos canônicos vindos do LLM antes do raw parse.
+3. Injeção determinística pelo servidor + parse canônico.
+4. Fallback determinístico no servidor para falhas que o cliente não pode resolver.
+
+**Bônus de padrão.** Edge Function testável deve separar `index.ts` (`Deno.serve(handleRequest)`) de `handler.ts` puro. `HandlerDeps.resolveUserId` permite testar fallback sem depender de Supabase Auth real ou secrets locais.

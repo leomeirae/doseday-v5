@@ -1,8 +1,5 @@
 import { supabase } from '@lib/supabase/client'
-import {
-  onboardingInsightContractSchema,
-  type OnboardingInsightContract,
-} from '../../../types/api'
+import { onboardingInsightContractSchema, type OnboardingInsightContract } from '../../../types/api'
 
 export type { MoodValue } from '@lib/validation/diarioSchemas'
 export { emotionalStateToMood } from '@lib/validation/diarioSchemas'
@@ -35,11 +32,11 @@ export type DailyInsightResponse =
 // ── Edge Function calls ──────────────────────────────────────────────────────
 
 export async function callGenerateCheckinInsight(
-  input: GenerateCheckinInsightInput
+  input: GenerateCheckinInsightInput,
 ): Promise<CheckinInsightOutput> {
   const { data, error } = await supabase.functions.invoke<CheckinInsightOutput>(
     'generate-checkin-insight',
-    { body: input }
+    { body: input },
   )
   if (error) throw error
   if (!data) throw new Error('Empty response from generate-checkin-insight')
@@ -56,12 +53,11 @@ export type GenerateOnboardingInsightInput = {
 }
 
 export async function callGenerateOnboardingInsight(
-  input: GenerateOnboardingInsightInput
+  input: GenerateOnboardingInsightInput,
 ): Promise<OnboardingInsightContract> {
-  const { data, error } = await supabase.functions.invoke<unknown>(
-    'generate-onboarding-insight',
-    { body: input }
-  )
+  const { data, error } = await supabase.functions.invoke<unknown>('generate-onboarding-insight', {
+    body: input,
+  })
   if (error) throw error
   if (!data) throw new Error('Empty response from generate-onboarding-insight')
   return onboardingInsightContractSchema.parse(data)
@@ -102,7 +98,7 @@ export async function callMemoryDailyInsight(): Promise<DailyInsightResponse> {
 // ── Fallback secundário: lê educational_insights diretamente ─────────────────
 
 export async function getLatestEducationalInsight(
-  userId: string
+  userId: string,
 ): Promise<CheckinInsightOutput | null> {
   const { data, error } = await supabase
     .from('educational_insights')
@@ -121,7 +117,7 @@ export async function getLatestEducationalInsight(
 // Não chama a Edge Function de novo — o insight já foi gerado e persistido (ADR 0002).
 // Zod garante que dado corrompido no DB retorne null em vez de quebrar a UI.
 export async function getOnboardingInsightContract(
-  userId: string
+  userId: string,
 ): Promise<OnboardingInsightContract | null> {
   const { data, error } = await supabase
     .from('educational_insights')
@@ -137,5 +133,10 @@ export async function getOnboardingInsightContract(
   const output = (data?.context as { output?: unknown } | null)?.output
   if (output == null) return null
 
-  return onboardingInsightContractSchema.safeParse(output).data ?? null
+  const parsed = onboardingInsightContractSchema.safeParse(output)
+  if (!parsed.success || parsed.data.schemaVersion !== 'onboarding_insight_v2') {
+    return null
+  }
+
+  return parsed.data
 }
