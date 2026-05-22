@@ -6,6 +6,7 @@ import { GreetingHeader } from '@components/home/GreetingHeader'
 import { NextDoseCard } from '@components/home/NextDoseCard'
 import { EmptyDoseStateCard } from '@components/home/EmptyDoseStateCard'
 import { InsightCard } from '@components/home/InsightCard'
+import { HomeQuickActions } from '@components/home/HomeQuickActions'
 import { useProfile } from '@hooks/useProfile'
 import { useDoseSummary } from '@hooks/useDoseSummary'
 import { mapQueryError } from '@lib/supabase/queries/errors'
@@ -42,6 +43,11 @@ export default function HomeScreen() {
             currentDose={profile?.currentDose}
           />
         )}
+        <HomeQuickActions
+          hasDose={hasDose}
+          onPressDose={() => router.push('/dose/registrar')}
+          onPressWeight={() => router.push('/peso/registrar')}
+        />
         <InsightCard source={hasDose ? 'daily' : 'onboarding'} />
       </ScrollView>
     </SafeAreaView>

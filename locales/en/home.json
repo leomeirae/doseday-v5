@@ -1,0 +1,6 @@
+{
+  "quickActions": {
+    "registerDose": "Log dose",
+    "registerWeight": "Log weight"
+  }
+}
