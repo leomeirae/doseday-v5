@@ -36,7 +36,6 @@ export const REQUIRED_STEPS: ReadonlySet<OnboardingStep> = new Set([
   'weight',
   'goal-weight',
   'treatment-status',
-  'treatment-duration',
   'medication',
   'dose',
   'medical-support',
@@ -96,7 +95,7 @@ export interface OnboardingData {
   height: number
   goal_weight: number
   treatment_status: TreatmentStatus
-  treatment_duration: TreatmentDuration
+  treatment_duration?: TreatmentDuration | null
   current_medication: OnboardingMedication
   current_dose: number
   doctor_name?: string

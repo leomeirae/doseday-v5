@@ -31,7 +31,7 @@ export function buildOnboardingInsightInput(
   return {
     medication: data.current_medication ?? null,
     dose_mg: data.current_dose ?? null,
-    treatment_week: deriveTreatmentWeek(data.treatment_duration),
+    treatment_week: deriveTreatmentWeek(data.treatment_duration ?? undefined),
     current_weight: data.current_weight ?? null,
     initial_weight: data.initial_weight ?? null,
     goal_weight: data.goal_weight ?? null,

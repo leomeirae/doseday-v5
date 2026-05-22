@@ -71,9 +71,7 @@ export function OnboardingShell({
             ) : null}
           </View>
 
-          <Text style={styles.progress} numberOfLines={1}>
-            Passo {stepNumber} de {totalSteps}
-          </Text>
+          <View style={styles.flex} />
 
           <View style={[styles.headerSide, styles.headerSideEnd]}>
             {onClose ? (
@@ -85,6 +83,10 @@ export function OnboardingShell({
               />
             ) : null}
           </View>
+        </View>
+
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${(stepNumber / totalSteps) * 100}%` }]} />
         </View>
 
         <ScrollView
@@ -191,11 +193,14 @@ const styles = StyleSheet.create({
   headerSideEnd: {
     alignItems: 'flex-end',
   },
-  progress: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    flex: 1,
+  progressTrack: {
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  progressFill: {
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: colors.brand,
   },
   iconButton: {
     width: 32,

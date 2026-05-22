@@ -36,7 +36,12 @@ export default function TreatmentStatusScreen() {
 
   const onSubmit = handleSubmit(async (data) => {
     await submitStep('treatment-status', data)
-    router.replace('/(onboarding)/treatment-duration' as Href)
+    if (data.treatment_status === 'planning') {
+      await submitStep('treatment-duration', { treatment_duration: null })
+      router.replace('/(onboarding)/medication' as Href)
+    } else {
+      router.replace('/(onboarding)/treatment-duration' as Href)
+    }
   })
 
   function handleBack() {

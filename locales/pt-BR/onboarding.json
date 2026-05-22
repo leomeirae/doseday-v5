@@ -102,7 +102,7 @@
     }
   },
   "medication": {
-    "headline": "Qual é a sua caneta?",
+    "headline": "Qual medicamento você vai usar?",
     "subtitle": "Pra organizar lembretes corretos e o relatório clínico.",
     "options": {
       "Mounjaro": {
