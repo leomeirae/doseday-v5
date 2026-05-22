@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { AuthButton } from '@components/ui/AuthButton'
 import { TextField } from '@components/ui/TextField'
 import { useWeightLogs } from '@hooks/useWeightLogs'
-import { showErrorToast } from '@lib/utils/showToast'
+import { showErrorToast, showSuccessToast } from '@lib/utils/showToast'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 import { weightLogSchema } from '@lib/validation/weightSchemas'
 import type { WeightLogInput } from '@lib/supabase/queries/weight'
@@ -83,7 +83,10 @@ export default function PesoRegistrarScreen() {
       updateWeightLog(
         { id: editId, input },
         {
-          onSuccess: () => router.back(),
+          onSuccess: () => {
+            showSuccessToast('Peso atualizado')
+            router.back()
+          },
           onError: () => showErrorToast(t('addModal.errors.saveFailed')),
         }
       )
@@ -91,7 +94,10 @@ export default function PesoRegistrarScreen() {
     }
 
     addWeightLog(input, {
-      onSuccess: () => router.back(),
+      onSuccess: () => {
+        showSuccessToast('Peso registrado')
+        router.back()
+      },
       onError: () => showErrorToast(t('addModal.errors.saveFailed')),
     })
   }

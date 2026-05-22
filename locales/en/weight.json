@@ -12,6 +12,7 @@
   "addModal": {
     "titleAdd": "Record your weight",
     "titleEdit": "Edit Weight",
+    "fabAdd": "Record weight",
     "weightHint": "Between 30 and 300 kg",
     "dateLabel": "Date",
     "notesLabel": "Notes (optional)",

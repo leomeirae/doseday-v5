@@ -96,10 +96,10 @@ export default function PesoHistoricoScreen() {
           onPress={openAdd}
           enabled={!isDeleting}
           accessibilityRole="button"
-          accessibilityLabel={t('addModal.titleAdd')}
+          accessibilityLabel={t('addModal.fabAdd')}
         >
           <SymbolView name="plus" size={18} tintColor={colors.textInverse} />
-          <Text style={styles.floatingButtonText}>{t('addModal.titleAdd')}</Text>
+          <Text style={styles.floatingButtonText}>{t('addModal.fabAdd')}</Text>
         </RectButton>
       )}
     </SafeAreaView>

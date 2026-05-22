@@ -12,6 +12,7 @@
   "addModal": {
     "titleAdd": "Registre seu peso",
     "titleEdit": "Editar Peso",
+    "fabAdd": "Registrar peso",
     "weightHint": "Entre 30 e 300 kg",
     "dateLabel": "Data",
     "notesLabel": "Notas (opcional)",
