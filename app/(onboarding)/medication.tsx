@@ -40,7 +40,11 @@ export default function MedicationScreen() {
 
   function handleBack() {
     goBack()
-    router.replace('/(onboarding)/treatment-duration' as Href)
+    const backRoute =
+      state.data.treatment_status === 'planning'
+        ? '/(onboarding)/treatment-status'
+        : '/(onboarding)/treatment-duration'
+    router.replace(backRoute as Href)
   }
 
   return (

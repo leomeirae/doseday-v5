@@ -102,7 +102,7 @@
     }
   },
   "medication": {
-    "headline": "Which pen are you using?",
+    "headline": "Which medication will you use?",
     "subtitle": "To organize accurate reminders and the clinical report.",
     "options": {
       "Mounjaro": {

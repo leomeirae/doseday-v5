@@ -102,7 +102,7 @@
     }
   },
   "medication": {
-    "headline": "¿Cuál es tu pluma?",
+    "headline": "¿Qué medicamento vas a usar?",
     "subtitle": "Para organizar recordatorios correctos y el informe clínico.",
     "options": {
       "Mounjaro": {
