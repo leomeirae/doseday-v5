@@ -2,7 +2,7 @@ import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, Pressable,
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
-import { colors, typography, spacing } from '@lib/theme/tokens'
+import { colors, typography, spacing, radius } from '@lib/theme/tokens'
 import { DoseCard } from '@components/doses/DoseCard'
 import { SectionHeader } from '@components/ui/SectionHeader'
 import { useDoseSummary } from '@hooks/useDoseSummary'
@@ -35,14 +35,7 @@ export default function DosesScreen() {
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.headlineRow}>
             <Text style={styles.headline}>Doses</Text>
-            <Pressable
-              onPress={() => router.push('/dose/registrar')}
-              hitSlop={8}
-              accessibilityLabel="Registrar nova dose"
-              accessibilityRole="button"
-            >
-              <SymbolView name="plus" size={22} tintColor={colors.brand} />
-            </Pressable>
+            <RegisterDosePill onPress={() => router.push('/dose/registrar')} />
           </View>
           <SectionHeader title="Próximas" />
           <View style={styles.inlineLoader}><ActivityIndicator size="small" color={colors.brand} /></View>
@@ -89,14 +82,7 @@ export default function DosesScreen() {
       >
         <View style={styles.headlineRow}>
           <Text style={styles.headline}>Doses</Text>
-          <Pressable
-            onPress={() => router.push('/dose/registrar')}
-            hitSlop={8}
-            accessibilityLabel="Registrar nova dose"
-            accessibilityRole="button"
-          >
-            <SymbolView name="plus" size={22} tintColor={colors.brand} />
-          </Pressable>
+          <RegisterDosePill onPress={() => router.push('/dose/registrar')} />
         </View>
 
         <SectionHeader title="Próximas" />
@@ -118,6 +104,21 @@ export default function DosesScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
+  )
+}
+
+function RegisterDosePill({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={8}
+      style={({ pressed }) => [styles.registerPill, pressed && styles.registerPillPressed]}
+      accessibilityLabel="Registrar nova dose"
+      accessibilityRole="button"
+    >
+      <SymbolView name="plus" size={13} tintColor={colors.brand} />
+      <Text style={styles.registerPillText}>Registrar dose</Text>
+    </Pressable>
   )
 }
 
@@ -175,5 +176,22 @@ const styles = StyleSheet.create({
     color: colors.textTertiary,
     textAlign: 'center',
     paddingVertical: spacing.lg,
+  },
+  registerPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xxs,
+    minHeight: 36,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(0,212,170,0.32)',
+  },
+  registerPillPressed: {
+    opacity: 0.6,
+  },
+  registerPillText: {
+    ...typography.label,
+    color: colors.brand,
   },
 })
