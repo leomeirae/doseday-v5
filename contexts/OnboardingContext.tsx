@@ -116,7 +116,9 @@ function inferCompletedSteps(data: Partial<OnboardingData>): Set<OnboardingStep>
   }
   if (data.goal_weight) completedSteps.add('goal-weight')
   if (data.treatment_status) completedSteps.add('treatment-status')
-  if (data.treatment_duration) completedSteps.add('treatment-duration')
+  if (data.treatment_status === 'planning' || data.treatment_duration) {
+    completedSteps.add('treatment-duration')
+  }
   if (data.current_medication) completedSteps.add('medication')
   if (data.current_dose) completedSteps.add('dose')
   if (data.doctor_name) completedSteps.add('doctor-name')
