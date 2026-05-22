@@ -65,10 +65,7 @@ export default function SignUpScreen() {
         setGeneralError(mapSignUpError(error.message))
         return
       }
-      if (session) {
-        router.replace('/(tabs)')
-      } else {
-        // Email confirmation required
+      if (!session) {
         setGeneralError('Verifique seu email para ativar a conta.')
       }
     } catch (e: unknown) {

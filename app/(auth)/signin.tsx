@@ -54,13 +54,10 @@ export default function SignInScreen() {
 
     setLoading(true)
     try {
-      const { session, error } = await signIn(email, password)
+      const { error } = await signIn(email, password)
       if (error) {
         setGeneralError(mapSignInError(error.message))
         return
-      }
-      if (session) {
-        router.replace('/(tabs)')
       }
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : ''
