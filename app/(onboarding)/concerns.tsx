@@ -43,7 +43,11 @@ export default function ConcernsScreen() {
 
   function handleBack() {
     goBack()
-    router.replace('/(onboarding)/medical-support' as Href)
+    if (state.data.has_medical_support === 'no') {
+      router.replace('/(onboarding)/medical-support' as Href)
+    } else {
+      router.replace('/(onboarding)/doctor-name' as Href)
+    }
   }
 
   return (

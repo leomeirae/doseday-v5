@@ -176,7 +176,7 @@
     "options": {
       "nausea": "Nausea",
       "weight": "Weight plateau",
-      "side_effects": "Side effects",
+      "side_effects": "Other side effects",
       "dose_timing": "Missing a dose",
       "cost": "Treatment cost",
       "appointment": "Remembering things to ask at appointments",

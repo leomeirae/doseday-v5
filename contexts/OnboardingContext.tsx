@@ -121,8 +121,8 @@ function inferCompletedSteps(data: Partial<OnboardingData>): Set<OnboardingStep>
   }
   if (data.current_medication) completedSteps.add('medication')
   if (data.current_dose !== undefined) completedSteps.add('dose')
-  if (data.doctor_name) completedSteps.add('doctor-name')
   if (data.has_medical_support) completedSteps.add('medical-support')
+  if (data.has_medical_support === 'no' || data.doctor_name) completedSteps.add('doctor-name')
   if (data.main_concerns && data.main_concerns.length > 0) completedSteps.add('concerns')
   if (data.consent_given) completedSteps.add('consent')
 
