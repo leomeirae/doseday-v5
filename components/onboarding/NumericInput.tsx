@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { InputAccessoryView, Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
+
+const NOOP_ACCESSORY_ID = 'onboarding-numeric-noop'
 
 type Props = {
   label: string
@@ -59,6 +61,7 @@ export function NumericInput({
           onBlur={() => setFocused(false)}
           keyboardType={decimals ? 'decimal-pad' : 'number-pad'}
           returnKeyType={returnKeyType}
+          inputAccessoryViewID={Platform.OS === 'ios' ? NOOP_ACCESSORY_ID : undefined}
           autoCorrect={false}
           placeholder={placeholder}
           placeholderTextColor={colors.textTertiary}
@@ -71,6 +74,7 @@ export function NumericInput({
         <Text style={styles.suffix}>{suffix}</Text>
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {Platform.OS === 'ios' && <InputAccessoryView nativeID={NOOP_ACCESSORY_ID} />}
     </View>
   )
 }

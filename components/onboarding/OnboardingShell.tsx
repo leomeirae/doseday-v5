@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -102,7 +103,7 @@ export function OnboardingShell({
 
         <View style={styles.footer}>
           <Pressable
-            onPress={primaryCTA.onPress}
+            onPress={() => { Keyboard.dismiss(); primaryCTA.onPress(); }}
             disabled={primaryDisabled}
             accessibilityRole="button"
             accessibilityLabel={primaryCTA.label}
