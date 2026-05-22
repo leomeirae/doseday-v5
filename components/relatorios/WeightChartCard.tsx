@@ -15,10 +15,19 @@ type Props = {
   onRetry: () => void
 }
 
+// gifted-charts y-axis label column width (35) + axis thickness (1).
+const Y_AXIS_RESERVE = 36
+
 export function WeightChartCard({ data, isLoading, error, onRetry }: Props) {
   const router = useRouter()
   const { width } = useWindowDimensions()
-  const chartWidth = Math.min(width - spacing.lg * 4, 328)
+  // gifted-charts draws the y-axis labels (~36px) and endSpacing OUTSIDE the `width`
+  // prop, so the rendered chart is wider than chartWidth. Reserve that here so the
+  // chart stays inside the card content box (width - spacing.lg * 4).
+  const chartWidth = Math.min(
+    width - spacing.lg * 4 - Y_AXIS_RESERVE - spacing.lg - spacing.xs,
+    280
+  )
 
   const first = data[0]
   const latest = data[data.length - 1]
@@ -31,6 +40,9 @@ export function WeightChartCard({ data, isLoading, error, onRetry }: Props) {
       ? format(point.date, 'd/MM', { locale: ptBR })
       : '',
   }))
+
+  const dataMin = data.length > 1 ? Math.min(...data.map((p) => p.weight)) : 0
+  const yMin = data.length > 1 ? Math.max(0, Math.floor(dataMin / 5) * 5 - 10) : 0
 
   return (
     <Pressable
@@ -106,9 +118,10 @@ export function WeightChartCard({ data, isLoading, error, onRetry }: Props) {
               yAxisTextStyle={styles.axisText}
               xAxisLabelTextStyle={styles.axisText}
               noOfSections={4}
-              spacing={Math.max(26, chartWidth / Math.max(chartData.length - 1, 1))}
-              initialSpacing={0}
-              endSpacing={0}
+              spacing={Math.max(26, (chartWidth - spacing.lg * 2) / Math.max(chartData.length - 1, 1))}
+              yAxisOffset={yMin}
+              initialSpacing={spacing.lg}
+              endSpacing={spacing.lg}
               isAnimated
               animationDuration={800}
             />

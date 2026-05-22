@@ -13,9 +13,15 @@ type Props = {
   onRetry: () => void
 }
 
+// gifted-charts y-axis label column width (35) + axis thickness (1).
+const Y_AXIS_RESERVE = 36
+
 export function DoseAdherenceCard({ data, isLoading, error, onRetry }: Props) {
   const { width } = useWindowDimensions()
-  const chartWidth = Math.min(width - spacing.lg * 4, 328)
+  // gifted-charts draws the y-axis labels (~36px) and endSpacing OUTSIDE the `width`
+  // prop, so the rendered chart is wider than chartWidth. Reserve that here so the
+  // chart stays inside the card content box (width - spacing.lg * 4).
+  const chartWidth = Math.min(width - spacing.lg * 4 - Y_AXIS_RESERVE - spacing.sm, 280)
   const total = data.reduce((sum, week) => sum + week.applied, 0)
   const maxValue = Math.max(3, ...data.map((week) => week.applied))
 
@@ -69,8 +75,10 @@ export function DoseAdherenceCard({ data, isLoading, error, onRetry }: Props) {
           data={chartData}
           width={chartWidth}
           height={176}
-          barWidth={22}
-          spacing={16}
+          barWidth={18}
+          spacing={12}
+          initialSpacing={8}
+          endSpacing={8}
           roundedTop
           roundedBottom
           hideRules
