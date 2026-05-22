@@ -35,7 +35,12 @@ export default function HomeScreen() {
             onRetry={refetch}
           />
         ) : (
-          <EmptyDoseStateCard onPressRegister={() => router.push('/dose/registrar')} />
+          <EmptyDoseStateCard
+            onPressRegister={() => router.push('/dose/registrar')}
+            treatmentStatus={profile?.treatmentStatus}
+            medicationName={profile?.currentMedication}
+            currentDose={profile?.currentDose}
+          />
         )}
         <InsightCard source={hasDose ? 'daily' : 'onboarding'} />
       </ScrollView>
