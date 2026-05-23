@@ -352,7 +352,7 @@ export type Database = {
         Row: {
           application_date: string
           created_at: string | null
-          days_until_next_dose: number
+          days_until_next_dose: number | null
           dose: number
           id: string
           injection_site: string | null
@@ -364,7 +364,7 @@ export type Database = {
         Insert: {
           application_date: string
           created_at?: string | null
-          days_until_next_dose?: number
+          days_until_next_dose?: number | null
           dose: number
           id?: string
           injection_site?: string | null
@@ -376,7 +376,7 @@ export type Database = {
         Update: {
           application_date?: string
           created_at?: string | null
-          days_until_next_dose?: number
+          days_until_next_dose?: number | null
           dose?: number
           id?: string
           injection_site?: string | null
@@ -746,6 +746,8 @@ export type Database = {
           current_medication: string | null
           current_weight: number | null
           doctor_name: string | null
+          dose_frequency_days: number | null
+          dose_frequency_source: string | null
           exp_push_token: string | null
           full_name: string | null
           goal_weight: number | null
@@ -776,6 +778,8 @@ export type Database = {
           current_medication?: string | null
           current_weight?: number | null
           doctor_name?: string | null
+          dose_frequency_days?: number | null
+          dose_frequency_source?: string | null
           exp_push_token?: string | null
           full_name?: string | null
           goal_weight?: number | null
@@ -806,6 +810,8 @@ export type Database = {
           current_medication?: string | null
           current_weight?: number | null
           doctor_name?: string | null
+          dose_frequency_days?: number | null
+          dose_frequency_source?: string | null
           exp_push_token?: string | null
           full_name?: string | null
           goal_weight?: number | null
