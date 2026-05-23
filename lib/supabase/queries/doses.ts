@@ -17,7 +17,7 @@ export type DoseRecord = {
   medicationName: string
   dose: number
   applicationDate: Date
-  daysUntilNextDose: number
+  daysUntilNextDose: number | null
   status: DoseStatus
 }
 
@@ -58,6 +58,10 @@ export async function getDoseSummary(userId: string): Promise<DoseSummary> {
   }))
 
   const last = history[0]
+  if (last.daysUntilNextDose == null) {
+    return { nextDose: null, history }
+  }
+
   const nextDate = new Date(last.applicationDate)
   nextDate.setDate(nextDate.getDate() + last.daysUntilNextDose)
 
@@ -91,6 +95,7 @@ export async function registerDose(
     medication_name: medicationName,
     dose: input.dose,
     application_date: input.applicationDate.toISOString(),
+    days_until_next_dose: null,
     injection_site: input.injectionSite ?? null,
     notes: input.notes ?? null,
   })
