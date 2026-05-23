@@ -19,5 +19,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["supabase/**", "node_modules"]
+  "exclude": ["supabase/**", "node_modules", "docs/handoff/edge-functions-snapshot-2026-05-22/**"]
 }

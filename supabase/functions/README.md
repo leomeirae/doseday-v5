@@ -6,12 +6,15 @@ Este diretório contém o **código-fonte** das Edge Functions Deno usadas pelo 
 
 Importadas da V4 (`/Dose-Day-Jules-1`) como ponto de partida histórico para a refatoração do V5:
 
-| Função | Propósito (V4) |
+| Função | Propósito/status |
 |---|---|
 | `delete-user-account` | Apaga conta do usuário + dados associados (LGPD Art. 18) |
-| `generate-insights` | Gera insight de IA pra Home/Dashboard |
-| `generate-report` | Gera relatório bilíngue (paciente + profissional) |
+| `generate-checkin-insight` | **Frente 1 2026-05-23:** contenção sem OpenAI para substituir v4 deployada com termos proibidos |
+| `generate-insights` | **Frente 1 2026-05-23:** contenção sem OpenAI para remover tom incompatível da versão local |
+| `generate-report` | **Frente 1 2026-05-23:** contenção sem OpenAI até novo contrato de relatório |
 | `get-revenuecat-metrics` | Lê métricas do RevenueCat para dashboards internos |
+| `memory-daily-insight` | **Frente 1 2026-05-23:** contenção sem OpenAI para substituir v4 com prompt placeholder |
+| `memory-summary` | **Frente 1 2026-05-23:** contenção sem OpenAI para substituir v2 com prompt placeholder |
 | `revenuecat-webhook` | Recebe eventos do RevenueCat (subscribe/cancel/renew) |
 | `send-rich-notification` | Dispara push notification rica via Expo Notifications |
 | `trigger-weekly-reports` | Cron semanal: dispara geração de relatório por usuário |

@@ -34,13 +34,15 @@ export type DailyInsightResponse =
 export async function callGenerateCheckinInsight(
   input: GenerateCheckinInsightInput,
 ): Promise<CheckinInsightOutput> {
-  const { data, error } = await supabase.functions.invoke<CheckinInsightOutput>(
-    'generate-checkin-insight',
-    { body: input },
-  )
-  if (error) throw error
-  if (!data) throw new Error('Empty response from generate-checkin-insight')
-  return data
+  void input
+  // P0 containment: post-check-in AI is disabled until the function is
+  // rewritten to the PRODUCT_COHERENCE contract.
+  return {
+    headline: 'Check-in registrado',
+    body: 'Anotamos esse registro na memória do seu tratamento.',
+    disclaimer:
+      'Isso é uma anotação inteligente, não orientação médica. Sempre fale com um profissional de saúde.',
+  }
 }
 
 export type GenerateOnboardingInsightInput = {
@@ -64,35 +66,9 @@ export async function callGenerateOnboardingInsight(
 }
 
 export async function callMemoryDailyInsight(): Promise<DailyInsightResponse> {
-  const { data, error } = await supabase.functions.invoke<{
-    id?: string | null
-    insight_text?: string | null
-    generated_at?: string | null
-    content?: null
-    mode?: string
-    placeholder_key?: string
-  }>('memory-daily-insight', { body: {} })
-
-  if (error) throw error
-  if (!data) throw new Error('Empty response from memory-daily-insight')
-
-  if (data.mode === 'free_placeholder' && data.placeholder_key) {
-    return { kind: 'free_placeholder', placeholderKey: data.placeholder_key }
-  }
-
-  if (!data.id) {
-    return {
-      kind: 'fallback',
-      insightText: data.insight_text ?? 'Sua memória será atualizada em breve.',
-    }
-  }
-
-  return {
-    kind: 'premium',
-    id: data.id,
-    insightText: data.insight_text ?? '',
-    generatedAt: data.generated_at ?? new Date().toISOString(),
-  }
+  // P0 containment: memory-daily-insight is still being rewritten to the
+  // PRODUCT_COHERENCE contract. Keep the UI path alive without invoking AI.
+  return { kind: 'fallback', insightText: 'Sua memória será atualizada em breve.' }
 }
 
 // ── Fallback secundário: lê educational_insights diretamente ─────────────────
@@ -100,17 +76,10 @@ export async function callMemoryDailyInsight(): Promise<DailyInsightResponse> {
 export async function getLatestEducationalInsight(
   userId: string,
 ): Promise<CheckinInsightOutput | null> {
-  const { data, error } = await supabase
-    .from('educational_insights')
-    .select('headline, body, disclaimer')
-    .eq('user_id', userId)
-    .eq('trigger_source', 'first_checkin')
-    .maybeSingle()
-
-  if (error) throw error
-  if (!data) return null
-
-  return { headline: data.headline, body: data.body, disclaimer: data.disclaimer }
+  void userId
+  // P0 containment: first_checkin rows may contain legacy patient-facing AI.
+  // Do not surface them from the client while cleanup remains a gated prod task.
+  return null
 }
 
 // Lê o contrato completo gerado no onboarding direto do DB (jsonb context.output).

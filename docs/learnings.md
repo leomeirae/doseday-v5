@@ -341,3 +341,21 @@ Registrado em 2026-05-21 durante o Prompt 33b (hardening do onboarding insight).
 4. Fallback determinístico no servidor para falhas que o cliente não pode resolver.
 
 **Bônus de padrão.** Edge Function testável deve separar `index.ts` (`Deno.serve(handleRequest)`) de `handler.ts` puro. `HandlerDeps.resolveUserId` permite testar fallback sem depender de Supabase Auth real ou secrets locais.
+
+## 14.26 Aprendizado 58 — Contenção de IA precisa separar source local, caller e runtime deployado
+
+Registrado em 2026-05-23 durante a Frente 1 P0 IA/compliance.
+
+**Contexto.** `generate-checkin-insight`, `memory-daily-insight` e `memory-summary` estavam ativas em produção com source ausente do repo. `generate-checkin-insight` v4 citava trials por design; `memory-*` rodavam com prompt placeholder. O app também tinha callers client-side para pós-check-in e memória diária.
+
+**Achado.** Neutralizar só o caller do app novo não contém builds antigos nem schedulers. Versionar só o source local também não muda produção. A contenção real tem três camadas separadas: (1) caller no app, (2) source versionado auditável, (3) deploy aprovado no Supabase. Se uma dessas camadas ficar ambígua, o time pode achar que o P0 foi fechado quando apenas o PR local foi preparado.
+
+**Solução aplicada na Frente 1.** Caller pós-check-in e memória diária foram neutralizados no client. As EFs em risco foram versionadas ou convertidas localmente para respostas determinísticas sem OpenAI. A documentação passou a marcar explicitamente que produção continua rodando as versões antigas até deploy aprovado.
+
+**Princípio.** Para Edge Function paciente-facing, todo PR de contenção deve declarar o status de cada camada:
+
+1. `client caller`: chama, não chama, ou retorna fallback local.
+2. `source local`: versionado, testado e sem output proibido.
+3. `prod runtime`: deployado ou ainda pendente.
+
+**Bônus de validação.** Snapshots recuperados de produção em `docs/handoff/edge-functions-snapshot-*` são evidência histórica, não código compilável do app. Excluir esses snapshots de `tsconfig`/ESLint evita que validações locais quebrem por imports Deno remotos antigos sem alterar o registro histórico.
