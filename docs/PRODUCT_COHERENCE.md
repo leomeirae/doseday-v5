@@ -57,11 +57,11 @@ Nem toda IA do app esta no mesmo estado. Proximos prompts devem nomear a funcao 
 | Edge Function | Versao deploy | verify_jwt | Source local? | Status |
 |---|---|---|---|---|
 | `generate-onboarding-insight` | v9 | ✓ | ✅ | Hardenizada no PR #50. Referencia de contrato, fallback, blacklist e `schemaVersion`. |
-| `generate-insights` | v27 | ✓ | ✅ | **Frente 1 (2026-05-23): source local convertido para resposta de contencao sem OpenAI.** Producao continua v27 ate deploy explicito. |
-| `generate-checkin-insight` | v4 | **✗** (gateway) | ✅ em `supabase/functions/generate-checkin-insight/` + snapshot em `docs/handoff/edge-functions-snapshot-2026-05-22/` | **Frente 1 (2026-05-23): source local versionado como contencao sem OpenAI e caller client-side neutralizado.** Producao continua v4 ate deploy explicito. A causa raiz permanece: v4 antiga EXIGE citar trials por nome. |
-| `memory-daily-insight` | v4 | ✓ | ✅ em `supabase/functions/memory-daily-insight/` + snapshot recuperado | **Frente 1 (2026-05-23): source local versionado como contencao sem OpenAI; `callMemoryDailyInsight` retorna fallback local sem invocar EF.** Producao continua v4 ate deploy explicito. |
-| `memory-summary` | v2 | ✓ | ✅ em `supabase/functions/memory-summary/` + snapshot recuperado | **Frente 1 (2026-05-23): source local versionado como contencao sem OpenAI.** Sem caller identificado no client local. Producao continua v2 ate deploy explicito. |
-| `generate-report` | v48 | ✓ | ✅ | **Frente 1 (2026-05-23): source local convertido para resposta de contencao sem OpenAI.** Producao continua v48 ate deploy explicito. Hardening de relatorio real fica para plano separado. |
+| `generate-insights` | **v28** (era v27) | ✓ | ✅ | **Frente 2 DEPLOYADA 2026-05-23 19:55Z via MCP.** Contencao deterministica sem OpenAI (`generate_insights_containment_v1`) substituiu v27 com tom coach/motivacional/celebratorio. Reescrita real alinhada a §6 continua pendente. |
+| `generate-checkin-insight` | **v5** (era v4) | **✓ (era ✗ no gateway)** | ✅ em `supabase/functions/generate-checkin-insight/` + snapshot em `docs/handoff/edge-functions-snapshot-2026-05-22/` | **Frente 2 DEPLOYADA 2026-05-23 19:54Z via MCP. P0 compliance vivo FECHADO.** Contencao `checkin_insight_containment_v1` sem OpenAI substituiu v4 que exigia citar trials. **`verify_jwt` agora true** (era false) — alinha ADR 0003. Caller client-side da PR #64 ainda nao mergeado. |
+| `memory-daily-insight` | **v5** (era v4) | ✓ | ✅ em `supabase/functions/memory-daily-insight/` + snapshot recuperado | **Frente 2 DEPLOYADA 2026-05-23 19:54Z via MCP.** Contencao `memory_daily_containment_v1` sem OpenAI substituiu v4 com prompt `[PLACEHOLDER]`. |
+| `memory-summary` | **v3** (era v2) | ✓ | ✅ em `supabase/functions/memory-summary/` + snapshot recuperado | **Frente 2 DEPLOYADA 2026-05-23 19:53Z via MCP.** Contencao `memory_summary_containment_v1` sem OpenAI substituiu v2 com prompt `[PLACEHOLDER]`. Caller continua desconhecido. |
+| `generate-report` | **v49** (era v48) | ✓ | ✅ | **Frente 2 DEPLOYADA 2026-05-23 19:56Z via MCP.** Contencao `generate_report_containment_v1` sem OpenAI substituiu v48 (91 relatorios ja gerados, nao auditados). Auditoria do source antigo + reescrita real continuam pendentes. |
 | `delete-user-account` | v4 | ✓ | ✅ | Fora do escopo deste documento. |
 | `get-revenuecat-metrics` | v2 | ✓ | ✅ | Fora do escopo deste documento. |
 | `revenuecat-webhook` | v3 | ✗ (webhook) | ✅ | OK — webhook publico esperado. |
@@ -481,9 +481,9 @@ Antes de transformar os P0s/P1s em prompt operacional, confirmar:
 
 | EF deployada | versao | `verify_jwt` gateway | Auth manual no codigo | Snapshot recuperado | Promovido para `supabase/functions/`? | Comportamento real |
 |---|---|---|---|---|---|---|
-| `generate-checkin-insight` | v4 | **false** | **✓ retorna 401 sem Bearer** | ✅ em `docs/handoff/edge-functions-snapshot-2026-05-22/` | **❌ NAO** | System prompt EXIGE citar trials (REGRA DE OURO 6 + `validateNumericClaims`). Tese de produto antiga. Conserto = decisao §6 + reescrita de prompt. |
-| `memory-daily-insight` | v4 | true | ✓ | ✅ em snapshot | **❌ NAO** | System prompt e `[PLACEHOLDER — sera preenchido pelo PO]` literal contra `gpt-5-nano`. Sem guardrail, sem schemaVersion. |
-| `memory-summary` | v2 | true | ✓ | ✅ em snapshot | **❌ NAO** | Modo `full` tem mesmo `[PLACEHOLDER]` contra `gpt-5-mini`. Modos `template`/`skeleton` sao zero-IA e funcionam. Sem caller identificado no client. |
+| `generate-checkin-insight` | **v5 deployada 2026-05-23** (era v4) | **true** (era false) | **✓ retorna 401 sem Bearer (+gateway agora valida)** | ✅ promovido em `supabase/functions/` + snapshot historico em `docs/handoff/edge-functions-snapshot-2026-05-22/` | **✅ Promovido + deployado como contencao** | v4 antiga (REGRA DE OURO 6 + `validateNumericClaims` exigindo trials) substituida por response deterministica sem OpenAI |
+| `memory-daily-insight` | **v5 deployada 2026-05-23** (era v4) | true | ✓ | ✅ promovido + snapshot | **✅ Promovido + deployado como contencao** | Prompt `[PLACEHOLDER]` substituido por response deterministica sem OpenAI |
+| `memory-summary` | **v3 deployada 2026-05-23** (era v2) | true | ✓ | ✅ promovido + snapshot | **✅ Promovido + deployado como contencao** | Prompt `[PLACEHOLDER]` substituido por response deterministica sem OpenAI. Caller continua desconhecido (investigacao pendente) |
 
 **Inversao de hipoteses pos-`get_edge_function`:**
 

@@ -1,7 +1,7 @@
 # P0 Contencao — Edge Functions IA orfas + texto proibido em prod
 
 **Data:** 2026-05-22 (revisado pos-recuperacao de source)
-**Status:** Frente 1 executada localmente em 2026-05-23. PR prepara contencao, mas **nenhum deploy Supabase foi executado**.
+**Status:** **Frente 2 EXECUTADA em producao em 2026-05-23 19:53–19:56Z via MCP Supabase.** 5 EFs paciente-facing substituidas por contencao deterministica sem OpenAI. P0 compliance vivo FECHADO. Frente 1 (source local) ja executada antes. PR #64 ainda nao mergeado — drift entre prod (contencao) e main (v4/v27/v48 antigas) ate merge.
 **Origem:** auditoria Supabase SELECT-only + `get_edge_function` em 2026-05-22; documentado em `docs/PRODUCT_COHERENCE.md` §3 + §13.2 + §13.3 + §6 (decisao fechada sobre tese de credibilidade).
 **Gate:** este plano interrompe o standby pre-Fase 2 da Regra de Foco #64 — `CLAUDE.md` Regra 11 (security-review obrigatorio para PHI) + decisao de produto §6 (pivotar tese de credibilidade clinica) prevalecem.
 
@@ -53,6 +53,49 @@ O source local agora contem uma contencao deterministica, sem chamada OpenAI, pa
 | `supabase/functions/generate-report` | convertida para contencao sem OpenAI | v48 antiga continua ate deploy explicito |
 
 Esta frente fecha o risco no source local e prepara PR auditavel. Ela **nao limpa rows em producao** e **nao altera nenhuma funcao deployada**.
+
+### Atualizacao 2026-05-23 19:56Z — Frente 2 EXECUTADA em producao
+
+Deploy executado via Supabase MCP (`deploy_edge_function`), sem CLI local, sem migration, sem cleanup de dados.
+
+| Funcao | Versao antes | Versao depois | verify_jwt antes → depois | Schema da resposta deployada |
+|---|---|---|---|---|
+| `memory-summary` | v2 | **v3** | true → true | `memory_summary_containment_v1` |
+| `memory-daily-insight` | v4 | **v5** | true → true | `memory_daily_containment_v1` |
+| `generate-checkin-insight` | v4 | **v5** | **false → true** | `checkin_insight_containment_v1` |
+| `generate-insights` | v27 | **v28** | true → true | `generate_insights_containment_v1` |
+| `generate-report` | v48 | **v49** | true → true | `generate_report_containment_v1` |
+
+**Validacao pre-deploy:**
+- `npm run type-check`: 0 erros
+- `npm run lint`: 0 erros, 1 warning preexistente (i18n, nao relacionado)
+- `patient-facing-ai-safety.test.ts` (4 testes) — 4/4 passaram via Node equivalente (deno-bin nao compilou no sandbox; testes sao regex JS puros, validacao equivalente)
+- `generate-onboarding-insight/handler.test.ts` — **nao rodado** (exige Deno + mock Zod; risco baixo: essa EF nao foi redeployada, continua v9 hardenizada)
+
+**Validacao pos-deploy:**
+- `list_edge_functions` confirma todas as 5 EFs em versao nova com SHA256 diferente, `verify_jwt: true`
+- Smoke test sem JWT em todas as 5 retorna **HTTP 401 "Missing authorization header"** (gateway gating ativo)
+- Smoke test com JWT positivo **NAO executado**: requer JWT real ou Service Role Key. Substituido por: (a) inspecao do source local pre-deploy, (b) tests Node confirmando que `assertSafePatientFacingPayload` aprova payloads hardcoded, (c) SQL pos-deploy em `educational_insights`: **0 rows criadas na ultima hora**, 5 rows antigas remanescentes (continuam intocadas)
+
+**Criterio de sucesso atingido:**
+- Producao deixa de gerar IA paciente-facing antiga ✅
+- Producao retorna contencao/fallback seguro com `assertSafePatientFacingPayload` auto-defesa ✅
+- Nenhuma resposta nova com SURPASS/SURMOUNT/STEP/SUSTAIN/SELECT/trial/estudo clinico/ensaio/coach/parabens/jornada/causado/causou/ajuste dose ✅
+
+**O que NAO foi feito (gates respeitados):**
+- ❌ Nenhum DELETE/UPDATE/INSERT em dados (as 5 rows antigas com SURPASS continuam no banco)
+- ❌ Nenhuma migration
+- ❌ Nenhum bucket criado
+- ❌ Nenhuma alteracao de schema
+- ❌ Nenhum git push/commit/PR — branch local `codex/p0-ai-compliance-containment` intocada via Cowork
+
+**Pendencias remanescentes:**
+
+1. **P0a-cleanup das 5 rows antigas** em `educational_insights` (IDs em §13.2): continua gated por plano separado. Agora seguro porque a torneira foi fechada.
+2. **PR #64 (`codex/p0-ai-compliance-containment`) precisa ser mergeado** pra evitar drift entre producao (contencao deployada) e main (v4/v27/v48 antigas). Sem merge, qualquer redeploy futuro a partir de main vai re-introduzir o risco.
+3. **Migration `dose_frequency_days` / `dose_frequency_source`** em `user_profiles` — pre-requisito tecnico da memoria do ciclo (decidida §6).
+4. **Auditoria futura do source original de `generate-report` v48** — gerou 91 relatorios antes da contencao, com conteudo nao auditado. Sera necessaria pra decidir reescrita real do relatorio (§6 colocou como pilar).
+5. **Decidir reescrita da memoria Pro** — `generate-insights` e `memory-daily-insight` precisam de versao real alinhada a §6 (Free sem IA, Pro com memoria inteligente). Contencao atual e fallback "memoria sera atualizada em breve", nao versao final.
 
 Cada opcao com objetivo, pre-requisito, risco operacional, custo de UX e como reverter. **Nenhuma autorizada por este documento.** Aprovacao item-a-item pelo Leo.
 
