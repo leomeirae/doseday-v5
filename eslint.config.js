@@ -1,7 +1,20 @@
 const expoFlat = require('eslint-config-expo/flat');
 
 module.exports = [
-  { ignores: ['node_modules/**', '.expo/**', '.agents/**', '.claude/**', 'ios/**', 'android/**', 'dist/**', 'build/**', 'supabase/**'] },
+  {
+    ignores: [
+      'node_modules/**',
+      '.expo/**',
+      '.agents/**',
+      '.claude/**',
+      'ios/**',
+      'android/**',
+      'dist/**',
+      'build/**',
+      'supabase/**',
+      'docs/handoff/edge-functions-snapshot-2026-05-22/**',
+    ],
+  },
   ...expoFlat,
   // eslint-plugin-react@7.x calls context.getFilename() (removed in ESLint v10)
   // when react.version is 'detect'. Pinning to '18.0.0' avoids the detection call.

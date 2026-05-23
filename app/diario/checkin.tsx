@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import {
   View,
   Text,
@@ -13,108 +13,30 @@ import { useRouter } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
 import { AuthButton } from '@components/ui/AuthButton'
 import { TextField } from '@components/ui/TextField'
-import { CheckinInsightView } from '@components/diario/CheckinInsightView'
 import { EmotionalStatePicker } from '@components/diario/EmotionalStatePicker'
 import { SymptomsMultiSelect } from '@components/diario/SymptomsMultiSelect'
 import { TriggersMultiSelect } from '@components/diario/TriggersMultiSelect'
 import { useDoseSummary } from '@hooks/useDoseSummary'
 import { useProfile } from '@hooks/useProfile'
 import { useRegisterCheckin } from '@hooks/useRegisterCheckin'
-import { useSession } from '@hooks/useSession'
-import { supabase } from '@lib/supabase/client'
 import { buildTreatmentContext } from '@lib/supabase/queries/diario'
-import { callGenerateCheckinInsight, emotionalStateToMood } from '@lib/supabase/queries/insights'
-import type { CheckinInsightOutput } from '@lib/supabase/queries/insights'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 import { colors, typography, spacing } from '@lib/theme/tokens'
 import { showErrorToast, showSuccessToast } from '@lib/utils/showToast'
 import { checkinSchema } from '@lib/validation/diarioSchemas'
 import type { EmotionalState, SymptomType, Trigger } from '@lib/validation/diarioSchemas'
 
-const INSIGHT_TIMEOUT_MS = 20000
-
 export default function CheckinScreen() {
   const router = useRouter()
-  const { session } = useSession()
   const { data: profile } = useProfile()
   const { data: doseSummary } = useDoseSummary()
   const { mutate, isPending } = useRegisterCheckin()
-  const userId = session?.user?.id
 
   const [emotionalState, setEmotionalState] = useState<EmotionalState | null>(null)
   const [symptoms, setSymptoms] = useState<SymptomType[]>([])
   const [triggers, setTriggers] = useState<Trigger[]>([])
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
-
-  const [phase, setPhase] = useState<'form' | 'loading' | 'insight'>('form')
-  const [insight, setInsight] = useState<CheckinInsightOutput | null>(null)
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    }
-  }, [])
-
-  async function tryGenerateFirstCheckinInsight(state: EmotionalState) {
-    if (!userId) return
-
-    const { count } = await supabase
-      .from('daily_checkins')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId)
-
-    if (count !== 1) {
-      showSuccessToast('Check-in registrado')
-      router.back()
-      return
-    }
-
-    setPhase('loading')
-
-    timeoutRef.current = setTimeout(() => {
-      showSuccessToast('Check-in registrado')
-      router.back()
-    }, INSIGHT_TIMEOUT_MS)
-
-    try {
-      const result = await callGenerateCheckinInsight({
-        medication: profile?.currentMedication ?? null,
-        dose_mg: profile?.currentDose ?? null,
-        treatment_week: profile?.treatmentStartDate
-          ? Math.floor(
-              (Date.now() - new Date(profile.treatmentStartDate).getTime()) /
-                (7 * 24 * 60 * 60 * 1000)
-            ) + 1
-          : null,
-        current_weight: profile?.currentWeight ?? null,
-        initial_weight: profile?.initialWeight ?? null,
-        goal_weight: profile?.goalWeight ?? null,
-        mood: emotionalStateToMood(state),
-        days_since_last_dose: doseSummary?.history[0]?.applicationDate
-          ? Math.floor(
-              (Date.now() - new Date(doseSummary.history[0].applicationDate).getTime()) /
-                (24 * 60 * 60 * 1000)
-            )
-          : null,
-      })
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
-      }
-      setInsight(result)
-      setPhase('insight')
-    } catch {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
-      }
-      showSuccessToast('Check-in registrado')
-      router.back()
-    }
-  }
 
   function handleSubmit() {
     if (!emotionalState) {
@@ -142,30 +64,18 @@ export default function CheckinScreen() {
     setErrors({})
     const lastDoseDate = doseSummary?.history[0]?.applicationDate ?? null
     const ctx = buildTreatmentContext(profile ?? null, lastDoseDate)
-    const capturedState = parsed.data.emotionalState
 
     mutate(
       { input: parsed.data, ctx },
       {
         onSuccess: () => {
-          void tryGenerateFirstCheckinInsight(capturedState)
+          showSuccessToast('Check-in registrado')
+          router.back()
         },
         onError: (err) => {
           showErrorToast(mapQueryError(err))
         },
       }
-    )
-  }
-
-  if (phase === 'loading' || phase === 'insight') {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <CheckinInsightView
-          insight={insight}
-          isLoading={phase === 'loading'}
-          onClose={() => router.back()}
-        />
-      </SafeAreaView>
     )
   }
 
