@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { Redirect, useLocalSearchParams, useRouter, type Href } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
 import * as Haptics from 'expo-haptics'
 import { AuthButton } from '@components/ui/AuthButton'
@@ -31,13 +31,17 @@ type Intensity = 1 | 2 | 3
 export default function QuickLogScreen() {
   const router = useRouter()
   const params = useLocalSearchParams<{ type?: string }>()
+  const { mutate, isPending } = useRegisterQuickLog()
+  const [intensity, setIntensity] = useState<Intensity>(2)
+  const [notes, setNotes] = useState('')
+
+  if (!params.type || params.type === 'other') {
+    return <Redirect href={'/diario/anotar-memoria' as Href} />
+  }
+
   const logType = QUICK_LOG_TYPES.includes(params.type as QuickLogType)
     ? (params.type as QuickLogType)
     : 'other'
-  const { mutate, isPending } = useRegisterQuickLog()
-
-  const [intensity, setIntensity] = useState<Intensity>(2)
-  const [notes, setNotes] = useState('')
 
   function selectIntensity(nextIntensity: Intensity) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)

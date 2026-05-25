@@ -176,6 +176,10 @@ export default function RootLayout() {
                 options={{ presentation: 'modal', headerShown: false }}
               />
               <Stack.Screen
+                name="diario/anotar-memoria"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+              <Stack.Screen
                 name="perfil/notificacoes"
                 options={{ headerShown: false }}
               />

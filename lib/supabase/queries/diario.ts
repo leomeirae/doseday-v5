@@ -2,6 +2,7 @@ import { supabase } from '@lib/supabase/client'
 import type {
   CheckinInput,
   EmotionalState,
+  MemoryNoteInput,
   QuickLogInput,
   QuickLogType,
   SymptomType,
@@ -98,6 +99,21 @@ export async function registerQuickLog(
     intensity: input.intensity,
     notes: input.notes ?? null,
     logged_at: input.loggedAt.toISOString(),
+  })
+
+  if (error) throw error
+}
+
+export async function registerMemoryNote(
+  userId: string,
+  input: MemoryNoteInput
+): Promise<void> {
+  const { error } = await supabase.from('quick_logs').insert({
+    user_id: userId,
+    log_type: 'other',
+    intensity: null,
+    notes: input.notes,
+    logged_at: new Date().toISOString(),
   })
 
   if (error) throw error
