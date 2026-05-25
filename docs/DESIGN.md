@@ -7,6 +7,7 @@ colors:
   bg-surface: "#1B2433"
   brand: "#00D4AA"
   brand-dim: "#00B894"
+  mint-soft: "#A3E6D2"
   semantic-positive: "#00D4AA"
   semantic-warning: "#FFB347"
   semantic-critical: "#E64545"
@@ -28,6 +29,11 @@ typography:
     fontSize: "32"
     fontWeight: 700
     lineHeight: "38"
+  display-ultralight:
+    fontFamily: "system"
+    fontSize: "28"
+    fontWeight: 300
+    lineHeight: "34"
   headline:
     fontFamily: "system"
     fontSize: "28"
@@ -73,6 +79,11 @@ typography:
     fontSize: "40"
     fontWeight: 700
     lineHeight: "48"
+  number-personal:
+    fontFamily: "system"
+    fontSize: "48"
+    fontWeight: 300
+    lineHeight: "54"
   number-medium:
     fontFamily: "system"
     fontSize: "28"
@@ -177,6 +188,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 
 - **Vital Mint Dim** (`#00B894`): Variante pressed/hover do primary. Aparece apenas em estados de interação — tap em botão primário, item de tab pressionado.
 
+- **Mint Soft** (`#A3E6D2`): Variante suave para indicador de estado atual em visualização de dado pessoal, como o ponto final do sparkline de peso. Não substitui Vital Mint como marca, CTA primário, tab ativa ou linha principal de gráfico.
+
 ### Semantic
 
 - **Warm Amber** (`#FFB347`): Atenção moderada. Sintoma de intensidade moderada (4-6/10), aviso de dado incompleto, período próximo da próxima consulta. Nunca para situação urgente — isso é Alert Red.
@@ -215,6 +228,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 
 **The Vital Mint Rarity Rule.** Vital Mint (`#00D4AA`) aparece em ≤10% de qualquer tela. Sua raridade é o que o torna poderoso. Um app onde todo botão e todo ícone é verde não tem cor de marca — tem poluição visual.
 
+**The Mint Soft State Rule.** Mint Soft (`#A3E6D2`) é permitido somente como indicador discreto de estado atual em dado pessoal já exibido, especialmente o ponto final do sparkline de peso. Não comunica ação, sucesso clínico ou marca.
+
 **The 30% Glass Rule.** Glass aplica em no máximo 30% da área visível de qualquer tela. Nenhuma área de conteúdo toca glass. Se um card, lista, texto ou gráfico estiver sobre glass, está errado. Glass é camada de navegação, não padrão de card.
 
 **The Semantic Integrity Rule.** Cor semântica (positivo, warning, critical, info) não é reutilizada para fins decorativos. Alert Red em um badge de marketing é um bug, não uma escolha de design.
@@ -232,6 +247,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 ### Hierarchy
 
 - **Display** (Bold, 32pt, 38pt line-height): Headline de tela-marco. Welcome screen, paywall hero, tela de relatório gerado. Máximo 2-3 palavras. Nunca em tela de dado corrente.
+
+- **Display Ultralight** (Light, 28pt, 34pt line-height): Header emocional e calmo em tela pessoal, quando a função é acolher sem competir com os dados. Exemplo: frase de Home que contextualiza a memória do tratamento. Nunca usar em label, botão, dose, alerta ou título técnico.
 
 - **Headline** (Semibold, 28pt, 34pt): Título de tela padrão — "Seu tratamento", "Doses", "Relatório". Uma por tela.
 
@@ -251,6 +268,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 
 - **Number Large** (Bold, 40pt, 48pt): Peso atual, dose principal. O número é o herói — o label é Caption abaixo dele.
 
+- **Number Personal** (Light, 48pt, 54pt): Dado corporal pessoal do paciente quando a tela precisa parecer memória, não painel clínico. Uso principal: peso atual na Home. Nunca usar para dose, delta de dose, valor financeiro, alerta, relatório técnico ou número comparativo.
+
 - **Number Medium** (Bold, 28pt, 34pt): Delta de peso (−2.3 kg), valor secundário de dose.
 
 - **Mono Data** (Regular SF Mono, 14pt, 20pt): Tabelas de cronologia clínica, logs de dado bruto no relatório técnico. Alinhamento de coluna precisa de mono.
@@ -262,6 +281,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 **The System-Only Rule.** Nunca usar string literal `"SF Pro"` em código — Apple recomenda `System` (ou `-apple-system` em web). Usar a string literal quebra em atualizações do iOS. Todo token de `fontFamily` no DESIGN.md usa `"system"` ou `"SF Mono, monospace"`.
 
 **The Weight-Is-Importance Rule.** Peso comunica importância. Bold = dado crítico. Semibold = label de seção. Regular = conteúdo explicativo. Medium = suporte de interface (tab, chip). Nunca usar Bold para decoração.
+
+**The Ultralight-Is-Personal Rule.** Ultralight é uma exceção deliberada para dado próprio e emocionalmente sensível, não para dado clínico de referência. Se o número orienta decisão, compara risco, define protocolo ou aparece em relatório para profissional, use `Number Large`/`Number Medium` Bold. Se o número representa o corpo do paciente na Home, `Number Personal` pode reduzir dureza visual sem perder hierarquia.
 
 ---
 

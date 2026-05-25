@@ -12,6 +12,7 @@ export const colors = {
   // Brand
   brand: '#00D4AA',
   brandDim: '#00B894',
+  mintSoft: '#A3E6D2',
 
   // Semantic
   semanticPositive: '#00D4AA',
@@ -37,6 +38,7 @@ export const colors = {
 
 export const typography = {
   display:      { fontSize: 32, fontWeight: '700' as const, lineHeight: 38 },
+  displayUltralight: { fontSize: 28, fontWeight: '300' as const, lineHeight: 34 },
   headline:     { fontSize: 28, fontWeight: '600' as const, lineHeight: 34 },
   title:        { fontSize: 22, fontWeight: '600' as const, lineHeight: 28 },
   subtitle:     { fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
@@ -46,6 +48,7 @@ export const typography = {
   caption:      { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
   tabLabel:     { fontSize: 11, fontWeight: '500' as const, lineHeight: 14 },
   numberHero:   { fontSize: 48, fontWeight: '700' as const, lineHeight: 54 }, // Hero number — usado APENAS em NextDoseCard D1+ (Vital Mint Rarity)
+  numberPersonal: { fontSize: 48, fontWeight: '300' as const, lineHeight: 54 },
   numberLarge:  { fontSize: 40, fontWeight: '700' as const, lineHeight: 48 },
   numberMedium: { fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
   monoData:     { fontFamily: 'SF Mono, monospace', fontSize: 14, fontWeight: '400' as const, lineHeight: 20 },
