@@ -17,7 +17,8 @@ export function useRegisterDose() {
       return registerDose(
         session.user.id,
         input,
-        profile?.currentMedication ?? 'Medicamento desconhecido'
+        profile?.currentMedication ?? 'Medicamento desconhecido',
+        profile?.doseFrequencyDays ?? null
       )
     },
     onSuccess: async () => {

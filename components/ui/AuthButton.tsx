@@ -44,7 +44,13 @@ export function AuthButton({
           size="small"
         />
       ) : (
-        <Text style={[styles.label, isPrimary ? styles.labelPrimary : styles.labelSecondary]}>
+        <Text
+          style={[
+            styles.label,
+            isPrimary ? styles.labelPrimary : styles.labelSecondary,
+            isDisabled && styles.labelDisabled,
+          ]}
+        >
           {label}
         </Text>
       )}
@@ -69,7 +75,8 @@ const styles = StyleSheet.create({
     borderColor: colors.bgSurface,
   },
   disabled: {
-    opacity: 0.5,
+    backgroundColor: colors.bgSurface,
+    borderColor: colors.bgSurface,
   },
   pressed: {
     transform: [{ scale: 0.98 }],
@@ -82,5 +89,8 @@ const styles = StyleSheet.create({
   },
   labelSecondary: {
     color: colors.textPrimary,
+  },
+  labelDisabled: {
+    color: colors.textTertiary,
   },
 })

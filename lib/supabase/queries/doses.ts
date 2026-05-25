@@ -36,19 +36,27 @@ export type DoseSummary = {
 }
 
 export async function getDoseSummary(userId: string): Promise<DoseSummary> {
-  const { data, error } = await supabase
-    .from('medication_applications')
-    .select('id, medication_name, dose, application_date, days_until_next_dose')
-    .eq('user_id', userId)
-    .order('application_date', { ascending: false })
-    .limit(20)
+  const [doseRes, profileRes] = await Promise.all([
+    supabase
+      .from('medication_applications')
+      .select('id, medication_name, dose, application_date, days_until_next_dose')
+      .eq('user_id', userId)
+      .order('application_date', { ascending: false })
+      .limit(20),
+    supabase
+      .from('user_profiles')
+      .select('dose_frequency_days')
+      .eq('user_id', userId)
+      .maybeSingle(),
+  ])
 
-  if (error) throw error
-  if (!data || data.length === 0) {
+  if (doseRes.error) throw doseRes.error
+  if (profileRes.error) throw profileRes.error
+  if (!doseRes.data || doseRes.data.length === 0) {
     return { nextDose: null, history: [] }
   }
 
-  const history: DoseRecord[] = data.map((row) => ({
+  const history: DoseRecord[] = doseRes.data.map((row) => ({
     id: row.id,
     medicationName: row.medication_name,
     dose: Number(row.dose),
@@ -58,12 +66,13 @@ export async function getDoseSummary(userId: string): Promise<DoseSummary> {
   }))
 
   const last = history[0]
-  if (last.daysUntilNextDose == null) {
+  const frequencyDays = profileRes.data?.dose_frequency_days ?? last.daysUntilNextDose ?? null
+  if (frequencyDays == null) {
     return { nextDose: null, history }
   }
 
   const nextDate = new Date(last.applicationDate)
-  nextDate.setDate(nextDate.getDate() + last.daysUntilNextDose)
+  nextDate.setDate(nextDate.getDate() + frequencyDays)
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -88,14 +97,15 @@ export async function getDoseSummary(userId: string): Promise<DoseSummary> {
 export async function registerDose(
   userId: string,
   input: RegisterDoseInput,
-  medicationName: string
+  medicationName: string,
+  doseFrequencyDays: number | null
 ): Promise<void> {
   const { error } = await supabase.from('medication_applications').insert({
     user_id: userId,
     medication_name: medicationName,
     dose: input.dose,
     application_date: input.applicationDate.toISOString(),
-    days_until_next_dose: null,
+    days_until_next_dose: doseFrequencyDays,
     injection_site: input.injectionSite ?? null,
     notes: input.notes ?? null,
   })
