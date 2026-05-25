@@ -3,10 +3,12 @@ import { ptBR } from 'date-fns/locale'
 import { useRouter, type Href } from 'expo-router'
 import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import Svg, { Circle as SvgCircle, Polyline } from 'react-native-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDiarioSummary } from '@hooks/useDiarioSummary'
 import { useDoseSummary } from '@hooks/useDoseSummary'
 import { useProfile } from '@hooks/useProfile'
+import { usePurchaseSummary } from '@hooks/usePurchaseSummary'
 import { useWeightLogs } from '@hooks/useWeightLogs'
 import type { DoseRecord, NextDoseData } from '@lib/supabase/queries/doses'
 import type { QuickLogRecord } from '@lib/supabase/queries/diario'
@@ -32,6 +34,7 @@ export function HomeV7Content() {
   const { data: doseSummary } = useDoseSummary()
   const { data: diarioSummary } = useDiarioSummary()
   const { data: profile } = useProfile()
+  const { data: purchaseSummary } = usePurchaseSummary()
   const { data: weightLogs = [] } = useWeightLogs()
 
   const latestWeight = weightLogs[0] ?? null
@@ -70,12 +73,19 @@ export function HomeV7Content() {
 
         <Divider />
 
-        <WeightSection currentWeight={currentWeight} delta={weightDelta} />
+        <WeightSection currentWeight={currentWeight} delta={weightDelta} logs={weightLogs} />
 
         {timeline.length > 0 && (
           <>
             <Divider />
             <RecentMemoryTimeline items={timeline} />
+          </>
+        )}
+
+        {purchaseSummary && purchaseSummary.count > 0 && (
+          <>
+            <Divider />
+            <ExpensesSection total={purchaseSummary.total} />
           </>
         )}
 
@@ -203,9 +213,11 @@ function NextDoseSection({
 function WeightSection({
   currentWeight,
   delta,
+  logs,
 }: {
   currentWeight: number | null
   delta: number | null
+  logs: WeightLog[]
 }) {
   return (
     <View>
@@ -214,13 +226,39 @@ function WeightSection({
         {delta !== null && <Text style={styles.weightDelta}>{formatDelta(delta)}</Text>}
       </View>
       {currentWeight !== null ? (
-        <View style={styles.weightValueRow}>
-          <Text style={styles.weightValue}>{formatNumber(currentWeight)}</Text>
-          <Text style={styles.weightUnit}>kg</Text>
-        </View>
+        <>
+          <View style={styles.weightValueRow}>
+            <Text style={styles.weightValue}>{formatNumber(currentWeight)}</Text>
+            <Text style={styles.weightUnit}>kg</Text>
+          </View>
+          <WeightSparkline logs={logs} />
+        </>
       ) : (
         <Text style={styles.emptyText}>Nenhum peso registrado ainda.</Text>
       )}
+    </View>
+  )
+}
+
+function WeightSparkline({ logs }: { logs: WeightLog[] }) {
+  const sparkline = buildSparklinePoints(logs)
+  if (!sparkline) return null
+
+  return (
+    <View style={styles.sparkline}>
+      <Svg width="100%" height="100%" viewBox="0 0 100 32" preserveAspectRatio="none">
+        <Polyline
+          points={sparkline.points}
+          fill="none"
+          stroke={colors.semanticMuted}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.2}
+          vectorEffect="non-scaling-stroke"
+        />
+        <SvgCircle cx={sparkline.first.x} cy={sparkline.first.y} r={1.7} fill={colors.semanticMuted} />
+        <SvgCircle cx={sparkline.last.x} cy={sparkline.last.y} r={2.2} fill={graphite.mintSoft} />
+      </Svg>
     </View>
   )
 }
@@ -256,6 +294,15 @@ function Disclaimer() {
     <Text style={styles.disclaimer}>
       Nada aqui é orientação médica. É uma memória organizada do seu tratamento.
     </Text>
+  )
+}
+
+function ExpensesSection({ total }: { total: number }) {
+  return (
+    <View style={styles.expenses}>
+      <Text style={styles.eyebrow}>Custos registrados</Text>
+      <Text style={styles.expenseText}>{formatCurrency(total)} registrados no tratamento.</Text>
+    </View>
   )
 }
 
@@ -320,6 +367,48 @@ function formatDelta(delta: number): string {
   return `${delta > 0 ? '+' : ''}${value} kg desde o início`
 }
 
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    currency: 'BRL',
+    maximumFractionDigits: 0,
+    style: 'currency',
+  }).format(value)
+}
+
+type SparklinePoint = {
+  x: number
+  y: number
+}
+
+function buildSparklinePoints(
+  logs: WeightLog[]
+): { points: string; first: SparklinePoint; last: SparklinePoint } | null {
+  const ordered = [...logs]
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
+    .slice(-8)
+
+  if (ordered.length < 2) return null
+
+  const weights = ordered.map((log) => log.weight)
+  const min = Math.min(...weights)
+  const max = Math.max(...weights)
+  const range = max - min || 1
+  const lastIndex = ordered.length - 1
+
+  const points = ordered
+    .map((log, index) => {
+      const x = lastIndex === 0 ? 4 : 4 + (index / lastIndex) * 92
+      const y = 28 - ((log.weight - min) / range) * 24
+      return { x, y }
+    })
+
+  return {
+    points: points.map((point) => `${point.x.toFixed(2)},${point.y.toFixed(2)}`).join(' '),
+    first: points[0],
+    last: points[points.length - 1],
+  }
+}
+
 function formatNumber(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
     maximumFractionDigits: 1,
@@ -342,10 +431,10 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 240,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
+    paddingTop: 22,
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   title: {
     color: colors.textPrimary,
@@ -361,7 +450,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: 10,
     marginBottom: 28,
   },
   actionButton: {
@@ -373,7 +462,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.xs,
     justifyContent: 'center',
-    minHeight: 66,
+    minHeight: 88,
     overflow: 'hidden',
     paddingHorizontal: spacing.xs,
     paddingVertical: spacing.sm,
@@ -391,9 +480,11 @@ const styles = StyleSheet.create({
     top: 0,
   },
   actionLabel: {
-    ...typography.caption,
     color: colors.textPrimary,
+    fontSize: 11,
     fontWeight: '600',
+    letterSpacing: 0.2,
+    lineHeight: 13,
     textAlign: 'center',
   },
   divider: {
@@ -461,7 +552,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     flexDirection: 'row',
     gap: spacing.xs,
-    marginBottom: 24,
+    marginBottom: spacing.xs,
   },
   weightValue: {
     color: colors.textPrimary,
@@ -478,6 +569,12 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     marginBottom: 24,
+  },
+  sparkline: {
+    height: 32,
+    marginBottom: 24,
+    marginTop: spacing.xs,
+    width: '60%',
   },
   timelineTitle: {
     marginBottom: spacing.lg,
@@ -530,5 +627,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     paddingHorizontal: spacing.md,
     textAlign: 'center',
+  },
+  expenses: {
+    marginBottom: 28,
+  },
+  expenseText: {
+    ...typography.bodyClinical,
+    color: colors.textSecondary,
+    marginTop: spacing.sm,
   },
 })
