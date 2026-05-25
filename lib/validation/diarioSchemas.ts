@@ -1,5 +1,9 @@
 import { z } from 'zod'
 
+/**
+ * 'other' é tipo de storage legado (rows históricas em `quick_logs`).
+ * A UI redireciona pra /diario/anotar-memoria via guard em quick-log.tsx.
+ */
 export const QUICK_LOG_TYPES = [
   'nausea',
   'headache',
@@ -130,5 +134,10 @@ export const checkinSchema = z.object({
   notes: z.string().max(1000).optional(),
 })
 
+export const memoryNoteSchema = z.object({
+  notes: z.string().trim().min(1, 'Anote algo antes de registrar').max(500),
+})
+
 export type QuickLogInput = z.infer<typeof quickLogSchema>
 export type CheckinInput = z.infer<typeof checkinSchema>
+export type MemoryNoteInput = z.infer<typeof memoryNoteSchema>

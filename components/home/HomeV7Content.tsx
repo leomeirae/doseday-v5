@@ -60,7 +60,7 @@ export function HomeV7Content() {
         <QuickActions
           onPressDose={() => router.push('/dose/registrar')}
           onPressWeight={() => router.push('/peso/registrar')}
-          onPressMemory={() => router.push('/diario/quick-log?type=other' as Href)}
+          onPressMemory={() => router.push('/diario/anotar-memoria' as Href)}
         />
 
         <Divider />
