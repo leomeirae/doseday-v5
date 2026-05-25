@@ -14,6 +14,8 @@
 
 - A execucao ocorre dentro da Camada 3 ativa da Regra de Foco #64, documentada em `docs/PRODUCT_COHERENCE.md` pelo PR #71 mesclado em 2026-05-25. Nao e excecao ao freeze: o freeze permanece para front-end legado e a Home v7 esta explicitamente autorizada.
 - A passagem foi autorizada por Leo no chat de 2026-05-25, apos a decisao Opcao C de 2026-05-22.
+- Alinhamento de 2026-05-25: `docs/HOME_DESIGN_DIRECTION.md` local atualiza a regra Vital Mint para dois papeis controlados. Este PR preserva `mintSoft` (`#A3E6D2`) no ponto final do sparkline de peso como indicador de estado atual, sem aplicar mint em `Observacoes` ou `Para a consulta`.
+- Alinhamento de 2026-05-25: `docs/SETTINGS_DESIGN_DIRECTION.md` local define Configuracoes como hub futuro; a tab bar atual permanece provisoria e nao sera alterada nesta passagem.
 - `/impeccable critique components/home/HomeV7Content.tsx` baseline: `24/40`.
 - O detector do cache integro do Codex sera usado no final, pois a copia local de `.agents/skills/impeccable` falha com `Error: bundled detector not found.`
 
@@ -31,6 +33,7 @@
 | Criar | `lib/supabase/queries/symptoms.ts`, `hooks/useSymptomMemory.ts`, `hooks/useConsultationNotes.ts` |
 | Modificar | `components/home/HomeV7Content.tsx`, `docs/history.md` |
 | Nao tocar | Home antiga `app/(tabs)/index.tsx`, Configuracoes, tab bar, migrations, Edge Functions, IA paciente-facing |
+| Publicacao | Rebasear em `main` apos merge do PR #72 (`chore/fix-types-jest-lockfile-drift`) antes de abrir o PR da Home; nao alterar `package.json` ou `package-lock.json` nesta branch |
 | Dados | Somente `symptom_type` e `symptom_date`; sem nota livre, intensidade, timing de dose ou check-in |
 | Ordem visual | `Peso` -> `Memoria recente` -> `Observacoes` -> `Para a consulta` -> `Custos registrados` -> disclaimer |
 
@@ -39,7 +42,7 @@
 **Files:**
 - Create: `lib/supabase/queries/symptoms.ts`
 
-- [ ] **Step 1: Criar o contrato minimo e a leitura canonica**
+- [x] **Step 1: Criar o contrato minimo e a leitura canonica**
 
 ```ts
 import { supabase } from '@lib/supabase/client'
@@ -68,7 +71,7 @@ export async function getRecentSymptom(userId: string): Promise<RecentSymptom | 
 }
 ```
 
-- [ ] **Step 2: Verificar minimizacao de PHI**
+- [x] **Step 2: Verificar minimizacao de PHI**
 
 Run: `rg -n "select\\(|notes|intensity|days_since_dose|checkin_id" lib/supabase/queries/symptoms.ts`
 
@@ -80,7 +83,7 @@ Expected: o unico campo de `select(...)` e `symptom_type, symptom_date`; os camp
 - Create: `hooks/useSymptomMemory.ts`
 - Create: `hooks/useConsultationNotes.ts`
 
-- [ ] **Step 1: Criar query autenticada do sintoma mais recente**
+- [x] **Step 1: Criar query autenticada do sintoma mais recente**
 
 ```ts
 import { useQuery } from '@tanstack/react-query'
@@ -100,7 +103,7 @@ export function useSymptomMemory() {
 }
 ```
 
-- [ ] **Step 2: Criar contrato vazio de notas de consulta v1**
+- [x] **Step 2: Criar contrato vazio de notas de consulta v1**
 
 ```ts
 export type ConsultationNote = {
@@ -119,7 +122,7 @@ export function useConsultationNotes() {
 }
 ```
 
-- [ ] **Step 3: Confirmar ausencia de logging de PHI**
+- [x] **Step 3: Confirmar ausencia de logging de PHI**
 
 Run: `rg -n "console\\.(log|warn|error)" hooks/useSymptomMemory.ts`
 
@@ -130,7 +133,7 @@ Expected: zero matches.
 **Files:**
 - Modify: `components/home/HomeV7Content.tsx`
 
-- [ ] **Step 1: Integrar hooks e estados seguros**
+- [x] **Step 1: Integrar hooks e estados seguros**
 
 Adicionar `useSymptomMemory`, `useConsultationNotes` e `mapQueryError`; manter `data`, `isLoading`, `error` e `refetch` para proxima dose, peso, diario e sintoma. Um componente compacto de estado deve apresentar carregamento ou mensagem de `mapQueryError(error)` com botao `Tentar novamente`, em vez de renderizar ausencia falsa.
 
@@ -158,15 +161,15 @@ function SectionReadState({
 }
 ```
 
-- [ ] **Step 2: Adicionar `ObservationMemoryCard` depois da memoria recente**
+- [x] **Step 2: Adicionar `ObservationMemoryCard` depois da memoria recente**
 
-Renderizar `null` quando a leitura concluiu sem dado. Com dado, formatar `symptom_date` com `format(date, "d 'de' MMMM", { locale: ptBR })`; rótulos conhecidos produzem copy factual (`Náusea registrada em 22 de maio.`), e tipo desconhecido produz `Uma observação foi registrada em 22 de maio.`. Usar card neutro outlined e icone circular `semanticMuted`, sem mint ou glass.
+Renderizar `null` quando a leitura concluiu sem dado. Com dado, formatar `symptom_date` com `format(date, "d 'de' MMMM", { locale: ptBR })`; rótulos conhecidos produzem copy factual (`Náusea registrada em 22 de maio.`), e tipo desconhecido produz `Uma observação foi registrada em 22 de maio.`. Usar card neutro outlined e icone circular `semanticMuted`, sem mint ou glass; o uso ja existente de `mintSoft` no ponto final do sparkline permanece autorizado como indicador de estado atual.
 
-- [ ] **Step 3: Adicionar `ConsultationMemorySection` sem dados ficticios**
+- [x] **Step 3: Adicionar `ConsultationMemorySection` sem dados ficticios**
 
 O componente recebe `ConsultationNote[]`, retorna `null` para array vazio e, quando houver source futura, exibe eyebrow, badge pluralizado (`1 item`/`N itens`) e linhas com `circle`/`checkmark.circle`, aplicando `textDecorationLine: 'line-through'` nas concluidas. Nao incluir botao de adicionar.
 
-- [ ] **Step 4: Corrigir os issues do baseline**
+- [x] **Step 4: Corrigir os issues do baseline**
 
 Alterar `formatQuickLogTitle` para retornar `log.notes.trim()` quando `log.logType === 'other'` e existir texto; manter `Memória adicionada.` quando vazio. Ampliar `styles.arrowButton` para `height: 44` e `width: 44`. Manter como follow-up o acesso ao historico completo da timeline.
 
@@ -175,7 +178,7 @@ Alterar `formatQuickLogTitle` para retornar `log.notes.trim()` quando `log.logTy
 **Files:**
 - Modify: `docs/history.md`
 
-- [ ] **Step 1: Executar verificacoes estaticas e de copy**
+- [x] **Step 1: Executar verificacoes estaticas e de copy**
 
 Run:
 
@@ -186,6 +189,8 @@ grep -E "24h|pós-dose|D\+[0-9]|causa[douas]+|esperad[oa]|ajuste de dose|100% ad
 ```
 
 Expected: TypeScript PASS; lint PASS com apenas o warning preexistente em `lib/i18n/index.ts`; grep sem matches.
+
+Executado antes do rebase final: `npm run type-check` PASS; `npm run lint` PASS com 1 warning preexistente em `lib/i18n/index.ts:127`; grep sem matches. Como o PR #72 ainda esta aberto para corrigir o drift do lockfile, as dependencias de validacao foram instaladas em `node_modules` com `npm install --package-lock=false --legacy-peer-deps`, sem modificar arquivos versionados.
 
 - [ ] **Step 2: Executar security review objetivo**
 
@@ -213,6 +218,10 @@ Solicitar `assets/screenshots/home-v7-clean/02-observacoes-consulta.png` no iPho
 - [ ] **Step 5: Atualizar historico e abrir PR somente quando completo**
 
 Adicionar linha final em `docs/history.md` com feature, cold-start, ausencia de IA/causalidade/copy proibida, validacoes e `baseline 24/40 -> final Y/40`. O PR so sera aberto depois da validacao local e da imagem real fornecida.
+
+- [ ] **Step 6: Sincronizar dependencia documental antes da publicacao**
+
+Confirmar que o PR #72 foi mesclado, rebasear a branch em `origin/main`, repetir `npm run type-check`, `npm run lint` e o grep proibido, e conferir que `package.json`/`package-lock.json` nao aparecem no diff.
 
 ## Self-Review
 

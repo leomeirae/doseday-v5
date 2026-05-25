@@ -2,16 +2,20 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { useRouter, type Href } from 'expo-router'
 import { SymbolView, type SFSymbol } from 'expo-symbols'
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Svg, { Circle as SvgCircle, Polyline } from 'react-native-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useConsultationNotes, type ConsultationNote } from '@hooks/useConsultationNotes'
 import { useDiarioSummary } from '@hooks/useDiarioSummary'
 import { useDoseSummary } from '@hooks/useDoseSummary'
 import { useProfile } from '@hooks/useProfile'
 import { usePurchaseSummary } from '@hooks/usePurchaseSummary'
+import { useSymptomMemory } from '@hooks/useSymptomMemory'
 import { useWeightLogs } from '@hooks/useWeightLogs'
 import type { DoseRecord, NextDoseData } from '@lib/supabase/queries/doses'
 import type { QuickLogRecord } from '@lib/supabase/queries/diario'
+import { mapQueryError } from '@lib/supabase/queries/errors'
+import type { RecentSymptom } from '@lib/supabase/queries/symptoms'
 import type { WeightLog } from '@lib/supabase/queries/weight'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 import { QUICK_LOG_LABELS } from '@lib/validation/diarioSchemas'
@@ -29,13 +33,30 @@ type TimelineItem = {
   title: string
 }
 
+const SYMPTOM_LABELS: Record<string, string> = {
+  constipation: 'Constipação',
+  diarrhea: 'Diarreia',
+  fatigue: 'Cansaço',
+  headache: 'Dor de cabeça',
+  heartburn: 'Azia',
+  injection_pain: 'Dor na injeção',
+  nausea: 'Náusea',
+}
+
 export function HomeV7Content() {
   const router = useRouter()
-  const { data: doseSummary } = useDoseSummary()
-  const { data: diarioSummary } = useDiarioSummary()
-  const { data: profile } = useProfile()
+  const doseQuery = useDoseSummary()
+  const diarioQuery = useDiarioSummary()
+  const profileQuery = useProfile()
   const { data: purchaseSummary } = usePurchaseSummary()
-  const { data: weightLogs = [] } = useWeightLogs()
+  const weightQuery = useWeightLogs()
+  const symptomQuery = useSymptomMemory()
+  const { data: consultationNotes } = useConsultationNotes()
+
+  const doseSummary = doseQuery.data
+  const diarioSummary = diarioQuery.data
+  const profile = profileQuery.data
+  const weightLogs = weightQuery.data ?? []
 
   const latestWeight = weightLogs[0] ?? null
   const currentWeight = latestWeight?.weight ?? profile?.currentWeight ?? null
@@ -47,6 +68,12 @@ export function HomeV7Content() {
     weightLogs,
     diarioSummary?.recentQuickLogs ?? []
   )
+  const needsProfileForWeight = weightLogs.length === 0
+  const weightIsLoading = weightQuery.isLoading || (needsProfileForWeight && profileQuery.isLoading)
+  const weightError = weightQuery.error ?? (needsProfileForWeight ? profileQuery.error : null)
+  const timelineIsLoading =
+    doseQuery.isLoading || diarioQuery.isLoading || weightQuery.isLoading
+  const timelineError = doseQuery.error ?? diarioQuery.error ?? weightQuery.error
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -69,18 +96,44 @@ export function HomeV7Content() {
           nextDose={doseSummary?.nextDose ?? null}
           hasDoseHistory={(doseSummary?.history.length ?? 0) > 0}
           onPress={() => router.push('/perfil/protocolo')}
+          isLoading={doseQuery.isLoading}
+          error={doseQuery.error ? mapQueryError(doseQuery.error) : null}
+          onRetry={() => void doseQuery.refetch()}
         />
 
         <Divider />
 
-        <WeightSection currentWeight={currentWeight} delta={weightDelta} logs={weightLogs} />
+        <WeightSection
+          currentWeight={currentWeight}
+          delta={weightDelta}
+          logs={weightLogs}
+          isLoading={weightIsLoading}
+          error={weightError ? mapQueryError(weightError) : null}
+          onRetry={() => {
+            void weightQuery.refetch()
+            if (needsProfileForWeight) void profileQuery.refetch()
+          }}
+        />
 
-        {timeline.length > 0 && (
-          <>
-            <Divider />
-            <RecentMemoryTimeline items={timeline} />
-          </>
-        )}
+        <RecentMemoryTimeline
+          items={timeline}
+          isLoading={timelineIsLoading}
+          error={timelineError ? mapQueryError(timelineError) : null}
+          onRetry={() => {
+            void doseQuery.refetch()
+            void diarioQuery.refetch()
+            void weightQuery.refetch()
+          }}
+        />
+
+        <ObservationMemoryCard
+          symptom={symptomQuery.data ?? null}
+          isLoading={symptomQuery.isLoading}
+          error={symptomQuery.error ? mapQueryError(symptomQuery.error) : null}
+          onRetry={() => void symptomQuery.refetch()}
+        />
+
+        <ConsultationMemorySection items={consultationNotes} />
 
         {purchaseSummary && purchaseSummary.count > 0 && (
           <>
@@ -174,10 +227,16 @@ function NextDoseSection({
   nextDose,
   hasDoseHistory,
   onPress,
+  isLoading,
+  error,
+  onRetry,
 }: {
   nextDose: NextDoseData | null
   hasDoseHistory: boolean
   onPress: () => void
+  isLoading: boolean
+  error: string | null
+  onRetry: () => void
 }) {
   const value = nextDose ? formatNextDoseValue(nextDose) : 'A definir'
   const helper = nextDose
@@ -193,9 +252,20 @@ function NextDoseSection({
     <View style={styles.nextDoseRow}>
       <View style={styles.sectionCopy}>
         <Text style={styles.eyebrow}>Próxima dose</Text>
-        <Text style={styles.sectionValue}>{capitalize(value)}</Text>
-        <Text style={styles.helper}>{capitalize(helper)}</Text>
-        {medicationDetail && <Text style={styles.protocolDetail}>{medicationDetail}</Text>}
+        {isLoading || error ? (
+          <SectionReadState
+            isLoading={isLoading}
+            error={error}
+            onRetry={onRetry}
+            loadingLabel="Carregando próxima dose."
+          />
+        ) : (
+          <>
+            <Text style={styles.sectionValue}>{capitalize(value)}</Text>
+            <Text style={styles.helper}>{capitalize(helper)}</Text>
+            {medicationDetail && <Text style={styles.protocolDetail}>{medicationDetail}</Text>}
+          </>
+        )}
       </View>
       <Pressable
         onPress={onPress}
@@ -214,10 +284,16 @@ function WeightSection({
   currentWeight,
   delta,
   logs,
+  isLoading,
+  error,
+  onRetry,
 }: {
   currentWeight: number | null
   delta: number | null
   logs: WeightLog[]
+  isLoading: boolean
+  error: string | null
+  onRetry: () => void
 }) {
   return (
     <View>
@@ -225,7 +301,14 @@ function WeightSection({
         <Text style={styles.eyebrow}>Peso</Text>
         {delta !== null && <Text style={styles.weightDelta}>{formatDelta(delta)}</Text>}
       </View>
-      {currentWeight !== null ? (
+      {isLoading || error ? (
+        <SectionReadState
+          isLoading={isLoading}
+          error={error}
+          onRetry={onRetry}
+          loadingLabel="Carregando peso registrado."
+        />
+      ) : currentWeight !== null ? (
         <>
           <View style={styles.weightValueRow}>
             <Text style={styles.weightValue}>{formatNumber(currentWeight)}</Text>
@@ -263,24 +346,161 @@ function WeightSparkline({ logs }: { logs: WeightLog[] }) {
   )
 }
 
-function RecentMemoryTimeline({ items }: { items: TimelineItem[] }) {
+function RecentMemoryTimeline({
+  items,
+  isLoading,
+  error,
+  onRetry,
+}: {
+  items: TimelineItem[]
+  isLoading: boolean
+  error: string | null
+  onRetry: () => void
+}) {
+  if (!isLoading && !error && items.length === 0) return null
+
   return (
-    <View>
-      <Text style={[styles.eyebrow, styles.timelineTitle]}>Memória recente</Text>
-      <View style={styles.timeline}>
-        {items.map((item, index) => (
-          <View key={item.id} style={styles.timelineItem}>
-            <View style={styles.timelineMarkerColumn}>
-              <View style={[styles.timelineDot, index > 0 && styles.timelineDotMuted]} />
-              {index < items.length - 1 && <View style={styles.timelineStem} />}
-            </View>
-            <View style={styles.timelineContent}>
-              <Text style={styles.timelineDate}>{formatRelativeDay(item.date)}</Text>
-              <Text style={styles.timelineText}>{item.title}</Text>
-            </View>
+    <>
+      <Divider />
+      <View>
+        <Text style={[styles.eyebrow, styles.timelineTitle]}>Memória recente</Text>
+        {isLoading || error ? (
+          <SectionReadState
+            isLoading={isLoading}
+            error={error}
+            onRetry={onRetry}
+            loadingLabel="Carregando memória recente."
+          />
+        ) : (
+          <View style={styles.timeline}>
+            {items.map((item, index) => (
+              <View key={item.id} style={styles.timelineItem}>
+                <View style={styles.timelineMarkerColumn}>
+                  <View style={[styles.timelineDot, index > 0 && styles.timelineDotMuted]} />
+                  {index < items.length - 1 && <View style={styles.timelineStem} />}
+                </View>
+                <View style={styles.timelineContent}>
+                  <Text style={styles.timelineDate}>{formatRelativeDay(item.date)}</Text>
+                  <Text style={styles.timelineText}>{item.title}</Text>
+                </View>
+              </View>
+            ))}
           </View>
-        ))}
+        )}
       </View>
+    </>
+  )
+}
+
+function ObservationMemoryCard({
+  symptom,
+  isLoading,
+  error,
+  onRetry,
+}: {
+  symptom: RecentSymptom | null
+  isLoading: boolean
+  error: string | null
+  onRetry: () => void
+}) {
+  if (!isLoading && !error && !symptom) return null
+
+  return (
+    <>
+      <Divider />
+      <View style={styles.observation}>
+        <Text style={styles.eyebrow}>Observações</Text>
+        {isLoading || error ? (
+          <SectionReadState
+            isLoading={isLoading}
+            error={error}
+            onRetry={onRetry}
+            loadingLabel="Carregando observações."
+          />
+        ) : symptom ? (
+          <View style={styles.observationCard}>
+            <SymbolView name="circle" size={16} tintColor={colors.semanticMuted} />
+            <Text style={styles.observationText}>{formatSymptomMemory(symptom)}</Text>
+          </View>
+        ) : null}
+      </View>
+    </>
+  )
+}
+
+function ConsultationMemorySection({ items }: { items: ConsultationNote[] }) {
+  if (items.length === 0) return null
+
+  return (
+    <>
+      <Divider />
+      <View style={styles.consultation}>
+        <View style={styles.consultationHeader}>
+          <Text style={styles.eyebrow}>Para a consulta</Text>
+          <View style={styles.consultationBadge}>
+            <Text style={styles.consultationBadgeText}>
+              {items.length} {items.length === 1 ? 'item' : 'itens'}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.consultationList}>
+          {items.map((item) => (
+            <View key={item.id} style={styles.consultationItem}>
+              <SymbolView
+                name={item.completed ? 'checkmark.circle' : 'circle'}
+                size={18}
+                tintColor={colors.semanticMuted}
+              />
+              <Text
+                style={[
+                  styles.consultationText,
+                  item.completed && styles.consultationTextCompleted,
+                ]}
+              >
+                {item.text}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </>
+  )
+}
+
+function SectionReadState({
+  isLoading,
+  error,
+  onRetry,
+  loadingLabel,
+}: {
+  isLoading: boolean
+  error: string | null
+  onRetry: () => void
+  loadingLabel: string
+}) {
+  if (isLoading) {
+    return (
+      <View style={styles.readStateLoading}>
+        <ActivityIndicator color={colors.textSecondary} size="small" />
+        <Text style={styles.readStateText}>{loadingLabel}</Text>
+      </View>
+    )
+  }
+
+  if (!error) return null
+
+  return (
+    <View style={styles.readStateError}>
+      <Text style={styles.readStateText}>{error}</Text>
+      <Pressable
+        onPress={onRetry}
+        accessibilityRole="button"
+        accessibilityLabel="Tentar novamente"
+        accessibilityHint="Tenta carregar esta seção novamente."
+        style={({ pressed }) => [styles.retryButton, pressed && styles.arrowButtonPressed]}
+      >
+        <Text style={styles.retryText}>Tentar novamente</Text>
+      </Pressable>
     </View>
   )
 }
@@ -292,7 +512,8 @@ function Divider() {
 function Disclaimer() {
   return (
     <Text style={styles.disclaimer}>
-      Nada aqui é orientação médica. É uma memória organizada do seu tratamento.
+      Este conteúdo organiza seus registros e não substitui uma conversa com um profissional de
+      saúde.
     </Text>
   )
 }
@@ -333,8 +554,16 @@ function buildTimeline(
 }
 
 function formatQuickLogTitle(log: QuickLogRecord): string {
-  if (log.logType === 'other') return 'Memória adicionada.'
+  if (log.logType === 'other') return log.notes?.trim() || 'Memória adicionada.'
   return `Registro: ${QUICK_LOG_LABELS[log.logType]}.`
+}
+
+function formatSymptomMemory(symptom: RecentSymptom): string {
+  const recordedAt = format(symptom.date, "d 'de' MMMM", { locale: ptBR })
+  const label = SYMPTOM_LABELS[symptom.type]
+  return label
+    ? `${label} registrada em ${recordedAt}.`
+    : `Uma observação foi registrada em ${recordedAt}.`
 }
 
 function formatCurrentDate(): string {
@@ -530,9 +759,9 @@ const styles = StyleSheet.create({
     borderColor: colors.semanticMuted,
     borderRadius: radius.full,
     borderWidth: StyleSheet.hairlineWidth,
-    height: 32,
+    height: 44,
     justifyContent: 'center',
-    width: 32,
+    width: 44,
   },
   arrowButtonPressed: {
     backgroundColor: colors.bgSurface,
@@ -620,6 +849,92 @@ const styles = StyleSheet.create({
   timelineText: {
     ...typography.bodyClinical,
     color: colors.textPrimary,
+  },
+  observation: {
+    marginBottom: 28,
+  },
+  observationCard: {
+    alignItems: 'center',
+    backgroundColor: colors.bgElevated,
+    borderColor: 'rgba(255,255,255,0.04)',
+    borderRadius: radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+    padding: spacing.md,
+  },
+  observationText: {
+    ...typography.bodyClinical,
+    color: colors.textPrimary,
+    flex: 1,
+  },
+  consultation: {
+    marginBottom: 28,
+  },
+  consultationHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
+  },
+  consultationBadge: {
+    backgroundColor: colors.bgElevated,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xxs,
+  },
+  consultationBadgeText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  consultationList: {
+    gap: spacing.sm,
+  },
+  consultationItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  consultationText: {
+    ...typography.bodyClinical,
+    color: colors.textPrimary,
+    flex: 1,
+  },
+  consultationTextCompleted: {
+    color: colors.textTertiary,
+    textDecorationColor: colors.semanticMuted,
+    textDecorationLine: 'line-through',
+  },
+  readStateLoading: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  readStateError: {
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  readStateText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+  },
+  retryButton: {
+    alignItems: 'center',
+    borderColor: colors.semanticMuted,
+    borderRadius: radius.full,
+    borderWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'center',
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+  },
+  retryText: {
+    ...typography.caption,
+    color: colors.textPrimary,
+    fontWeight: '600',
   },
   disclaimer: {
     ...typography.caption,
