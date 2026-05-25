@@ -1,5 +1,7 @@
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useContext } from 'react'
+import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs'
 import { useRouter, type Href } from 'expo-router'
 import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -20,12 +22,9 @@ import type { WeightLog } from '@lib/supabase/queries/weight'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 import { QUICK_LOG_LABELS } from '@lib/validation/diarioSchemas'
 
-const graphite = {
-  bg: '#0B1017',
-  action: '#121923',
-  line: '#1C2330',
-  mintSoft: '#A3E6D2',
-} as const
+const FALLBACK_TAB_BAR_HEIGHT = 96
+const TIMELINE_LIMIT = 4
+const TIMELINE_SOURCE_LIMIT = 2
 
 type TimelineItem = {
   id: string
@@ -45,6 +44,7 @@ const SYMPTOM_LABELS: Record<string, string> = {
 
 export function HomeV7Content() {
   const router = useRouter()
+  const tabBarHeight = useContext(BottomTabBarHeightContext) ?? FALLBACK_TAB_BAR_HEIGHT
   const doseQuery = useDoseSummary()
   const diarioQuery = useDiarioSummary()
   const profileQuery = useProfile()
@@ -74,12 +74,35 @@ export function HomeV7Content() {
   const timelineIsLoading =
     doseQuery.isLoading || diarioQuery.isLoading || weightQuery.isLoading
   const timelineError = doseQuery.error ?? diarioQuery.error ?? weightQuery.error
+  const hasConsultationNotes = consultationNotes.length > 0
+  const contentPaddingBottom = tabBarHeight + spacing.xxxl
+  const consultationSection = <ConsultationMemorySection items={consultationNotes} />
+  const recentMemorySection = (
+    <RecentMemoryTimeline
+      items={timeline}
+      isLoading={timelineIsLoading}
+      error={timelineError ? mapQueryError(timelineError) : null}
+      onRetry={() => {
+        void doseQuery.refetch()
+        void diarioQuery.refetch()
+        void weightQuery.refetch()
+      }}
+    />
+  )
+  const observationSection = (
+    <ObservationMemoryCard
+      symptom={symptomQuery.data ?? null}
+      isLoading={symptomQuery.isLoading}
+      error={symptomQuery.error ? mapQueryError(symptomQuery.error) : null}
+      onRetry={() => void symptomQuery.refetch()}
+    />
+  )
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: contentPaddingBottom }]}
         showsVerticalScrollIndicator={false}
       >
         <HeaderMemory />
@@ -115,25 +138,19 @@ export function HomeV7Content() {
           }}
         />
 
-        <RecentMemoryTimeline
-          items={timeline}
-          isLoading={timelineIsLoading}
-          error={timelineError ? mapQueryError(timelineError) : null}
-          onRetry={() => {
-            void doseQuery.refetch()
-            void diarioQuery.refetch()
-            void weightQuery.refetch()
-          }}
-        />
-
-        <ObservationMemoryCard
-          symptom={symptomQuery.data ?? null}
-          isLoading={symptomQuery.isLoading}
-          error={symptomQuery.error ? mapQueryError(symptomQuery.error) : null}
-          onRetry={() => void symptomQuery.refetch()}
-        />
-
-        <ConsultationMemorySection items={consultationNotes} />
+        {hasConsultationNotes ? (
+          <>
+            {consultationSection}
+            {recentMemorySection}
+            {observationSection}
+          </>
+        ) : (
+          <>
+            {recentMemorySection}
+            {observationSection}
+            {consultationSection}
+          </>
+        )}
 
         {purchaseSummary && purchaseSummary.count > 0 && (
           <>
@@ -151,9 +168,7 @@ export function HomeV7Content() {
 function HeaderMemory() {
   return (
     <View style={styles.header}>
-      <Text style={styles.title}>
-        Seu tratamento está{'\n'}organizado até aqui.
-      </Text>
+      <Text style={styles.title}>Seu tratamento está organizado até aqui.</Text>
       <Text style={styles.date}>{formatCurrentDate()}</Text>
     </View>
   )
@@ -209,16 +224,17 @@ function QuickAction({
       accessibilityHint="Abre o registro correspondente."
       style={({ pressed }) => [
         styles.actionButton,
+        primary && styles.actionButtonPrimary,
         pressed && styles.actionButtonPressed,
+        primary && pressed && styles.actionButtonPrimaryPressed,
       ]}
     >
-      {primary && <View style={styles.primaryActionHairline} />}
       <SymbolView
         name={symbol}
         size={18}
-        tintColor={primary ? graphite.mintSoft : colors.textSecondary}
+        tintColor={primary ? colors.textInverse : colors.textSecondary}
       />
-      <Text style={styles.actionLabel}>{label}</Text>
+      <Text style={[styles.actionLabel, primary && styles.actionLabelPrimary]}>{label}</Text>
     </Pressable>
   )
 }
@@ -329,7 +345,7 @@ function WeightSparkline({ logs }: { logs: WeightLog[] }) {
 
   return (
     <View style={styles.sparkline}>
-      <Svg width="100%" height="100%" viewBox="0 0 100 32" preserveAspectRatio="none">
+      <Svg width="100%" height="100%" viewBox="0 0 100 48" preserveAspectRatio="none">
         <Polyline
           points={sparkline.points}
           fill="none"
@@ -340,7 +356,7 @@ function WeightSparkline({ logs }: { logs: WeightLog[] }) {
           vectorEffect="non-scaling-stroke"
         />
         <SvgCircle cx={sparkline.first.x} cy={sparkline.first.y} r={1.7} fill={colors.semanticMuted} />
-        <SvgCircle cx={sparkline.last.x} cy={sparkline.last.y} r={2.2} fill={graphite.mintSoft} />
+        <SvgCircle cx={sparkline.last.x} cy={sparkline.last.y} r={2.2} fill={colors.mintSoft} />
       </Svg>
     </View>
   )
@@ -532,17 +548,17 @@ function buildTimeline(
   weightLogs: WeightLog[],
   quickLogs: QuickLogRecord[]
 ): TimelineItem[] {
-  const doseItems = doses.slice(0, 3).map((dose) => ({
+  const doseItems = doses.slice(0, TIMELINE_SOURCE_LIMIT).map((dose) => ({
     id: `dose-${dose.id}`,
     date: dose.applicationDate,
     title: `Dose de ${formatNumber(dose.dose)}mg administrada.`,
   }))
-  const weightItems = weightLogs.slice(0, 3).map((weight) => ({
+  const weightItems = weightLogs.slice(0, TIMELINE_SOURCE_LIMIT).map((weight) => ({
     id: `weight-${weight.id}`,
     date: weight.date,
     title: `Peso registrado (${formatNumber(weight.weight)} kg).`,
   }))
-  const quickLogItems = quickLogs.slice(0, 3).map((log) => ({
+  const quickLogItems = quickLogs.slice(0, TIMELINE_SOURCE_LIMIT).map((log) => ({
     id: `quick-${log.id}`,
     date: log.loggedAt,
     title: formatQuickLogTitle(log),
@@ -550,7 +566,7 @@ function buildTimeline(
 
   return [...doseItems, ...weightItems, ...quickLogItems]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
-    .slice(0, 4)
+    .slice(0, TIMELINE_LIMIT)
 }
 
 function formatQuickLogTitle(log: QuickLogRecord): string {
@@ -563,7 +579,16 @@ function formatSymptomMemory(symptom: RecentSymptom): string {
   const label = SYMPTOM_LABELS[symptom.type]
   return label
     ? `${label} registrada em ${recordedAt}.`
-    : `Uma observação foi registrada em ${recordedAt}.`
+    : `${formatUnknownSymptomType(symptom.type)} registrada em ${recordedAt}.`
+}
+
+function formatUnknownSymptomType(type: string): string {
+  const normalized = type
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return normalized ? capitalize(normalized) : 'Uma observação'
 }
 
 function formatCurrentDate(): string {
@@ -588,6 +613,7 @@ function formatRelativeDay(date: Date): string {
 
   if (days === 0) return 'Hoje'
   if (days === 1) return 'Ontem'
+  if (days > 6) return format(date, "d 'de' MMM", { locale: ptBR })
   return `Há ${days} dias`
 }
 
@@ -627,7 +653,7 @@ function buildSparklinePoints(
   const points = ordered
     .map((log, index) => {
       const x = lastIndex === 0 ? 4 : 4 + (index / lastIndex) * 92
-      const y = 28 - ((log.weight - min) / range) * 24
+      const y = 42 - ((log.weight - min) / range) * 36
       return { x, y }
     })
 
@@ -652,13 +678,12 @@ function capitalize(value: string): string {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: graphite.bg,
+    backgroundColor: colors.bgBase,
   },
   scroll: {
     flex: 1,
   },
   content: {
-    paddingBottom: 240,
     paddingHorizontal: spacing.lg,
     paddingTop: 22,
   },
@@ -666,11 +691,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
+    ...typography.displayUltralight,
     color: colors.textPrimary,
-    fontSize: 28,
-    fontWeight: '300',
     letterSpacing: 0,
-    lineHeight: 34,
     marginBottom: spacing.sm,
   },
   date: {
@@ -684,7 +707,7 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     alignItems: 'center',
-    backgroundColor: graphite.action,
+    backgroundColor: colors.bgElevated,
     borderColor: 'rgba(255,255,255,0.08)',
     borderRadius: radius.md,
     borderWidth: StyleSheet.hairlineWidth,
@@ -700,13 +723,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgSurface,
     transform: [{ scale: 0.98 }],
   },
-  primaryActionHairline: {
-    backgroundColor: 'rgba(163,230,210,0.22)',
-    height: StyleSheet.hairlineWidth,
-    left: spacing.lg,
-    position: 'absolute',
-    right: spacing.lg,
-    top: 0,
+  actionButtonPrimary: {
+    backgroundColor: colors.brand,
+    borderColor: colors.brand,
+    flex: 1.12,
+  },
+  actionButtonPrimaryPressed: {
+    backgroundColor: colors.brandDim,
   },
   actionLabel: {
     color: colors.textPrimary,
@@ -716,8 +739,11 @@ const styles = StyleSheet.create({
     lineHeight: 13,
     textAlign: 'center',
   },
+  actionLabelPrimary: {
+    color: colors.textInverse,
+  },
   divider: {
-    backgroundColor: graphite.line,
+    backgroundColor: colors.bgSurface,
     height: StyleSheet.hairlineWidth,
     marginBottom: 28,
   },
@@ -735,7 +761,7 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textSecondary,
     fontWeight: '700',
-    letterSpacing: 2,
+    letterSpacing: 1.4,
     textTransform: 'uppercase',
   },
   sectionValue: {
@@ -784,11 +810,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   weightValue: {
+    ...typography.numberPersonal,
     color: colors.textPrimary,
-    fontSize: 48,
-    fontWeight: '300',
     letterSpacing: 0,
-    lineHeight: 54,
   },
   weightUnit: {
     ...typography.subtitle,
@@ -800,10 +824,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sparkline: {
-    height: 32,
+    height: 64,
     marginBottom: 24,
     marginTop: spacing.xs,
-    width: '60%',
+    width: '100%',
   },
   timelineTitle: {
     marginBottom: spacing.lg,
@@ -831,7 +855,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.semanticMuted,
   },
   timelineStem: {
-    backgroundColor: graphite.line,
+    backgroundColor: colors.bgSurface,
     flex: 1,
     marginTop: spacing.xs,
     width: 2,

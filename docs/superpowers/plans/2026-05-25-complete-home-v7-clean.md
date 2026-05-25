@@ -225,6 +225,26 @@ Confirmar que o PR #72 foi mesclado, rebasear a branch em `origin/main`, repetir
 
 Executado em 2026-05-25: PR #72 mesclado (`d55590b`), branch rebaseada sem conflitos, `npm run type-check` PASS, `npm run lint` PASS com 1 warning preexistente em `lib/i18n/index.ts:127`, grep sem matches e `package.json`/`package-lock.json` fora do diff. Observacao de infraestrutura: `npm ci --ignore-scripts` ainda falha no `main` com `Missing: react-dom@19.2.6 from lock file` e `Missing: scheduler@0.27.0 from lock file`; `npm ci --ignore-scripts --legacy-peer-deps` conclui e foi o setup usado para repetir a validacao.
 
+### Task 5: Polish Do Critique Final
+
+Critique final rodado por Leo no Claude Code em 2026-05-25: `24/40`, igual ao baseline. Como o score nao caiu, o criterio minimo do prompt foi satisfeito. Leo autorizou executar o escopo completo do critique, incluindo minors.
+
+- [ ] **Step 1: Token drift**
+
+Remover o objeto local `graphite` de `components/home/HomeV7Content.tsx` e usar tokens canonicos (`colors.bgBase`, `colors.bgElevated`, `colors.bgSurface`). Codificar `mintSoft` (`#A3E6D2`) como token nomeado e regra de uso restrita: indicador de estado atual no ponto final do sparkline, nao substitui Vital Mint como CTA primario.
+
+- [ ] **Step 2: Ultralight intencional**
+
+Codificar a tipografia ultralight como decisao intencional em `docs/DESIGN.md` e `lib/theme/tokens.ts`: uso apenas para dados pessoais do paciente e headers emocionais, nunca para dose, delta clinico ou referencia tecnica.
+
+- [ ] **Step 3: Layout e acao primaria**
+
+Diferenciar `Anotar dose` sem hairline decorativa: usar Vital Mint como fill primario e manter os outros dois tiles neutros. Preservar tab bar. Para `Para a consulta`, manter a secao omitida na v1, mas preparar a ordem futura para subir acima de memoria/observacoes quando houver itens.
+
+- [ ] **Step 4: Minors de baixo risco**
+
+Trocar `paddingBottom: 240` por calculo baseado no contexto da tab bar com fallback seguro para rota `/home-v7`; reduzir letter-spacing do eyebrow; `formatRelativeDay` passa para data factual apos 6 dias; simplificar cap de timeline; remover quebra manual `\n` do title.
+
 ## Self-Review
 
 - Cobertura: o plano inclui os dois componentes, minimizacao PHI, ordem aprovada, quatro correcoes/decisoes do baseline, estados de cold-start, seguranca, critique e screenshot real.
