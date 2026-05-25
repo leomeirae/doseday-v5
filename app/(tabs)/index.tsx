@@ -10,8 +10,15 @@ import { HomeQuickActions } from '@components/home/HomeQuickActions'
 import { useProfile } from '@hooks/useProfile'
 import { useDoseSummary } from '@hooks/useDoseSummary'
 import { mapQueryError } from '@lib/supabase/queries/errors'
+import { HomeV7Content } from '@components/home/HomeV7Content'
+
+const ENABLE_HOME_V7 = true
 
 export default function HomeScreen() {
+  return ENABLE_HOME_V7 ? <HomeV7Content /> : <LegacyHomeScreen />
+}
+
+function LegacyHomeScreen() {
   const router = useRouter()
   const { data: profile } = useProfile()
   const { data: dose, isLoading: doseLoading, error: doseError, refetch } = useDoseSummary()
