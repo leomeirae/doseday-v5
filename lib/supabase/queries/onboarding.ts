@@ -32,6 +32,7 @@ type OnboardingProfileRow = Pick<
   | 'treatment_duration'
   | 'current_medication'
   | 'current_dose'
+  | 'dose_frequency_days'
   | 'doctor_name'
   | 'has_medical_support'
   | 'main_concerns'
@@ -96,6 +97,7 @@ function mapProfileToOnboardingData(profile: OnboardingProfileRow): Partial<Onbo
     data.current_medication = profile.current_medication
   }
   data.current_dose = profile.current_dose !== null ? Number(profile.current_dose) : null
+  data.dose_frequency_days = profile.dose_frequency_days
   if (profile.doctor_name !== null) data.doctor_name = profile.doctor_name
   if (isOneOf<MedicalSupport>(profile.has_medical_support, MEDICAL_SUPPORT_OPTIONS)) {
     data.has_medical_support = profile.has_medical_support
@@ -127,6 +129,10 @@ function toProfileUpdate(data: Partial<PersistableOnboardingData>): UserProfileU
   }
   if (data.current_medication !== undefined) update.current_medication = data.current_medication
   if (data.current_dose !== undefined) update.current_dose = data.current_dose
+  if (data.dose_frequency_days !== undefined) {
+    update.dose_frequency_days = data.dose_frequency_days
+    update.dose_frequency_source = data.dose_frequency_days === null ? null : 'user_confirmed'
+  }
   if (data.doctor_name !== undefined) {
     const doctorName = data.doctor_name.trim()
     update.doctor_name = doctorName.length > 0 ? doctorName : null
@@ -154,6 +160,7 @@ export async function getOnboardingProgress(userId: string): Promise<OnboardingP
       treatment_duration,
       current_medication,
       current_dose,
+      dose_frequency_days,
       doctor_name,
       has_medical_support,
       main_concerns,

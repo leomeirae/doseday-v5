@@ -64,8 +64,8 @@ export default function ResultScreen() {
   return (
     <OnboardingShell
       step="result"
-      stepNumber={14}
-      totalSteps={14}
+      stepNumber={15}
+      totalSteps={15}
       headline={t('result.headline', { name: firstName })}
       showBack={false}
       primaryCTA={{

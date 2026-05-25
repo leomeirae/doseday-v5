@@ -121,6 +121,7 @@ function inferCompletedSteps(data: Partial<OnboardingData>): Set<OnboardingStep>
   }
   if (data.current_medication) completedSteps.add('medication')
   if (data.current_dose !== undefined) completedSteps.add('dose')
+  if (data.dose_frequency_days !== undefined) completedSteps.add('dose-frequency')
   if (data.has_medical_support) completedSteps.add('medical-support')
   if (data.has_medical_support === 'no' || data.doctor_name) completedSteps.add('doctor-name')
   if (data.main_concerns && data.main_concerns.length > 0) completedSteps.add('concerns')
@@ -143,6 +144,9 @@ function toPersistableData(data: Partial<OnboardingData>): Partial<PersistableOn
   if (data.treatment_duration !== undefined) persistable.treatment_duration = data.treatment_duration
   if (data.current_medication !== undefined) persistable.current_medication = data.current_medication
   if (data.current_dose !== undefined) persistable.current_dose = data.current_dose
+  if (data.dose_frequency_days !== undefined) {
+    persistable.dose_frequency_days = data.dose_frequency_days
+  }
   if (data.doctor_name !== undefined) persistable.doctor_name = data.doctor_name
   if (data.has_medical_support !== undefined) {
     persistable.has_medical_support = data.has_medical_support

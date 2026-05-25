@@ -7,6 +7,7 @@ export type OnboardingStep =
   | 'treatment-duration'
   | 'medication'
   | 'dose'
+  | 'dose-frequency'
   | 'doctor-name'
   | 'medical-support'
   | 'concerns'
@@ -23,6 +24,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   'treatment-duration',
   'medication',
   'dose',
+  'dose-frequency',
   'medical-support',
   'doctor-name',
   'concerns',
@@ -38,6 +40,7 @@ export const REQUIRED_STEPS: ReadonlySet<OnboardingStep> = new Set([
   'treatment-status',
   'medication',
   'dose',
+  'dose-frequency',
   'medical-support',
   'consent',
 ])
@@ -98,6 +101,7 @@ export interface OnboardingData {
   treatment_duration?: TreatmentDuration | null
   current_medication: OnboardingMedication
   current_dose?: number | null
+  dose_frequency_days?: number | null
   doctor_name?: string
   has_medical_support: MedicalSupport
   main_concerns?: OnboardingConcern[]

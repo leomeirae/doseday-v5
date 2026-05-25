@@ -51,8 +51,8 @@ export default function DoctorNameScreen() {
   return (
     <OnboardingShell
       step="doctor-name"
-      stepNumber={10}
-      totalSteps={14}
+      stepNumber={11}
+      totalSteps={15}
       headline={t('doctorName.headline')}
       subtitle={t('doctorName.subtitle')}
       onBack={handleBack}

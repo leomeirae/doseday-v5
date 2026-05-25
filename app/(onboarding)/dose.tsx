@@ -46,12 +46,12 @@ export default function DoseScreen() {
   const onSubmit = handleSubmit(async (data) => {
     const payload = doseSchema.parse(data)
     await submitStep('dose', payload)
-    router.replace('/(onboarding)/doctor-name' as Href)
+    router.replace('/(onboarding)/dose-frequency' as Href)
   })
 
   async function handleSkipDose() {
     await submitStep('dose', { current_dose: null })
-    router.replace('/(onboarding)/doctor-name' as Href)
+    router.replace('/(onboarding)/dose-frequency' as Href)
   }
 
   function handleBack() {
@@ -63,7 +63,7 @@ export default function DoseScreen() {
     <OnboardingShell
       step="dose"
       stepNumber={8}
-      totalSteps={14}
+      totalSteps={15}
       headline={t('dose.headline')}
       subtitle={t('dose.subtitle')}
       onBack={handleBack}
