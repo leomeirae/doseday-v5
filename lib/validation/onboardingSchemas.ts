@@ -74,6 +74,15 @@ export const doseSchema = z.object({
     .max(20, 'Dose máxima é 20 mg'),
 })
 
+export const doseFrequencySchema = z.object({
+  dose_frequency_days: z.coerce
+    .number()
+    .int('Use um número inteiro')
+    .min(1, 'Mínimo 1 dia')
+    .max(90, 'Máximo 90 dias')
+    .nullable(),
+})
+
 export const doctorNameSchema = z.object({
   doctor_name: z
     .string()
@@ -109,6 +118,7 @@ export const ONBOARDING_STEP_SCHEMAS = {
   'treatment-duration': treatmentDurationSchema,
   medication: medicationSchema,
   dose: doseSchema,
+  'dose-frequency': doseFrequencySchema,
   'doctor-name': doctorNameSchema,
   'medical-support': medicalSupportSchema,
   concerns: concernsSchema,
@@ -125,6 +135,7 @@ export type TreatmentStatusInput = z.infer<typeof treatmentStatusSchema>
 export type TreatmentDurationInput = z.infer<typeof treatmentDurationSchema>
 export type MedicationInput = z.infer<typeof medicationSchema>
 export type DoseInput = z.infer<typeof doseSchema>
+export type DoseFrequencyInput = z.infer<typeof doseFrequencySchema>
 export type DoctorNameInput = z.infer<typeof doctorNameSchema>
 export type MedicalSupportInput = z.infer<typeof medicalSupportSchema>
 export type ConcernsInput = z.infer<typeof concernsSchema>

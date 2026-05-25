@@ -51,14 +51,14 @@ export default function MedicalSupportScreen() {
 
   function handleBack() {
     goBack()
-    router.replace('/(onboarding)/dose' as Href)
+    router.replace('/(onboarding)/dose-frequency' as Href)
   }
 
   return (
     <OnboardingShell
       step="medical-support"
-      stepNumber={9}
-      totalSteps={14}
+      stepNumber={10}
+      totalSteps={15}
       headline={t('medicalSupport.headline')}
       subtitle={t('medicalSupport.subtitle')}
       onBack={handleBack}

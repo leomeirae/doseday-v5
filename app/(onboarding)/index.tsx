@@ -17,6 +17,7 @@ const IMPLEMENTED_ROUTES: Partial<Record<OnboardingStep, Href>> = {
   'treatment-duration': '/(onboarding)/treatment-duration' as Href,
   medication: '/(onboarding)/medication' as Href,
   dose: '/(onboarding)/dose' as Href,
+  'dose-frequency': '/(onboarding)/dose-frequency' as Href,
   'doctor-name': '/(onboarding)/doctor-name' as Href,
   'medical-support': '/(onboarding)/medical-support' as Href,
   concerns: '/(onboarding)/concerns' as Href,

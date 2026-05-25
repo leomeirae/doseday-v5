@@ -142,6 +142,20 @@
       "required": "Enter your dose"
     }
   },
+  "doseFrequency": {
+    "headline": "What interval between applications?",
+    "subtitle": "Use the interval agreed with whoever supports you, or the interval you are following. DoseDay only uses this to calculate the next dose.",
+    "optionOne": "{{count}} day",
+    "optionOther": "{{count}} days",
+    "optionA11y": "Use an interval of {{count}} days",
+    "otherLabel": "Other interval",
+    "placeholder": "E.g.: 12",
+    "inputA11y": "Interval between applications in days",
+    "daysSuffix": "days",
+    "error": "Use a whole number between 1 and 90.",
+    "note": "If the protocol changes, edit it later in Profile. Your previous history stays preserved.",
+    "skip": "I don't know yet"
+  },
   "doctorName": {
     "headline": "Who's supporting you?",
     "subtitle": "Doctor, nutritionist, anyone you trust on this treatment. You can skip.",

@@ -53,8 +53,8 @@ export default function ConcernsScreen() {
   return (
     <OnboardingShell
       step="concerns"
-      stepNumber={11}
-      totalSteps={14}
+      stepNumber={12}
+      totalSteps={15}
       headline={t('concerns.headline')}
       subtitle={t('concerns.subtitle')}
       onBack={handleBack}

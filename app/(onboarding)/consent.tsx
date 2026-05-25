@@ -37,8 +37,8 @@ export default function ConsentScreen() {
   return (
     <OnboardingShell
       step="consent"
-      stepNumber={12}
-      totalSteps={14}
+      stepNumber={13}
+      totalSteps={15}
       headline={t('consent.title')}
       subtitle={t('consent.subtitle')}
       onBack={handleBack}
