@@ -160,7 +160,7 @@ export default function RootLayout() {
                 options={{
                   presentation: 'formSheet',
                   headerShown: false,
-                  sheetAllowedDetents: 'fitToContents',
+                  sheetAllowedDetents: [0.7, 1.0],
                   sheetGrabberVisible: true,
                   sheetCornerRadius: 20,
                 }}
