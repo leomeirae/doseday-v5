@@ -138,6 +138,30 @@ export const memoryNoteSchema = z.object({
   notes: z.string().trim().min(1, 'Anote algo antes de registrar').max(500),
 })
 
+export const symptomNoteSchema = z.object({
+  rawText: z.string().trim().min(1, 'Descreva o sintoma antes de registrar').max(500),
+})
+
+export const costNoteSchema = z.object({
+  price: z
+    .number()
+    .positive('Informe um valor maior que zero')
+    .max(99999.99, 'Valor muito alto'),
+  description: z
+    .string()
+    .trim()
+    .min(1, 'Descreva brevemente o gasto')
+    .max(200, 'Máximo 200 caracteres'),
+  purchaseDate: z
+    .date()
+    .refine((date) => date.getTime() <= Date.now(), {
+      message: 'Não é possível registrar no futuro',
+    })
+    .default(() => new Date()),
+})
+
 export type QuickLogInput = z.infer<typeof quickLogSchema>
 export type CheckinInput = z.infer<typeof checkinSchema>
 export type MemoryNoteInput = z.infer<typeof memoryNoteSchema>
+export type SymptomNoteInput = z.infer<typeof symptomNoteSchema>
+export type CostNoteInput = z.infer<typeof costNoteSchema>

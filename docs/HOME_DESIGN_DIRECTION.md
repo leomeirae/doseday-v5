@@ -57,21 +57,20 @@ O design deve ser sofisticado pela precisao: espacamento, contraste, tipografia,
 
 ## 4. Estrutura da tela unica
 
-A ordem aprovada da tela e:
+A ordem aprovada da tela e (atualizada 2026-05-25 apos pivot Prompt 37 — acoes rapidas removidas, captura migrada para sheets dedicados acessiveis via `+` no header de cada bloco interativo):
 
 | Ordem | Bloco | Funcao |
 |---|---|---|
 | 1 | Topo de memoria | Estado humano da tela: tratamento organizado ate aqui |
-| 2 | Acoes rapidas | Registrar dose, peso ou memoria com minimo atrito |
-| 3 | Proxima dose | Mostrar proxima dose apenas quando houver protocolo; senao `A definir` |
-| 4 | Peso atual | Dado forte, number-first |
-| 5 | Memoria recente | Timeline simples dos registros relevantes |
-| 6 | Observacoes | Memoria contextual, sem causalidade |
-| 7 | Para a consulta | Itens que o usuario quer lembrar |
-| 8 | Custos registrados | Memoria financeira pessoal, exibida somente quando houver custo registrado |
-| 9 | Disclaimer | Limite claro: memoria, nao orientacao medica |
+| 2 | Proxima dose | Mostrar proxima dose apenas quando houver protocolo; senao `A definir`. Header tem `+` que abre sheet de anotar dose; body navega para editar protocolo |
+| 3 | Peso atual | Dado forte, number-first. Header tem `+` que abre sheet de anotar peso; body navega para historico |
+| 4 | Notas recentes | Timeline simples dos registros relevantes. Header tem `+` que abre sheet de anotar nota; body read-only |
+| 5 | Sintomas | Memoria contextual, sem causalidade. Header tem `+` que abre sheet de anotar sintoma; body read-only |
+| 6 | Para a consulta | Itens que o usuario quer lembrar — read-only nesta fase (sem `+`) |
+| 7 | Custos registrados | Memoria financeira pessoal, exibida somente quando houver custo registrado. Header tem `+` que abre sheet de anotar custo |
+| 8 | Disclaimer | Limite claro: memoria, nao orientacao medica |
 
-Essa ordem e importante: primeiro o usuario entende o estado, depois registra, depois revisa memoria.
+Essa ordem e importante: primeiro o usuario entende o estado, depois revisa memoria. Captura entra via sheets dedicados acessiveis em cada bloco — nao mais via barra fixa no topo.
 
 ---
 
@@ -110,9 +109,12 @@ A tela nao pode virar uma pilha de cartoes.
 
 ### 5.4 Cor
 
-Vital Mint continua raro. Na v7, ele aparece apenas como detalhe no icone da acao principal `Anotar dose`.
+Vital Mint continua raro. Aparece em **dois papeis controlados**:
 
-Regra: o mint nao deve dominar. Ele sinaliza acao, nao decora a tela.
+1. **CTA primario** — icone `Anotar dose` (gradient sutil no topo do botao + cor do icone `Plus`).
+2. **Indicador de estado atual** (decidida 2026-05-25 13:05) — ponto final do sparkline de peso na Home v7 clean usa `mintSoft` (`#A3E6D2`) pra marcar visualmente "este e o valor atual". O ponto inicial usa cor neutra (`semanticMuted`).
+
+Regra: o mint nao decora. Ele sinaliza **acao** ou **estado atual**. Nao usar em labels, dividers, eyebrows ou ornamento. Nao expandir alem desses dois papeis sem decisao explicita.
 
 ---
 
@@ -132,28 +134,32 @@ Nao usar fonte serifada. Nao usar display font. A implementacao deve usar system
 
 ---
 
-## 7. Acoes rapidas
+## 7. Entries dedicados via sheet
 
-As tres acoes aprovadas sao:
+**Decisao 2026-05-25 (Prompt 37):** As 3 acoes rapidas fixas no topo foram removidas. Captura migra para sheets nativos iOS (Form Sheet com detents) acessiveis via `+` discreto no header de cada bloco interativo. Sheet sobe pela metade da tela e mantem o dashboard visivel atras — preserva o contexto da memoria do tratamento. Captura permanece convencional e estruturada (sem IA).
 
-| Acao | Papel |
-|---|---|
-| `Anotar dose` | Registro principal do tratamento |
-| `Anotar peso` | Registro de progresso |
-| `Adicionar memoria` | Nota livre curta ou lembranca para consulta |
+| Entry | Sheet | Acessivel via | Detents |
+|---|---|---|---|
+| `Anotar dose` | `/dose/registrar` | `+` em PROXIMA DOSE | `fitToContents` |
+| `Anotar peso` | `/peso/registrar` | `+` em PESO | `fitToContents` |
+| `Anotar sintoma` | `/diario/anotar-sintoma` | `+` em SINTOMAS | `[0.5, 1.0]` |
+| `Anotar nota` | `/diario/anotar-memoria` | `+` em NOTAS RECENTES | `[0.5, 1.0]` |
+| `Anotar custo` | `/diario/anotar-custo` | `+` em CUSTOS REGISTRADOS | `[0.5, 1.0]` |
 
-Elas devem ficar logo abaixo do topo. Devem parecer ferramentas nativas, nao cards promocionais.
+Sheets sao Form Sheet nativos do Expo Router 6+ (`presentation: 'formSheet'`). Cada sheet tem drag handle nativo + botao `X` superior, suporta swipe-down para dismiss. Touch targets ≥ 44pt.
 
-Direcao visual:
+Direcao visual de cada sheet:
 
-- fundo escuro elevated;
-- borda fina;
-- icones claros;
-- texto curto;
-- detalhe mint apenas em `Anotar dose`;
-- altura compacta.
+- header conciso (titulo "Anotar X" + `X` para fechar);
+- conteudo em textarea/input livre, sem chips engessados;
+- CTA primario "Anotar" em Vital Mint (`AuthButton variant='primary'`);
+- footer fino com hairline divider;
+- sem glass em nenhuma parte do sheet (glass continua restrito a navegacao);
+- chips de "Frequentes" apenas no sheet de Sintoma, derivados do proprio historico do usuario (top 5 ultimos 30 dias). Quando 0 sintomas registrados, secao de chips fica oculta.
 
-Nao usar botoes brancos. Nao usar cards grandes tipo launcher.
+**Bloco "PARA A CONSULTA":** mantido read-only nesta fase. Sheet dedicado entra em PR futuro.
+
+**Bloco "CUSTOS REGISTRADOS":** continua condicional (`purchases.count > 0`). O `+` no header so existe quando o bloco esta visivel.
 
 ---
 
