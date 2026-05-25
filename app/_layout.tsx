@@ -157,7 +157,13 @@ export default function RootLayout() {
             >
               <Stack.Screen
                 name="dose/registrar"
-                options={{ presentation: 'modal', headerShown: false }}
+                options={{
+                  presentation: 'formSheet',
+                  headerShown: false,
+                  sheetAllowedDetents: 'fitToContents',
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 20,
+                }}
               />
               <Stack.Screen
                 name="peso/historico"
@@ -165,7 +171,13 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="peso/registrar"
-                options={{ presentation: 'modal', headerShown: false }}
+                options={{
+                  presentation: 'formSheet',
+                  headerShown: false,
+                  sheetAllowedDetents: 'fitToContents',
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 20,
+                }}
               />
               <Stack.Screen
                 name="diario/checkin"
@@ -177,7 +189,33 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="diario/anotar-memoria"
-                options={{ presentation: 'modal', headerShown: false }}
+                options={{
+                  presentation: 'formSheet',
+                  headerShown: false,
+                  sheetAllowedDetents: [0.5, 1.0],
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 20,
+                }}
+              />
+              <Stack.Screen
+                name="diario/anotar-sintoma"
+                options={{
+                  presentation: 'formSheet',
+                  headerShown: false,
+                  sheetAllowedDetents: [0.5, 1.0],
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 20,
+                }}
+              />
+              <Stack.Screen
+                name="diario/anotar-custo"
+                options={{
+                  presentation: 'formSheet',
+                  headerShown: false,
+                  sheetAllowedDetents: [0.5, 1.0],
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 20,
+                }}
               />
               <Stack.Screen
                 name="perfil/notificacoes"

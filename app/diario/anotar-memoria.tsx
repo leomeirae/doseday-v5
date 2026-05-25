@@ -43,7 +43,7 @@ export default function AnotarMemoriaScreen() {
 
     mutate(parsed.data, {
       onSuccess: () => {
-        showSuccessToast('Memória registrada')
+        showSuccessToast('Nota anotada')
         dismiss()
       },
       onError: (err) => {
@@ -63,7 +63,7 @@ export default function AnotarMemoriaScreen() {
         >
           <SymbolView name="xmark" size={18} tintColor={colors.textSecondary} />
         </Pressable>
-        <Text style={styles.headerTitle}>Anotar memória</Text>
+        <Text style={styles.headerTitle}>Anotar nota</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -82,13 +82,13 @@ export default function AnotarMemoriaScreen() {
             multiline
             numberOfLines={8}
             maxLength={NOTES_MAX_LENGTH}
-            placeholder="Anote uma lembrança, observação ou item para a próxima consulta."
+            placeholder="ex: bati o pé pra não comer doce hoje · domingo foi difícil"
             placeholderTextColor={colors.textTertiary}
             selectionColor={colors.brand}
             autoCapitalize="sentences"
             autoCorrect
             textAlignVertical="top"
-            accessibilityLabel="Anotar memória"
+            accessibilityLabel="Anotar nota"
             testID="anotar-memoria-input"
             style={styles.textarea}
           />

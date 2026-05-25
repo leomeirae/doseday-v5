@@ -5,6 +5,39 @@ export type RecentSymptom = {
   date: Date
 }
 
+export type FrequentSymptom = {
+  type: string
+  count: number
+}
+
+const FREQUENT_SYMPTOM_LIMIT = 5
+const FREQUENT_SYMPTOM_WINDOW_DAYS = 30
+
+export async function fetchFrequentSymptoms(userId: string): Promise<FrequentSymptom[]> {
+  const since = new Date(Date.now() - FREQUENT_SYMPTOM_WINDOW_DAYS * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10)
+
+  const { data, error } = await supabase
+    .from('symptom_logs')
+    .select('symptom_type')
+    .eq('user_id', userId)
+    .neq('symptom_type', 'other')
+    .gte('symptom_date', since)
+
+  if (error) throw error
+
+  const counts = (data ?? []).reduce<Record<string, number>>((acc, row) => {
+    acc[row.symptom_type] = (acc[row.symptom_type] ?? 0) + 1
+    return acc
+  }, {})
+
+  return Object.entries(counts)
+    .map(([type, count]) => ({ type, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, FREQUENT_SYMPTOM_LIMIT)
+}
+
 export async function getRecentSymptom(userId: string): Promise<RecentSymptom | null> {
   const { data, error } = await supabase
     .from('symptom_logs')
