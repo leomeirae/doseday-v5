@@ -8,10 +8,12 @@ import { colors, typography, spacing } from '@lib/theme/tokens'
 import { signOut } from '@lib/supabase/auth'
 import { SettingsSection } from '@components/perfil/SettingsSection'
 import { SettingsRow } from '@components/perfil/SettingsRow'
+import { useProfile } from '@hooks/useProfile'
 
 export default function PerfilScreen() {
   const router = useRouter()
   const { t } = useTranslation('settings')
+  const { data: profile } = useProfile()
   const [loadingSignOut, setLoadingSignOut] = useState(false)
 
   async function doSignOut() {
@@ -44,11 +46,22 @@ export default function PerfilScreen() {
       >
         <Text style={styles.headline}>Perfil</Text>
 
-        {/* PERFIL DE SAÚDE — placeholder, rows ativas em prompts futuros */}
         <SettingsSection title={t('sections.healthProfile')}>
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>Em breve</Text>
-          </View>
+          <SettingsRow
+            icon="calendar"
+            iconColor={colors.semanticInfo}
+            label="Protocolo de dose"
+            value={
+              profile?.doseFrequencyDays
+                ? `${profile.doseFrequencyDays} dias`
+                : 'A definir'
+            }
+            onPress={() => router.push('/perfil/protocolo' as Href)}
+            isLast
+            accessibilityLabel="Editar protocolo de dose"
+            accessibilityHint="Define o intervalo entre aplicações."
+            testID="perfil-row-protocolo"
+          />
         </SettingsSection>
 
         {/* PREFERÊNCIAS */}

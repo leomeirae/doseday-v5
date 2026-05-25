@@ -179,6 +179,10 @@ export default function RootLayout() {
                 name="perfil/notificacoes"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="perfil/protocolo"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </AuthGuard>
         </AuthProvider>

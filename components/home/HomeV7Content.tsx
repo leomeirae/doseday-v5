@@ -65,7 +65,7 @@ export function HomeV7Content() {
         <NextDoseSection
           nextDose={doseSummary?.nextDose ?? null}
           hasDoseHistory={(doseSummary?.history.length ?? 0) > 0}
-          onPress={() => router.push('/perfil/account')}
+          onPress={() => router.push('/perfil/protocolo')}
         />
 
         <Divider />
