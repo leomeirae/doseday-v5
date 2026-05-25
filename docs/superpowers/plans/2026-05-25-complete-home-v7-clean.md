@@ -219,9 +219,11 @@ Solicitar `assets/screenshots/home-v7-clean/02-observacoes-consulta.png` no iPho
 
 Adicionar linha final em `docs/history.md` com feature, cold-start, ausencia de IA/causalidade/copy proibida, validacoes e `baseline 24/40 -> final Y/40`. O PR so sera aberto depois da validacao local e da imagem real fornecida.
 
-- [ ] **Step 6: Sincronizar dependencia documental antes da publicacao**
+- [x] **Step 6: Sincronizar dependencia documental antes da publicacao**
 
 Confirmar que o PR #72 foi mesclado, rebasear a branch em `origin/main`, repetir `npm run type-check`, `npm run lint` e o grep proibido, e conferir que `package.json`/`package-lock.json` nao aparecem no diff.
+
+Executado em 2026-05-25: PR #72 mesclado (`d55590b`), branch rebaseada sem conflitos, `npm run type-check` PASS, `npm run lint` PASS com 1 warning preexistente em `lib/i18n/index.ts:127`, grep sem matches e `package.json`/`package-lock.json` fora do diff. Observacao de infraestrutura: `npm ci --ignore-scripts` ainda falha no `main` com `Missing: react-dom@19.2.6 from lock file` e `Missing: scheduler@0.27.0 from lock file`; `npm ci --ignore-scripts --legacy-peer-deps` conclui e foi o setup usado para repetir a validacao.
 
 ## Self-Review
 
