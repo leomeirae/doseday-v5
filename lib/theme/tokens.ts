@@ -21,6 +21,9 @@ export const colors = {
   semanticInfo: '#5BA8D9',
   semanticMuted: '#5C6878',
 
+  // Destructive actions (iOS HIG system red, distinto de semanticCritical que e magenta-red custom)
+  destructive: '#FF453A',
+
   // Text
   textPrimary: '#F2F4F7',
   textSecondary: '#9CA8B8',
