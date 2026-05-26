@@ -258,9 +258,18 @@ function NextDoseSection({
           accessibilityHint="Abre as configurações do tratamento."
           style={({ pressed }) => [styles.sectionBody, pressed && styles.sectionBodyPressed]}
         >
-          <Text style={styles.sectionValue}>{capitalize(value)}</Text>
-          <Text style={styles.helper}>{capitalize(helper)}</Text>
-          {medicationDetail && <Text style={styles.protocolDetail}>{medicationDetail}</Text>}
+          <View style={styles.sectionBodyContent}>
+            <Text style={styles.sectionValue}>{capitalize(value)}</Text>
+            <Text style={styles.helper}>{capitalize(helper)}</Text>
+            {medicationDetail && <Text style={styles.protocolDetail}>{medicationDetail}</Text>}
+          </View>
+          <SymbolView
+            name="chevron.right"
+            size={14}
+            tintColor={colors.semanticMuted}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
         </Pressable>
       )}
     </View>
@@ -314,11 +323,20 @@ function WeightSection({
           accessibilityHint="Abre o histórico completo de peso."
           style={({ pressed }) => [styles.sectionBody, pressed && styles.sectionBodyPressed]}
         >
-          <View style={styles.weightValueRow}>
-            <Text style={styles.weightValue}>{formatNumber(currentWeight)}</Text>
-            <Text style={styles.weightUnit}>kg</Text>
+          <View style={styles.sectionBodyContent}>
+            <View style={styles.weightValueRow}>
+              <Text style={styles.weightValue}>{formatNumber(currentWeight)}</Text>
+              <Text style={styles.weightUnit}>kg</Text>
+            </View>
+            <WeightSparkline logs={logs} />
           </View>
-          <WeightSparkline logs={logs} />
+          <SymbolView
+            name="chevron.right"
+            size={14}
+            tintColor={colors.semanticMuted}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
         </Pressable>
       ) : (
         <Text style={styles.emptyText}>Nenhum peso registrado ainda.</Text>
@@ -344,7 +362,7 @@ function WeightSparkline({ logs }: { logs: WeightLog[] }) {
           vectorEffect="non-scaling-stroke"
         />
         <SvgCircle cx={sparkline.first.x} cy={sparkline.first.y} r={1.7} fill={colors.semanticMuted} />
-        <SvgCircle cx={sparkline.last.x} cy={sparkline.last.y} r={2.2} fill={colors.mintSoft} />
+        <SvgCircle cx={sparkline.last.x} cy={sparkline.last.y} r={3} fill={colors.mintSoft} />
       </Svg>
     </View>
   )
@@ -743,9 +761,16 @@ const styles = StyleSheet.create({
   },
   sectionBody: {
     paddingBottom: spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  sectionBodyContent: {
+    flex: 1,
   },
   sectionBodyPressed: {
-    opacity: 0.7,
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
   },
   nextDoseBlock: {
     marginBottom: 28,
