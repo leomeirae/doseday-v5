@@ -1,10 +1,12 @@
-# HANDOFF — PR #76 Settings Hub (PAUSADO)
+# HANDOFF — PR Settings Hub (PAUSADO)
 
 **Data da pausa:** 2026-05-25
 **Branch:** `feature/38-settings-hub-screens`
 **Último commit pushed:** `1b95261` (5d SettingsSectionHeader)
 **Worktree:** `/private/tmp/dose-day-v5-settings-76`
 **Status:** componentes base prontos. Pausado antes da etapa 6 (telas em `app/configuracoes/`).
+
+> **Nota sobre nomenclatura:** este PR é chamado internamente de **"PR Settings Hub"** (sem número) porque ainda não foi aberto formalmente no GitHub. O número real só será atribuído quando a etapa 22 do plano executar `gh pr create`. O PR #76 oficial no GitHub é este handoff doc (`d9d0e75`).
 
 ---
 
@@ -55,7 +57,7 @@ Léo optou por finalizar primeiro a etapa do PR #75 (Pivot Home Sheets, mergeado
 | 19 | `/impeccable critique` 3 telas críticas (Hub, Tratamento, Dados) | gate ≥ 32/40 | 20min |
 | 20 | `security-review` LGPD (export + delete) | gate 0 críticos | 10min |
 | 21 | `design:accessibility-review` | gate | 10min |
-| 22 | Commit + push + abrir PR via `gh` | finaliza | 10min |
+| 22 | Commit + push + abrir PR via `gh` (vai pegar próximo número GitHub disponível) | finaliza | 10min |
 
 ---
 
@@ -75,7 +77,7 @@ Léo optou por finalizar primeiro a etapa do PR #75 (Pivot Home Sheets, mergeado
 2. **Linkagem** — `app/perfil/{account,protocolo,notificacoes}.tsx` ficam onde estão. Hub novo só linka.
 3. **`/configuracoes`** — rota nova (não reaproveita `/perfil`).
 4. **Os 6 grupos** no MVP — não MVP-faseado.
-5. **Tab "Perfil" mantida** — vira link pro hub. Saída completa fica pro PR #77.
+5. **Tab "Perfil" mantida** — vira link pro hub. Saída completa fica pro PR Gear Icon.
 6. **Footer global** repete em todas as telas (Termos · Versão · Política).
 7. **Zero mint** em Settings — §5.4 HOME_DESIGN_DIRECTION.
 8. **Zero IA paciente-facing** — §11.3 PRODUCT_COHERENCE.
@@ -97,7 +99,7 @@ Se Claude Code retomar sessão antiga automaticamente, manda mensagem abaixo. Se
 ### 2. Mensagem pra colar (sessão nova ou retomada)
 
 ```
-Retomando PR #76 Settings Hub.
+Retomando PR Settings Hub.
 
 Leia primeiro este handoff:
 @docs/handoff/HANDOFF-pr76-settings-hub-pause-2026-05-25.md
@@ -135,7 +137,7 @@ Manual approve segue.
 | 10 | Etapa 14 — registrations no _layout.tsx | 10min |
 | 11 | Etapa 15 — grill-with-docs (ADR 0007, CONTEXT.md, SETTINGS_DESIGN_DIRECTION §8/§9) | 25min |
 | 12 | Etapas 16-21 — history, gates, screenshots, critique, security, accessibility | ~90min |
-| 13 | Etapa 22 — Commit + push + PR | 10min |
+| 13 | Etapa 22 — Commit + push + PR (vai pegar próximo número GitHub disponível) | 10min |
 
 **Total estimado para terminar:** ~7h efetivas após retomada.
 
@@ -158,22 +160,36 @@ Manual approve segue.
 
 ---
 
-## Coordenação com PR #77
+## Coordenação com PR Gear Icon
 
-PR #77 (Gear icon na Home + remove tab bar) está **gated por este PR**. Quando #76 mergear:
+**PR Gear Icon** (Gear icon na Home + remove tab bar) está **gated por este PR**. Quando Settings Hub mergear:
 
-- Aba 1 (worktree principal) abre PR #77
-- Cria branch `feature/39-home-gear-icon-remove-tabbar`
+- Aba 1 (worktree principal) abre PR Gear Icon
+- Cria branch tipo `feature/<próximo número>-home-gear-icon-remove-tabbar`
 - Adiciona gear icon no `HomeV7Content.tsx` header top-right
 - Remove `app/(tabs)/_layout.tsx` ou esconde tab bar
 - Modifica `app/(tabs)/perfil.tsx` (já modificado neste PR como botão único) — provavelmente delete
 
 ---
 
+## Nomenclatura de PRs (referência)
+
+| Apelido interno | Estado real |
+|---|---|
+| **PR #75** | mergeado em `3b7e93e` — Pivot Home Sheets |
+| **PR #76** | mergeado em `d9d0e75` — este handoff doc |
+| **PR Settings Hub** | branch `feature/38-settings-hub-screens` @ `1b95261`, ainda não aberto |
+| **PR Gear Icon** | TBD, gated por Settings Hub |
+| **PR Polish** | TBD, acumula issues do uso real |
+
+PRs sem número são apelidos internos. Recebem número real GitHub apenas quando abertos via `gh pr create`.
+
+---
+
 ## Tasks relacionadas (Cowork)
 
-- **#8** [in_progress → pending] PR docs/direção visual (mint state + Settings hub)
-- **#15** [completed via #75] Investigar entrypoints faltantes
+- **#8** [completed] Handoff doc Settings pause
+- **#15** [completed via PR #75] Investigar entrypoints faltantes
 - **#17** [completed] Compilar prompt PR #75
-- **#19** [pending, gated] PR #77 — Gear icon + remove tab bar
-- **#20** [completed] Documentar handoff de pausa do PR #76
+- **#19** [pending, gated] PR Gear Icon
+- **#20** [completed] Documentar handoff de pausa do PR Settings Hub
