@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DoseDay V5 — Roadmap Frontend App Store</title>
+<style>
+  :root {
+    --bg-base: #0B1017;
+    --bg-elevated: #131C2A;
+    --bg-surface: #1B2433;
+    --border: rgba(255,255,255,0.08);
+    --text-primary: #F4F6FA;
+    --text-secondary: #95A0B5;
+    --text-muted: #5C677D;
+    --mint: #00D4AA;
+    --mint-soft: #A3E6D2;
+    --destructive: #FF453A;
+    --warning: #FFB020;
+    --info: #4A90E2;
+    --success: #34C759;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    line-height: 1.55;
+    padding: 32px 24px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 32px; font-weight: 600; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 600; margin-top: 36px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  h3 { font-size: 17px; font-weight: 600; margin-top: 24px; margin-bottom: 8px; color: var(--mint-soft); }
+  h4 { font-size: 14px; font-weight: 600; margin-top: 18px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--text-secondary); }
+  p, li { font-size: 14px; color: var(--text-primary); margin-bottom: 8px; }
+  ul, ol { padding-left: 22px; }
+  code { background: var(--bg-surface); padding: 2px 6px; border-radius: 4px; font-family: "SF Mono", Menlo, monospace; font-size: 12px; color: var(--mint-soft); }
+  pre { background: #0a0f17; border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; overflow-x: auto; font-family: "SF Mono", Menlo, monospace; font-size: 12px; color: var(--text-primary); margin: 12px 0; line-height: 1.5; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  th, td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { background: var(--bg-elevated); color: var(--text-secondary); font-weight: 600; }
+  tr:hover { background: var(--bg-surface); }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .b-critical { background: rgba(255,69,58,0.18); color: var(--destructive); }
+  .b-major   { background: rgba(255,176,32,0.18); color: var(--warning); }
+  .b-minor   { background: rgba(74,144,226,0.18); color: var(--info); }
+  .b-enhance { background: rgba(149,160,181,0.18); color: var(--text-secondary); }
+  .b-success { background: rgba(52,199,89,0.18); color: var(--success); }
+  .b-locked  { background: rgba(149,160,181,0.10); color: var(--text-muted); }
+  .b-active  { background: rgba(0,212,170,0.18); color: var(--mint); }
+  .tldr {
+    background: linear-gradient(135deg, rgba(0,212,170,0.10), rgba(74,144,226,0.05));
+    border-left: 3px solid var(--mint);
+    padding: 18px 22px;
+    border-radius: 10px;
+    margin: 16px 0 28px;
+  }
+  .tldr p { margin: 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .card {
+    background: var(--bg-elevated);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+  }
+  details {
+    background: var(--bg-elevated);
+    border-radius: 8px;
+    padding: 0;
+    margin: 8px 0;
+    border: 1px solid var(--border);
+  }
+  details summary {
+    cursor: pointer;
+    padding: 12px 18px;
+    font-weight: 600;
+    list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: " ›"; float: right; transition: transform 0.2s; }
+  details[open] summary::after { transform: rotate(90deg); }
+  details > *:not(summary) { padding: 0 18px 16px; }
+  .phase-card {
+    background: var(--bg-elevated);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 12px 0;
+    border-left: 3px solid var(--mint);
+  }
+  .phase-card.gated { border-left-color: var(--text-muted); }
+  .phase-card.active { border-left-color: var(--mint); background: linear-gradient(90deg, rgba(0,212,170,0.06), var(--bg-elevated)); }
+  .phase-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .phase-title { font-size: 16px; font-weight: 600; }
+  .toc { background: var(--bg-elevated); padding: 16px 22px; border-radius: 10px; margin: 20px 0 30px; }
+  .toc a { color: var(--mint-soft); text-decoration: none; display: inline-block; margin: 4px 12px 4px 0; font-size: 13px; }
+  .toc a:hover { color: var(--mint); }
+  .mockup-card {
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 8px 0;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .quote {
+    border-left: 3px solid var(--info);
+    padding: 8px 14px;
+    margin: 12px 0;
+    background: rgba(74,144,226,0.06);
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+  .decision-box {
+    background: var(--bg-elevated);
+    border: 1px dashed var(--warning);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+  .decision-box h4 { color: var(--warning); margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>DoseDay V5 — Roadmap Frontend → App Store</h1>
+<p style="color: var(--text-secondary); margin-bottom: 16px;">
+  <strong>Data:</strong> 2026-05-26 · <strong>Status:</strong> Fase A concluída (PR 39 a criar) · Fase C pausada (PR #76 Settings Hub) · <strong>Owner:</strong> Léo (PO) · <strong>Executores:</strong> Cowork + Claude Code Aba 1 + Codex (Aba 2)
+</p>
+
+<div class="tldr">
+  <p>
+    <strong>TL;DR:</strong> Fechar frontend em <strong>~15-22h focadas</strong> (3-5 dias) via 7 fases sequenciais e paralelas.
+    Polish UX crítico (A) começa <strong>agora</strong>. Settings Hub (C) em paralelo via Codex (worktree separado).
+    Pendente decisão de Léo em <strong>D1 sheets · D2 contraste · D3 tab bar</strong> antes de gerar prompts executáveis.
+  </p>
+</div>
+
+<div class="toc">
+  <strong style="display: block; margin-bottom: 8px;">Navegação rápida</strong>
+  <a href="#estado">1. Estado atual</a>
+  <a href="#critique">2. Critique 4 lentes</a>
+  <a href="#decisoes">3. Decisões pendentes</a>
+  <a href="#fases">4. 7 Fases</a>
+  <a href="#apple-hig">5. Apple HIG insights</a>
+  <a href="#prompts">6. Prompts prontos</a>
+  <a href="#riscos">7. Riscos</a>
+  <a href="#proximo">8. Próximo passo</a>
+</div>
+
+<!-- ESTADO ATUAL -->
+<h2 id="estado">1. Estado atual do frontend</h2>
+
+<p>Mergeado em <code>main</code> após PR #75:</p>
+
+<table>
+  <thead>
+    <tr><th>Tela</th><th>Rota</th><th>Status</th><th>Issues conhecidas</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Home v7</td><td><code>/(tabs)/index</code></td><td><span class="badge b-success">funcional</span></td><td>Contraste cards baixo · Sem chevron em cards tapáveis · Affordance fraca</td></tr>
+    <tr><td>Sheet Registrar Dose</td><td><code>/dose/registrar</code></td><td><span class="badge b-success">funcional</span></td><td>Detents [0.7, 1.0] · Chips de local OK</td></tr>
+    <tr><td>Sheet Registrar Peso</td><td><code>/peso/registrar</code></td><td><span class="badge b-major">label issue</span></td><td>"Entre 30 e 300 kg" usado como label do input</td></tr>
+    <tr><td>Histórico de Peso</td><td><code>/peso/historico</code></td><td><span class="badge b-minor">funcional, sem affordance</span></td><td>Descoberta por acaso (tap no card Peso) · Sem gráfico</td></tr>
+    <tr><td>Sheet Anotar Nota</td><td><code>/diario/anotar-memoria</code></td><td><span class="badge b-enhance">funcional</span></td><td>Ghost com 2 exemplos</td></tr>
+    <tr><td>Sheet Anotar Sintoma</td><td><code>/diario/anotar-sintoma</code></td><td><span class="badge b-enhance">funcional</span></td><td>Ghost com 2 exemplos · Chips cursor positioning não validado</td></tr>
+    <tr><td>Sheet Anotar Custo</td><td><code>/diario/anotar-custo</code></td><td><span class="badge b-success">funcional</span></td><td>—</td></tr>
+    <tr><td>Protocolo de Dose</td><td><code>/perfil/protocolo</code></td><td><span class="badge b-minor">descoberta indireta</span></td><td>Léo só descobriu via tab Perfil · Tap em PRÓXIMA DOSE da Home navega mas sem affordance</td></tr>
+    <tr><td>Tab Bar</td><td>5 tabs</td><td><span class="badge b-locked">provisória</span></td><td>Será removida via PR Gear Icon (após Settings Hub)</td></tr>
+    <tr><td>Settings Hub</td><td><code>/configuracoes</code></td><td><span class="badge b-active">pausado</span></td><td>4 componentes base prontos · Faltam 17 etapas</td></tr>
+  </tbody>
+</table>
+
+<!-- CRITIQUE -->
+<h2 id="critique">2. Critique mobile-product-critic — 4 lentes</h2>
+
+<p>Aplicado nas 7 telas que Léo enviou hoje (07:16-07:22).</p>
+
+<details>
+<summary>🎨 UX Designer — Visual & Composition</summary>
+<table>
+  <thead><tr><th>Issue</th><th>Severidade</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Contraste <code>bg-elevated</code> (#0E1620) vs <code>bg-base</code> (#0B1017) — só 3pts luminância</td><td><span class="badge b-major">revisado</span></td><td>D2=local first (PR 39): chevron + press feedback resolvem affordance dos cards interativos. Token global <strong>NÃO</strong> mudou. PR 39B fica documentado se cards readonly persistirem indistinguíveis pós-validação.</td></tr>
+    <tr><td>Cards tapáveis sem chevron — affordance invisível</td><td><span class="badge b-major">major</span></td><td>Adicionar <code>chevron.right</code> SF Symbol à direita dos cards PRÓXIMA DOSE e PESO</td></tr>
+    <tr><td>Sparkline mint endpoint quase invisível sobre fundo escuro</td><td><span class="badge b-minor">minor</span></td><td>Aumentar tamanho do dot endpoint de 4pt para 6pt</td></tr>
+    <tr><td>Tab bar provisória sem Liquid Glass — parece básica</td><td><span class="badge b-major">major (build-related)</span></td><td>Requer dev build (Fase F) — Expo Go SDK 53+ não suporta</td></tr>
+  </tbody>
+</table>
+</details>
+
+<details>
+<summary>✍️ UX Writer — Copy & Tone</summary>
+<table>
+  <thead><tr><th>Issue</th><th>Severidade</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>"Entre 30 e 300 kg" usado como label do input de Peso — mistura range com label</td><td><span class="badge b-major">major</span></td><td>Trocar para label "Peso (kg)" + placeholder "ex: 87,2"</td></tr>
+    <tr><td>Ghost placeholders com 2 exemplos separados por bullet em Notas e Sintoma</td><td><span class="badge b-enhance">enhance</span></td><td>Simplificar pra 1 exemplo curto: "ex: bati o pé pra não comer doce hoje"</td></tr>
+    <tr><td>"Histórico de Peso" cards mostram "Seed realista 90d: registro de peso" — texto de seed visível em produção</td><td><span class="badge b-critical">crítico</span></td><td>Esses são dados de seed do user de teste. Não bloqueia App Store (não aparece em users reais)</td></tr>
+    <tr><td>"Configurações da Conta" na tab Perfil → vai virar link pro hub no PR Settings Hub</td><td><span class="badge b-locked">gated</span></td><td>Será resolvido em Fase C</td></tr>
+  </tbody>
+</table>
+</details>
+
+<details>
+<summary>📊 Product Manager — Value & Conversion</summary>
+<table>
+  <thead><tr><th>Issue</th><th>Severidade</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Discovery de funcionalidades: Histórico de Peso e Protocolo descobertos por acaso</td><td><span class="badge b-major">major</span></td><td>Chevrons em cards tapáveis (resolve discovery) — Fase A</td></tr>
+    <tr><td>Falta gráfico real de peso na tela <code>/peso/historico</code></td><td><span class="badge b-enhance">enhance</span></td><td>Fase E — line chart com <code>react-native-gifted-charts</code> (já instalado)</td></tr>
+    <tr><td>Tab bar com "Doses" e "Diário" cria caminhos duplicados (já tem entry via Home)</td><td><span class="badge b-locked">gated</span></td><td>Resolve com remoção da tab bar (Fase D)</td></tr>
+    <tr><td>Sem onboarding pra primeiro acesso à Home v7 (Pivot Sheets)</td><td><span class="badge b-minor">minor</span></td><td>Considerar tooltip no primeiro tap em algum + ou no card. Pode esperar pós-launch</td></tr>
+  </tbody>
+</table>
+</details>
+
+<details>
+<summary>🔬 UX Researcher — Behavior & Friction</summary>
+<table>
+  <thead><tr><th>Issue</th><th>Severidade</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>"Sheets diferentes do que esperava" — Léo desenhou Centered Modal mas implementado é Form Sheet bottom-anchored</td><td><span class="badge b-major">decisão estratégica</span></td><td><strong>D1</strong> — manter Form Sheet (iOS HIG-native) OU refatorar pra Centered Modal customizado</td></tr>
+    <tr><td>Descoberta por acaso indica falta de affordance — usuárias reais podem não descobrir</td><td><span class="badge b-major">major</span></td><td>Adicionar chevron + animação de press feedback</td></tr>
+    <tr><td>Sem feedback haptic em CTAs primários — interação parece "muda"</td><td><span class="badge b-enhance">enhance</span></td><td>Adicionar <code>Haptics.impactAsync</code> em cada CTA mint (já tem em alguns)</td></tr>
+    <tr><td>Sheets cobrindo muito da tela podem causar desorientação</td><td><span class="badge b-minor">minor (já corrigido)</span></td><td>PR #75 já trocou Dose pra <code>[0.7, 1.0]</code> — resolvido</td></tr>
+  </tbody>
+</table>
+</details>
+
+<!-- DECISÕES -->
+<h2 id="decisoes">3. Decisões pendentes (cravar AGORA)</h2>
+
+<div class="decision-box">
+  <h4>D1 — Sheets: Form Sheet (iOS-native) ou Centered Modal (customizado)?</h4>
+  <table>
+    <thead><tr><th>Opção</th><th>Pró</th><th>Contra</th><th>Custo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A — Form Sheet (atual)</strong></td><td>iOS HIG aprovado · zero refactor · funciona nativo via Expo Router 6</td><td>Não bate 100% com seu desenho do mockup</td><td><span class="badge b-success">0h</span></td></tr>
+      <tr><td>B — Centered Modal</td><td>Bate com seu desenho · efeito visual diferenciado</td><td>Sai do padrão Apple · exige <code>react-native-modal</code> ou custom Animated.View · risco de inconsistência</td><td><span class="badge b-major">~4h</span></td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top: 12px;"><strong>Recomendação Cowork:</strong> A. Apple HIG é explícito que sheets em iPhone são <em>bottom-anchored</em>. Centered Modal é padrão iPad/macOS.</p>
+</div>
+
+<div class="decision-box">
+  <h4>D2 — Contraste cards: revisado pós-Codex review</h4>
+  <p><strong>Decisão final:</strong> <strong>fix LOCAL primeiro</strong> em PR 39A (chevron + press feedback nos cards INTERATIVOS resolvem affordance). Token global <code>bgElevated</code> só muda em <strong>PR 39B separado</strong> SE após validação visual a sensação de "margens invisíveis" persistir nos cards readonly. Razão: token é usado em inputs, sheets, empty states, Settings novos — blast radius enorme.</p>
+  <p><strong>Caminho:</strong></p>
+  <ol>
+    <li>PR 39A — chevron, press feedback, sparkline, microcopy, haptic via AuthButton</li>
+    <li>Validação visual no simulador pós-PR 39A</li>
+    <li>Se cards readonly continuarem "indistinguíveis" → abre PR 39B com screenshot tour prévio + mudança de token</li>
+  </ol>
+</div>
+
+<div class="decision-box">
+  <h4>D3 — Tab bar: manter v1 OU remover via Gear Icon após Settings Hub?</h4>
+  <table>
+    <thead><tr><th>Opção</th><th>Pró</th><th>Contra</th></tr></thead>
+    <tbody>
+      <tr><td>A — Manter v1 (com tab bar)</td><td>MVP mais rápido · usuária familiar com padrão tab bar</td><td>Caminhos duplicados (Home + tab Doses, etc.) · contraria decisão original de "tela única"</td></tr>
+      <tr><td><strong>B — Remover via Gear Icon após Settings Hub</strong></td><td>Coerente com decisão estratégica original · Home v7 fica protagonista · cobre §1 SETTINGS_DESIGN_DIRECTION</td><td>Adiciona Fase D no caminho crítico (~3h)</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top: 12px;"><strong>Recomendação Cowork:</strong> B. Decisão arquitetural original — voltar atrás agora vira contradição visível.</p>
+</div>
+
+<div class="decision-box">
+  <h4>D4 — Gráficos: agora (Fase E) ou pós-launch V2?</h4>
+  <p><strong>Recomendação Cowork:</strong> Agora, mas só line chart simples em <code>/peso/historico</code> (~2h). Gráficos visuais de doses ficam pra V2.</p>
+</div>
+
+<div class="decision-box">
+  <h4>D5 — Dev build agora ou só na Fase F final?</h4>
+  <p><strong>Recomendação Cowork:</strong> Fase F final. Antes disso não há razão técnica pra subir dev build — todos os ajustes funcionam em Expo Go.</p>
+</div>
+
+<!-- FASES -->
+<h2 id="fases">4. 7 Fases — pipeline visual</h2>
+
+<div class="phase-card">
+  <div class="phase-header">
+    <div class="phase-title">Fase A · Polish UX Crítico</div>
+    <span class="badge b-success">✅ concluído (PR 39 a criar)</span>
+  </div>
+  <p><strong>Owner:</strong> Claude Code Aba 1 · <strong>Tempo real:</strong> ~1h50min · <strong>Branch:</strong> <code>feature/39-polish-ux-critical</code></p>
+  <p><strong>Entregue:</strong></p>
+  <ul>
+    <li>✅ Chevron em cards tapáveis (PRÓXIMA DOSE, PESO) — affordance visível</li>
+    <li>✅ Press feedback (scale 0.98 + opacity 0.85) em cards interativos</li>
+    <li>✅ Label Peso "Entre 30 e 300 kg" → "Peso (kg)" + placeholder "ex: 87,2"</li>
+    <li>✅ Ghost simplificado em Anotar Nota e Anotar Sintoma (1 exemplo)</li>
+    <li>✅ Sparkline endpoint <code>r={2.2}</code> → <code>r={3}</code></li>
+    <li>✅ Haptics via prop opcional <code>haptic?</code> no <code>AuthButton</code> (DRY) propagada aos 5 sheets de registro</li>
+  </ul>
+  <p><strong>Decisão D1=B aprovada:</strong> <code>colors.destructive</code> + Named Rule "Destructive Action" fora deste PR — escopo 100% PR #76 Settings Hub (quem cria documenta).</p>
+  <p><strong>Decisão D2=local first:</strong> token global <code>bgElevated</code> NÃO mudou. PR 39B fica documentado se cards readonly persistirem indistinguíveis pós-validação visual.</p>
+  <p><strong>NÃO tocou:</strong> sheets (D1=A mantido), tab bar (D3=B gated), gráficos (D4=Fase E), Settings Hub (C), <code>app/_layout.tsx</code>, <code>app/configuracoes/*</code>, schemas Supabase.</p>
+</div>
+
+<div class="phase-card active">
+  <div class="phase-header">
+    <div class="phase-title">Fase B · Pesquisa Apple HIG Sheets</div>
+    <span class="badge b-active">paralelo com A</span>
+  </div>
+  <p><strong>Owner:</strong> Cowork via knowledge técnico + Apple HIG docs · <strong>Tempo:</strong> 30min · <strong>Output:</strong> Seção "Apple HIG Insights" deste doc</p>
+  <p><strong>Status:</strong> <span class="badge b-success">✅ feito inline</span> — ver seção 5 abaixo.</p>
+</div>
+
+<div class="phase-card active">
+  <div class="phase-header">
+    <div class="phase-title">Fase C · Settings Hub (Codex)</div>
+    <span class="badge b-active">paralelo com A · zero conflito</span>
+  </div>
+  <p><strong>Owner:</strong> Codex no worktree <code>/private/tmp/dose-day-v5-settings-76</code> · <strong>Tempo:</strong> ~7h (17 etapas restantes) · <strong>Branch:</strong> <code>feature/38-settings-hub-screens</code></p>
+  <p><strong>Status:</strong> ⏸️ pausado em <code>1b95261</code>. <strong>4 componentes base prontos:</strong> SettingsGroup, SettingsRow, SettingsFooter, SettingsSectionHeader. <strong>3 decisões cravadas.</strong></p>
+  <p><strong>Próxima etapa:</strong> 6 — <code>app/configuracoes/index.tsx</code> (hub principal com 6 grupos, ~150 LOC)</p>
+  <p><strong>Handoff completo:</strong> <code>docs/handoff/HANDOFF-pr76-settings-hub-pause-2026-05-25.md</code></p>
+  <p><strong>Sem overlap com Fase A:</strong></p>
+  <ul>
+    <li>Fase A toca: <code>HomeV7Content.tsx</code>, sheets, tokens</li>
+    <li>Fase C toca: <code>app/configuracoes/*</code> (novas telas), <code>app/_layout.tsx</code> (registrations no fim)</li>
+    <li>Único conflito teórico: <code>tokens.ts</code> — só se Fase A tocar. <strong>Resolução:</strong> Fase A muda <code>bg-elevated</code> e commit primeiro; Fase C rebase em main quando A mergear</li>
+  </ul>
+</div>
+
+<div class="phase-card gated">
+  <div class="phase-header">
+    <div class="phase-title">Fase D · Gear Icon + Remove Tab Bar</div>
+    <span class="badge b-locked">gated por C</span>
+  </div>
+  <p><strong>Owner:</strong> Codex · <strong>Tempo:</strong> 2-3h · <strong>Branch:</strong> <code>feature/gear-icon-remove-tabbar</code></p>
+  <p><strong>Escopo:</strong></p>
+  <ul>
+    <li>Adicionar ícone <code>gear</code> SF Symbol no header top-right do <code>HomeV7Content.tsx</code></li>
+    <li>Tap → navega pra <code>/configuracoes</code></li>
+    <li>Remover ou esconder a tab bar inteira</li>
+    <li>Migrar todas as 5 tabs (Início, Doses, Diário, Relatórios, Perfil) — manter funcionais via outros caminhos OU deletar telas órfãs</li>
+    <li>Atualizar <code>app/_layout.tsx</code> root stack</li>
+    <li>Validar deep links existentes não quebram</li>
+  </ul>
+</div>
+
+<div class="phase-card gated">
+  <div class="phase-header">
+    <div class="phase-title">Fase E · Gráficos Peso (mínimo) + Doses (opcional)</div>
+    <span class="badge b-locked">gated por C</span>
+  </div>
+  <p><strong>Owner:</strong> Codex · <strong>Tempo:</strong> 2-3h · <strong>Branch:</strong> <code>feature/charts-peso-doses</code></p>
+  <p><strong>Escopo MVP (mínimo viável — revisado pós-Codex review):</strong></p>
+  <ul>
+    <li><strong>Reaproveitar <code>components/relatorios/WeightChartCard.tsx</code></strong> que já existe e tem LineChart + loading/error/empty states implementados — NÃO criar gráfico do zero</li>
+    <li>Importar em <code>/peso/historico</code> + passar <code>WeightPoint[]</code> da query existente</li>
+    <li>Card mantém visual do componente original (cor mint pra delta negativo, etc.)</li>
+  </ul>
+  <p><strong>Escopo opcional (V2):</strong></p>
+  <ul>
+    <li>Timeline visual de doses (cada aplicação como dot na linha temporal)</li>
+    <li>Histograma de intervalos entre doses</li>
+  </ul>
+</div>
+
+<div class="phase-card gated">
+  <div class="phase-header">
+    <div class="phase-title">Fase F · Dev Build + Liquid Glass</div>
+    <span class="badge b-locked">gated por D</span>
+  </div>
+  <p><strong>Owner:</strong> Léo executa, Cowork orienta · <strong>Tempo:</strong> 2h · <strong>Foco:</strong> validação visual real do Liquid Glass</p>
+  <p><strong>Escopo:</strong></p>
+  <ul>
+    <li>Configurar EAS Build (eas.json profile development)</li>
+    <li>Rodar <code>eas build --platform ios --profile development</code></li>
+    <li>Instalar no iPhone real ou simulador via dev build</li>
+    <li>Ativar Liquid Glass na tab bar (se mantida) ou no header gear icon</li>
+    <li>Capturar screenshots reais com glass funcionando</li>
+    <li>Validar em iOS 26+ (Liquid Glass requer)</li>
+  </ul>
+</div>
+
+<div class="phase-card gated">
+  <div class="phase-header">
+    <div class="phase-title">Fase G · Pre-flight App Store</div>
+    <span class="badge b-locked">gated por F</span>
+  </div>
+  <p><strong>Owner:</strong> Cowork orienta · <strong>Tempo:</strong> 3h · <strong>Skills:</strong> <code>appstore-creative-designer</code>, <code>app-store-compliance</code></p>
+  <p><strong>Escopo:</strong></p>
+  <ul>
+    <li>Screenshots oficiais para App Store Connect (6.7", 6.1", iPad — se aplicável)</li>
+    <li>ASO copy: descrição, palavras-chave, what's new</li>
+    <li>Compliance check: privacy nutrition labels, GDPR/LGPD, ANVISA</li>
+    <li>App Review Guidelines audit (especial atenção 1.4 Safety Medical, 4.3 Spam, 5.1.1 Data Collection)</li>
+    <li>TestFlight build pra beta interno antes do submit</li>
+  </ul>
+</div>
+
+<!-- APPLE HIG -->
+<h2 id="apple-hig">5. Apple HIG — Sheets insights</h2>
+
+<p>Resumo do que Apple HIG documenta sobre sheets em iOS (baseado em conhecimento técnico + Apple Developer Documentation):</p>
+
+<table>
+  <thead><tr><th>Conceito</th><th>Apple HIG</th><th>Aplicação no DoseDay</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Sheet (geral)</strong></td><td>"A sheet helps people perform a scoped task that's closely related to their current context."</td><td>✅ Aplicado — sheets de Dose, Peso, etc. são "scoped tasks"</td></tr>
+    <tr><td><strong>Form Sheet</strong></td><td>iPhone/iPad: bottom-anchored com detents. Apple recomenda pra tarefas focadas que precisam de contexto do parent visível</td><td>✅ Atual implementação</td></tr>
+    <tr><td><strong>Page Sheet</strong></td><td>iPhone: cobre toda a tela exceto status bar. Pra fluxos mais longos</td><td>Não usado — DoseDay prefere form sheet com peek</td></tr>
+    <tr><td><strong>Modal Centered (popover)</strong></td><td>Apple usa em <strong>iPad e macOS</strong>. Em iPhone, popover NÃO é o padrão</td><td>O desenho de Léo se parece com este padrão — sai do HIG iOS</td></tr>
+    <tr><td><strong>Detents</strong></td><td>iOS 15+: sheet pode parar em alturas pré-definidas (.medium, .large, custom). Usuário arrasta drag handle</td><td>✅ Usado — <code>[0.5, 1.0]</code> ou <code>'fitToContents'</code></td></tr>
+    <tr><td><strong>Drag handle</strong></td><td>"Visible grabber indicates the sheet is dismissible via swipe"</td><td>✅ Habilitado em todos os sheets</td></tr>
+    <tr><td><strong>Use sparingly</strong></td><td>"Use sheets sparingly. Use them only for tasks that are closely related to the current context."</td><td>✅ Aplicado — só pra registros, não pra navegação</td></tr>
+  </tbody>
+</table>
+
+<div class="quote">
+  <strong>Conclusão:</strong> Form Sheet bottom-anchored com detents é o padrão Apple HIG-aprovado pra iPhone. Centered Modal é padrão iPad/macOS, não iPhone. Refatorar pra Centered Modal sai do padrão Apple — pode passar em review, mas usuárias podem achar "estranho" (não familiar). <strong>Recomendação técnica forte: manter D1=A.</strong>
+</div>
+
+<!-- PROMPTS -->
+<h2 id="prompts">6. Prompts prontos pra execução</h2>
+
+<details>
+<summary>Prompt A · Polish UX Crítico — pronto pra colar no Claude Code Aba 1</summary>
+<p>Será gerado em <code>docs/prompts/39-MID-polish-ux-critical.md</code> após Léo cravar D1, D2, D3.</p>
+<p>Estrutura prevista:</p>
+<ul>
+  <li>Contexto: PR #75 mergeado, 4 issues do critique a resolver</li>
+  <li>Critérios de aceitação (~15 checks)</li>
+  <li>Skills: <code>karpathy-guidelines</code>, <code>impeccable craft</code>, <code>impeccable critique</code>, <code>design:accessibility-review</code></li>
+  <li>Tempo estimado: 2-3h</li>
+  <li>Arquivos: <code>HomeV7Content.tsx</code>, <code>tokens.ts</code>, <code>peso/registrar.tsx</code>, <code>diario/anotar-memoria.tsx</code>, <code>diario/anotar-sintoma.tsx</code></li>
+</ul>
+</details>
+
+<details>
+<summary>Prompt C · Retomada Settings Hub — já existe</summary>
+<p>Plano e prompt completos em:</p>
+<ul>
+  <li><code>docs/prompts/38-MID-settings-hub-screens.md</code></li>
+  <li><code>docs/superpowers/plans/2026-05-25-settings-hub-screens.md</code></li>
+  <li><code>docs/handoff/HANDOFF-pr76-settings-hub-pause-2026-05-25.md</code></li>
+</ul>
+<p>Para retomar, Léo abre Aba 2 do Terminal apontando pro worktree e cola a mensagem do handoff doc.</p>
+</details>
+
+<details>
+<summary>Prompt D · Gear Icon + Remove Tab Bar — será gerado após C mergear</summary>
+<p>Estrutura prevista em <code>docs/prompts/40-MID-gear-icon-remove-tabbar.md</code>:</p>
+<ul>
+  <li>Pré-requisito: Settings Hub PR mergeado</li>
+  <li>Arquivos: <code>HomeV7Content.tsx</code>, <code>app/(tabs)/_layout.tsx</code>, possíveis deletes de telas órfãs</li>
+  <li>Validação: deep links existentes não quebram, gear navega pra <code>/configuracoes</code></li>
+</ul>
+</details>
+
+<details>
+<summary>Prompt E · Gráficos Peso — será gerado após C mergear</summary>
+<p>Estrutura prevista em <code>docs/prompts/41-LOW-charts-peso-historico.md</code>:</p>
+<ul>
+  <li>Usar <code>react-native-gifted-charts</code> (instalado)</li>
+  <li>Line chart na tela <code>/peso/historico</code></li>
+  <li>~2h, low complexity</li>
+</ul>
+</details>
+
+<!-- RISCOS -->
+<h2 id="riscos">7. Riscos consolidados</h2>
+
+<table>
+  <thead><tr><th>#</th><th>Risco</th><th>Probabilidade</th><th>Impacto</th><th>Mitigação</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Mudança de <code>bg-elevated</code> afeta cards em telas não-mapeadas</td><td>—</td><td>—</td><td>✅ Mitigado via D2=local first (PR 39). Token global NÃO mudou. PR 39B fica documentado se necessário.</td></tr>
+    <tr><td>2</td><td>Settings Hub demora mais que 7h pós-retomada</td><td>média</td><td>médio</td><td>Plano em 22 etapas com checkpoints · pausar entre etapas se cansaço</td></tr>
+    <tr><td>3</td><td>Conflito Fase A + Fase C em <code>tokens.ts</code></td><td>baixa</td><td>baixo</td><td>Fase A mergeia primeiro · Fase C rebase trivial</td></tr>
+    <tr><td>4</td><td>Liquid Glass não funciona como esperado em dev build</td><td>baixa</td><td>médio</td><td>Fallback gracioso já existe — sem glass, usa border + bg sólido</td></tr>
+    <tr><td>5</td><td>App Store rejection por compliance médico (ANVISA)</td><td>alta</td><td>alto</td><td>Compliance check completo na Fase G · evitar claims médicos · disclaimer já existe</td></tr>
+    <tr><td>6</td><td>Tab bar removal quebra deep links existentes</td><td>média</td><td>médio</td><td>Audit completo de rotas antes de remover · manter rotas mas esconder tab bar</td></tr>
+    <tr><td>7</td><td>Gráficos com <code>react-native-gifted-charts</code> performam mal em datasets grandes</td><td>baixa</td><td>baixo</td><td>Limitar a 90 dias no MVP · paginar se precisar</td></tr>
+  </tbody>
+</table>
+
+<!-- PRÓXIMO PASSO -->
+<h2 id="proximo">8. Próximo passo concreto</h2>
+
+<div class="card">
+  <h3 style="margin-top: 0;">Léo decide D1, D2, D3 (5 min)</h3>
+  <ol>
+    <li><strong>D1 sheets:</strong> A (Form Sheet, manter) ✅ ou B (Centered Modal, refactor)?</li>
+    <li><strong>D2 contraste:</strong> A (subir <code>bg-elevated</code>) ✅, B (border) ou C (ambos)?</li>
+    <li><strong>D3 tab bar:</strong> A (manter v1) ou B (remover via Gear Icon após Settings) ✅?</li>
+  </ol>
+  <p>Responde <strong><code>D1=X, D2=Y, D3=Z</code></strong> em 1 linha.</p>
+
+  <h3>Cowork executa em paralelo (3 ações simultâneas)</h3>
+  <ol>
+    <li><strong>Gera prompt Fase A</strong> (<code>docs/prompts/39-MID-polish-ux-critical.md</code>)</li>
+    <li><strong>Atualiza handoff</strong> com link pra este HTML roadmap</li>
+    <li><strong>Prepara mensagem Codex</strong> pra retomar Settings Hub na Aba 2</li>
+  </ol>
+
+  <h3>Você executa em sequência</h3>
+  <ol>
+    <li>Cola prompt Fase A no Claude Code Aba 1 → executa em ~3h</li>
+    <li>Quando A mergear, abre Aba 2 do Terminal e cola mensagem do handoff Codex</li>
+    <li>Codex executa Settings Hub em ~7h</li>
+    <li>Quando C mergear, Cowork gera prompts D e E em paralelo</li>
+    <li>Codex executa D e E em ~5h</li>
+    <li>Léo + Cowork: Fase F (Dev Build) ~2h</li>
+    <li>Cowork orienta: Fase G (App Store pre-flight) ~3h</li>
+  </ol>
+
+  <h3>Total realista</h3>
+  <p style="font-size: 18px;"><strong>15-22h efetivas · 3-5 dias de execução focada</strong></p>
+</div>
+
+<!-- FOOTER -->
+<hr style="border: none; border-top: 1px solid var(--border); margin: 50px 0 20px;">
+<p style="text-align: center; color: var(--text-muted); font-size: 12px;">
+  Gerado via <code>html-first-workflow</code> skill · DoseDay V5 · 2026-05-26
+</p>
+
+</body>
+</html>
