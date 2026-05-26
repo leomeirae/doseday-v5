@@ -225,6 +225,46 @@ export default function RootLayout() {
                 name="perfil/protocolo"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="configuracoes"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/conta"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/tratamento"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/tratamento/peso-meta"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/tratamento/medico"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/lembretes"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/dados"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/privacidade"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/suporte"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="configuracoes/suporte/sobre"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </AuthGuard>
         </AuthProvider>

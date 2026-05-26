@@ -13,6 +13,7 @@ colors:
   semantic-critical: "#E64545"
   semantic-info: "#5BA8D9"
   semantic-muted: "#5C6878"
+  destructive: "#FF453A"
   text-primary: "#F2F4F7"
   text-secondary: "#9CA8B8"
   text-tertiary: "#6B7280"
@@ -136,7 +137,7 @@ components:
     typography: "{typography.label}"
     padding: "16px 24px"
   button-destructive:
-    backgroundColor: "{colors.semantic-critical}"
+    backgroundColor: "{colors.destructive}"
     textColor: "{colors.text-primary}"
     rounded: "{rounded.md}"
     typography: "{typography.label}"
@@ -196,6 +197,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 
 - **Alert Red** (`#E64545`): Emergência clínica real. Sintoma severo (7+/10), erro grave no dado, alerta que requer ação imediata. Reservado — uso frequente quebra confiança.
 
+- **Destructive Red** (`#FF453A`): Ação irreversível. Exclusivo para apagar conta, excluir dados, encerrar sessão crítica ou outra ação destrutiva confirmada. Não substitui Alert Red para erro comum.
+
 - **Clinical Blue** (`#5BA8D9`): Informação neutra de referência. Marcadores de dose no gráfico, dado de contexto ("média da população"), informação de período. Sem conotação positiva ou negativa.
 
 - **Muted Slate** (`#5C6878`): Estado desativado, item secundário, metadado que não requer atenção. Texto de placeholder, label de campo inativo.
@@ -233,6 +236,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 **The 30% Glass Rule.** Glass aplica em no máximo 30% da área visível de qualquer tela. Nenhuma área de conteúdo toca glass. Se um card, lista, texto ou gráfico estiver sobre glass, está errado. Glass é camada de navegação, não padrão de card.
 
 **The Semantic Integrity Rule.** Cor semântica (positivo, warning, critical, info) não é reutilizada para fins decorativos. Alert Red em um badge de marketing é um bug, não uma escolha de design.
+
+**The Destructive Action Rule.** `colors.destructive` (`#FF453A`) é reservado exclusivamente para ações irreversíveis, como excluir conta, excluir dados ou encerrar uma sessão crítica. Não usar para erros não-destrutivos, validação de campo, alerta clínico ou estado negativo comum.
 
 ---
 
@@ -325,7 +330,7 @@ Tactile e confident. Raio `md` (14px) — nem arredondado demais (wellness app),
 - **Primary-Glass:** Liquid Glass nativo + tint Vital Mint 8%. Exclusivo de paywall CTA e splash. Nunca em tela de conteúdo.
 - **Secondary:** Border 1px `brand`, background transparente, texto `brand`. Ação alternativa na mesma tela que o primary.
 - **Ghost:** Background transparente, texto `brand`, sem border. Links inline ("Ver histórico completo"), ações terciárias.
-- **Destructive:** Background `semantic-critical` (#E64545), texto `text-primary`. Apenas em ações irreversíveis: cancelar assinatura, deletar dados. Nunca como CTA padrão.
+- **Destructive:** Background `destructive` (#FF453A), texto `text-primary`. Apenas em ações irreversíveis: cancelar assinatura, deletar dados. Nunca como CTA padrão.
 - **Disabled:** Background `bg-surface`, texto `text-disabled` (opacity 0.30), não responde a tap. Nunca finge ser interativo.
 - **Loading state:** Spinner inline, label contextual ("Salvando dose...", "Gerando relatório..."). Nunca "Loading...".
 

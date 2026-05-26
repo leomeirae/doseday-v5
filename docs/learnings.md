@@ -359,3 +359,15 @@ Registrado em 2026-05-23 durante a Frente 1 P0 IA/compliance.
 3. `prod runtime`: deployado ou ainda pendente.
 
 **Bônus de validação.** Snapshots recuperados de produção em `docs/handoff/edge-functions-snapshot-*` são evidência histórica, não código compilável do app. Excluir esses snapshots de `tsconfig`/ESLint evita que validações locais quebrem por imports Deno remotos antigos sem alterar o registro histórico.
+
+## 14.27 Aprendizado 59 — Exportação LGPD não deve cortar histórico retido
+
+Registrado em 2026-05-26 durante o PR Settings Hub.
+
+**Contexto.** O plano inicial considerava limitar o JSON de exportação a 12 meses para reduzir tamanho de arquivo em contas antigas. Durante a revisão LGPD, isso entrou em conflito com o próprio objetivo do recurso: se o produto ainda retém linhas mais antigas, o pacote de portabilidade não deve omiti-las.
+
+**Solução.** `useExportUserData` exporta todas as linhas armazenadas do usuário autenticado e pagina coleções por `id` com `range()`. O JSON declara `export_scope: 'all_stored_rows'`, deixando explícito que o escopo é integral, não temporal.
+
+**Validação.** A exportação real abriu a share sheet no iPhone 17 simulator com um JSON de 34 KB. RLS foi validada sem sessão (0 linhas anônimas) e com a conta `teste-22-maio@teste.com` (0 linhas de outros usuários) para as 19 tabelas exportadas.
+
+**Princípio.** Otimização de tamanho não pode reduzir direito LGPD sem decisão explícita de retenção. Primeiro garanta isolamento e paginação; só depois discuta política de retenção ou export assíncrono para contas muito grandes.

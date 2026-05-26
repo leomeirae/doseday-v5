@@ -7,9 +7,11 @@ type SettingsRowProps = {
   label: string
   value?: string
   chevron?: boolean
+  stacked?: boolean
   destructive?: boolean
   divider?: boolean
-  onPress: () => void
+  onPress?: () => void
+  disabled?: boolean
   accessibilityHint?: string
   testID?: string
 }
@@ -19,41 +21,74 @@ export function SettingsRow({
   label,
   value,
   chevron = true,
+  stacked = false,
   destructive = false,
   divider = false,
   onPress,
+  disabled = false,
   accessibilityHint,
   testID,
 }: SettingsRowProps) {
   const labelColor = destructive ? colors.destructive : colors.textPrimary
   const iconColor = destructive ? colors.destructive : colors.textSecondary
+  const accessibilityLabel = value ? `${label}: ${value}` : label
+  const rowContent = (
+    <>
+      <SymbolView name={icon} size={20} tintColor={iconColor} />
+      {stacked && value ? (
+        <View style={styles.copy}>
+          <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
+          <Text style={styles.stackedValue}>{value}</Text>
+        </View>
+      ) : (
+        <>
+          <Text style={[styles.label, { color: labelColor }]} numberOfLines={1}>
+            {label}
+          </Text>
+          <View style={styles.spacer} />
+          {value ? (
+            <Text style={styles.value} numberOfLines={1}>
+              {value}
+            </Text>
+          ) : null}
+        </>
+      )}
+      {chevron ? (
+        <SymbolView name="chevron.right" size={14} tintColor={colors.textTertiary} />
+      ) : null}
+    </>
+  )
+
+  if (!onPress) {
+    return (
+      <View
+        accessible
+        accessibilityLabel={accessibilityLabel}
+        testID={testID}
+        style={[styles.row, divider && styles.divider]}
+      >
+        {rowContent}
+      </View>
+    )
+  }
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled }}
       testID={testID}
+      disabled={disabled}
       style={({ pressed }) => [
         styles.row,
         divider && styles.divider,
         pressed && styles.rowPressed,
+        disabled && styles.rowDisabled,
       ]}
     >
-      <SymbolView name={icon} size={20} tintColor={iconColor} />
-      <Text style={[styles.label, { color: labelColor }]} numberOfLines={1}>
-        {label}
-      </Text>
-      <View style={styles.spacer} />
-      {value ? (
-        <Text style={styles.value} numberOfLines={1}>
-          {value}
-        </Text>
-      ) : null}
-      {chevron ? (
-        <SymbolView name="chevron.right" size={14} tintColor={colors.textTertiary} />
-      ) : null}
+      {rowContent}
     </Pressable>
   )
 }
@@ -70,6 +105,9 @@ const styles = StyleSheet.create({
   rowPressed: {
     backgroundColor: colors.bgSurface,
   },
+  rowDisabled: {
+    opacity: 0.5,
+  },
   divider: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: 'rgba(255,255,255,0.06)',
@@ -77,6 +115,14 @@ const styles = StyleSheet.create({
   label: {
     ...typography.body,
     flexShrink: 1,
+  },
+  copy: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
+  stackedValue: {
+    ...typography.caption,
+    color: colors.textSecondary,
   },
   value: {
     ...typography.body,

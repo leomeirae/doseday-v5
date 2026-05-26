@@ -12,7 +12,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
+import { SettingsHeader } from '@components/settings/SettingsHeader'
 import { AuthButton } from '@components/ui/AuthButton'
 import { useProfile } from '@hooks/useProfile'
 import { useSession } from '@hooks/useSession'
@@ -46,7 +46,7 @@ export default function DoseProtocolScreen() {
   const isDirty = isValid && parsedDays !== savedDays
   const isBlocked = updateDoseProtocol.isPending || !session?.user?.id
 
-  function goBackToProfile() {
+  function goBack() {
     if (router.canGoBack()) {
       router.back()
       return
@@ -68,7 +68,7 @@ export default function DoseProtocolScreen() {
       {
         onSuccess: () => {
           showSuccessToast('Protocolo salvo')
-          goBackToProfile()
+          goBack()
         },
         onError: () => Alert.alert('', 'Não consegui salvar seu protocolo.'),
       }
@@ -77,20 +77,11 @@ export default function DoseProtocolScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <View style={styles.header}>
-        <Pressable
-          style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-          onPress={goBackToProfile}
-          accessibilityLabel="Voltar"
-          accessibilityRole="button"
-          hitSlop={12}
-        >
-          <SymbolView name="chevron.left" size={18} tintColor={colors.textSecondary} />
-          <Text style={styles.backLabel}>Perfil</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>Protocolo</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+      <SettingsHeader
+        title="Protocolo"
+        onBack={goBack}
+        backAccessibilityLabel="Voltar"
+      />
 
       <KeyboardAvoidingView
         style={styles.flex}
@@ -101,10 +92,10 @@ export default function DoseProtocolScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.title}>Qual intervalo você vai seguir entre as aplicações?</Text>
+          <Text style={styles.title}>Intervalo entre aplicações</Text>
           <Text style={styles.description}>
-            Use o intervalo combinado com quem te acompanha, ou o intervalo que você está seguindo.
-            O DoseDay só usa esse dado para calcular a próxima dose.
+            Defina o intervalo combinado com quem te acompanha ou o intervalo que você está
+            seguindo. O DoseDay usa esse dado para calcular a próxima dose.
           </Text>
 
           <View style={styles.chips}>
@@ -174,36 +165,8 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  header: {
-    alignItems: 'center',
-    borderBottomColor: 'rgba(255,255,255,0.06)',
-    borderBottomWidth: 0.5,
-    flexDirection: 'row',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  backButton: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 4,
-    minHeight: 44,
-    minWidth: 70,
-  },
   pressed: {
     opacity: 0.65,
-  },
-  backLabel: {
-    ...typography.body,
-    color: colors.textSecondary,
-  },
-  headerTitle: {
-    ...typography.title,
-    color: colors.textPrimary,
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerSpacer: {
-    minWidth: 70,
   },
   content: {
     paddingBottom: spacing.xxxl,

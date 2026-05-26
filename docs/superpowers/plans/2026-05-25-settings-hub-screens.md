@@ -1,11 +1,37 @@
 # Plano — Prompt 38-MID Settings Hub Screens
 
-**Status:** Aguardando aprovação do Léo
+**Status:** Implementado — validação final concluída em 2026-05-26
 **Data:** 2026-05-25
 **Branch:** `feature/38-settings-hub-screens`
 **Worktree:** `/private/tmp/dose-day-v5-settings-76`
 **Prompt fonte:** `docs/prompts/38-MID-settings-hub-screens.md`
-**Estimativa:** ~6h efetivas
+**Estimativa:** ~6h efetivas + correções visuais pós-validação
+
+## Adendo aprovado — 2026-05-26
+
+A validação no iPhone 17 identificou falhas de navegação, quebra de títulos e
+duplicidade de informação. Léo aprovou o pacote corretivo mantendo os
+**6 grupos** do hub.
+
+| Problema observado | Correção aprovada |
+|---|---|
+| Hub acessado por `Perfil` sem retorno visível | Adicionar retorno para `Perfil` no hub enquanto a tab for a ponte |
+| Titles quebrados/colididos nas sub-telas | Criar header compartilhado compacto, com chevron visual e label acessível |
+| `Dados` e `Privacidade > Meus dados` duplicados | Manter `Dados` como destino LGPD único; `Privacidade` fica com documentos legais |
+| Footer legal repete os mesmos links em `Privacidade` | Omitir footer apenas na tela de documentos legais |
+| Labels clínicos truncados em Tratamento | Renderizar valores em layout que preserve labels completos |
+| `Medicamento atual` abre protocolo, ação semanticamente incorreta | Tornar medicamento read-only até existir edição própria |
+| Protocolo exibe origem `Perfil` ao ser aberto pelo hub | Usar navegação neutra e copy de manutenção; `router.back()` preserva a origem |
+| Acompanhamento renderizado em cards verticais | Aplicar controle segmentado 3-way usando strings i18n do onboarding |
+| CTAs de edição ativos sem alterações | Habilitar salvar apenas com draft válido e alterado |
+| Status bloqueado de lembretes usando vermelho destrutivo | Usar estado semântico de warning; `destructive` fica exclusivo de ação irreversível |
+| Assinatura ainda não disponível produz toast de sucesso | Exibir estado read-only `Em breve`, sem falsa confirmação |
+| Hub mostra `Sua assinatura` como navegação sem tela própria | Manter o status apenas dentro de `Conta` até a gestão de assinatura existir |
+| Etapa 13 removeria o único logout junto do menu legado | Levar `Sair` confirmado para `Configurações > Conta`; `Perfil` vira ponte real sem regressão de sessão |
+
+**Ajuste de regra visual:** Settings não usa mint como decoração ou estado
+ordinário; Vital Mint continua permitido no CTA primário ativo, de acordo com
+`docs/DESIGN.md`.
 
 ---
 
@@ -116,7 +142,7 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 | 5c | `components/settings/SettingsFooter.tsx` — versão dinâmica via Constants | 15min | Versão + build aparecem; Termos/Política abrem browser |
 | 5d | `components/settings/SettingsSectionHeader.tsx` | 10min | Header opcional pra subsections |
 | 6 | `app/configuracoes/index.tsx` — hub com 6 grupos | 60min | Tap em cada grupo navega corretamente |
-| 7 | `app/configuracoes/conta.tsx` — email + assinatura placeholder | 30min | Email do useSession; "Sua assinatura" → toast "Em breve" |
+| 7 | `app/configuracoes/conta.tsx` — email + assinatura placeholder + sessão | 30min | Email do useSession; assinatura read-only; logout preservado |
 | 8a | `app/configuracoes/tratamento.tsx` — 5 sections read-only display | 45min | Lê snake_case real (`current_dose`, `goal_weight`, etc) |
 | 8b | `app/configuracoes/tratamento/peso-meta.tsx` — form único | 25min | Save persiste em `goal_weight` via useUpdateProfile |
 | 8c | `app/configuracoes/tratamento/medico.tsx` — 3 campos (`doctor_name`, `has_medical_support` 3-way, `next_appointment_date`) | 30min | Persistem; NÃO reabre onboarding |
@@ -124,7 +150,7 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 | 10a | `hooks/useExportUserData.ts` — SELECT em 8 tabelas (RLS-bound) | 30min | JSON gerado, RLS verificada |
 | 10b | `app/configuracoes/dados.tsx` — 3 linhas + expo-sharing + modal duplo | 45min | Export funcional, modal "EXCLUIR" gating |
 | 10c | Modal duplo de exclusão chamando Edge Function | 25min | Após confirm, signout + redirect (welcome) |
-| 11 | `app/configuracoes/privacidade.tsx` — 4 linhas (2 placeholders, 2 web browser) | 25min | Tap em consents → tela read-only de consent_history |
+| 11 | `app/configuracoes/privacidade.tsx` — documentos legais | 25min | Termos/Política abrem browser; sem duplicar Dados nem os próprios links no footer |
 | 12 | `app/configuracoes/suporte.tsx` + `suporte/sobre.tsx` — StoreReview + Share API | 40min | Store review prompt aparece; share sheet abre |
 | 13 | `app/(tabs)/perfil.tsx` — substituir por botão único + helper text | 10min | Tap navega pra `/configuracoes` |
 | 14 | `app/_layout.tsx` — 10 Stack.Screen registrations em bloco contíguo no fim | 10min | Sem `presentation: 'formSheet'` |
@@ -132,6 +158,7 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 | 16 | `docs/history.md` entry Prompt 38 | 3min | Tabela atualizada |
 | 17 | `npm run type-check && npm run lint` | 3min | 0 errors |
 | 18 | Screenshots reais via `react-native-devtools-mcp` — 10 PNGs | 30min | 10 PNGs commitados |
+| 18b | Pacote corretivo pós-validação: header, retorno, IA, estados e semântica visual | 45min | Sem título quebrado, sem destino duplicado e sem CTA enganoso |
 | 19 | `/impeccable critique` 3 telas críticas — fallback manual | 20min | ≥32/40 cada |
 | 20 | `security-review` foco LGPD | 10min | 0 críticos |
 | 21 | `impeccable audit` accessibility | 10min | 0 críticos |
@@ -152,11 +179,12 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 | 5 | `delete-user-account` contract pode mudar | Etapa 2 lê código; provavelmente `Authorization: Bearer <jwt>` |
 | 6 | "Próxima consulta": canônico em `medical_visits` ou `user_profiles`? | Default: `user_profiles.next_appointment_date`. Documentar no ADR. Decisão aberta pro Léo |
 | 7 | `/impeccable critique` bloqueado pelos PRs #73/74 | Fallback manual contra DESIGN.md + Named Rules |
-| 8 | Export JSON > 10MB em users V4-migrados | Limitar a 12 meses no MVP |
+| 8 | Export JSON > 10MB em contas com histórico extenso | Exportar todas as linhas armazenadas com paginação; não reduzir direito de portabilidade por janela temporal |
 | 9 | Conflito `app/_layout.tsx` vs PR #75 | 10 Stack.Screens em bloco contíguo no fim. Rebase trivial pós-#75 |
 | 10 | URLs `dose-day.com/{termos,privacidade,faq}` placeholder | TODO no ADR. Léo confirma em PR futuro |
 | 11 | Modal "digite EXCLUIR" — fricção alta | LGPD + ANVISA recomendam confirmação explícita. Decisão consciente no ADR |
 | 12 | `expo-store-review.requestReview()` silencia em dev | Esperado; validar em TestFlight |
+| 13 | Header centralizado reserva largura demais para títulos longos | Usar componente único com ação voltar compacta |
 
 ---
 
@@ -171,6 +199,7 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 | `components/settings/SettingsRow.tsx` | ~90 |
 | `components/settings/SettingsFooter.tsx` | ~60 |
 | `components/settings/SettingsSectionHeader.tsx` | ~30 |
+| `components/settings/SettingsHeader.tsx` | ~70 |
 | `app/configuracoes/index.tsx` | ~150 |
 | `app/configuracoes/conta.tsx` | ~80 |
 | `app/configuracoes/tratamento.tsx` | ~120 |
@@ -193,10 +222,11 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 | `CONTEXT.md` | +3 entradas (hub de Configurações, Settings Row, Lista Agrupada iOS) |
 | `docs/history.md` | +1 entry Prompt 38 |
 | `package.json` | +3 packages via `expo install` (+ lockfile) |
+| `app/perfil/protocolo.tsx` | Navegação/copy neutras para acesso pelo hub ou Perfil |
 
 ### NÃO TOCAR
 - `components/home/HomeV7Content.tsx` — gear icon é PR #77
-- `app/perfil/{account,protocolo,notificacoes}.tsx` — rotas existentes mantidas
+- `app/perfil/{account,notificacoes}.tsx` — rotas existentes mantidas
 - `app/(tabs)/_layout.tsx` — gate pro PR #77
 - Schema Supabase — zero migration
 - Edge Functions — usar `delete-user-account` existente
@@ -210,16 +240,19 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 ### Navegação
 - [ ] Tap em tab "Perfil" → vê botão "Abrir Configurações"
 - [ ] Tap em "Abrir Configurações" → navega pra `/configuracoes`
+- [ ] Hub exibe voltar e retorna para Perfil enquanto a ponte estiver ativa
 - [ ] Tap em cada grupo navega pra rota correta
 - [ ] Back arrow em cada sub-tela volta pro hub
 
 ### Tela Conta
 - [ ] Email visível e correto
-- [ ] Tap em "Sua assinatura" → toast "Em breve"
+- [ ] "Sua assinatura" exibe estado não-interativo "Em breve"
+- [ ] "Sair" continua acessível em Conta e exige confirmação antes de encerrar sessão
 
 ### Tela Tratamento
 - [ ] 5 sections com valores atuais (snake_case)
-- [ ] Tap em "Medicamento" → `/perfil/protocolo`
+- [ ] "Medicamento atual" aparece read-only até existir editor próprio
+- [ ] Tap em "Protocolo de dose" abre editor e volta para a tela de origem
 - [ ] Tap em "Peso meta" → form de edição funcional, save persiste
 - [ ] Tap em "Acompanhamento médico" → 3-way para `has_medical_support`
 - [ ] Próxima consulta date picker funcional
@@ -239,7 +272,8 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 
 ### Tela Privacidade
 - [ ] Tap em Política/Termos abre web browser externo
-- [ ] Tap em "Compartilhamento de dados" mostra consents ativos
+- [ ] Não duplica exportação/consentimentos/exclusão já pertencentes a Dados
+- [ ] Não repete Termos/Política no footer da própria tela legal
 
 ### Tela Suporte
 - [ ] Tap em "Sobre" mostra nome + versão dinâmica + build dinâmico
@@ -251,7 +285,7 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 - [ ] Tap em Termos/Política abre browser
 
 ### Visual / Tokens
-- [ ] Zero mint em qualquer tela do hub
+- [ ] Vital Mint aparece somente em CTA primário ativo; não como decoração/estado comum
 - [ ] Background `colors.bgBase` em todas as telas
 - [ ] Cards `bg-elevated` com radius lg
 - [ ] Touch targets ≥ 44pt
@@ -269,7 +303,7 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 - [ ] `expo-web-browser`, `expo-store-review`, `expo-sharing` instalados sem warning
 - [ ] `has_medical_support` 3-way handled (não tratado como boolean)
 - [ ] Mapeamento snake_case ↔ camelCase consistente nos hooks
-- [ ] Export JSON limita-se a 12 meses (registrado no ADR)
+- [ ] Export JSON cobre todas as linhas armazenadas com paginação determinística (registrado no ADR)
 
 ---
 
@@ -297,7 +331,7 @@ ACTIVE v4, `verify_jwt: true`. Etapa 2 vai fazer `get_edge_function` pra confirm
 7. URLs `dose-day.com/{termos,privacidade,faq}` permanecem placeholder neste PR ⚠️
 8. Tab "Perfil" mantida — gate fica pro PR #77 ✅
 9. Footer global repete em todas as telas (decisão §3 SETTINGS_DESIGN_DIRECTION) ✅
-10. Zero mint em Settings — §5.4 HOME_DESIGN_DIRECTION ✅
+10. Vital Mint em Settings apenas em CTA primário ativo; zero uso decorativo ✅
 11. "Próxima consulta": lê de `user_profiles.next_appointment_date` (decisão aberta) ⚠️
 
 ### §2 — Could 50 lines do this?
@@ -321,18 +355,34 @@ Seção E é checklist binário. Comportamento observável apenas. Critérios: `
 
 ---
 
-## Decisões abertas pra Léo
+## Decisões fechadas por Léo
 
-1. **"Próxima consulta"** — ler de `user_profiles.next_appointment_date` (default neste plano) ou de `medical_visits.next_visit_date` (canônico)?
-2. **`has_medical_support` 3-way UI** — segmented control (Sim/Não/Pendente) [default] ou outro padrão?
-3. **URLs `dose-day.com/{termos,privacidade,faq}`** — placeholders ok pro MVP, ou Léo confirma URLs reais antes deste PR?
+1. **"Próxima consulta"** lê de `user_profiles.next_appointment_date`.
+2. **`has_medical_support`** usa segmented control 3-way com i18n do onboarding.
+3. **URLs `dose-day.com/{termos,privacidade,faq}`** permanecem placeholders no MVP.
+4. **Arquitetura do hub** mantém 6 grupos; `Dados` é a única entrada para ações LGPD.
 
 ---
 
-## ⏸️ Aguardando aprovação do Léo
+## Aprovação
 
-Manda "ok" ou ajuste as decisões abertas e eu sigo do passo 2 em diante (worktree + branch + install packages + componentes + telas).
+Pacote corretivo aprovado por Léo em 2026-05-26: **"OK, manter 6 grupos"**.
 
-**Manual approve recomendado** (não auto mode) — esse PR toca LGPD (export + delete) e cada edit merece revisão.
+## Validação final — 2026-05-26
+
+| Gate | Resultado |
+|---|---|
+| `npm run type-check` | PASS |
+| `npm run lint` | PASS com 1 warning preexistente em `lib/i18n/index.ts` |
+| Perfil → Configurações → voltar | PASS via iPhone 17 simulator |
+| Hub | PASS com 6 grupos e sem atalho falso de assinatura |
+| Conta | PASS; assinatura read-only `Em breve`, logout com confirmação |
+| Tratamento | PASS; labels preservados, medicamento/preocupações read-only, CTA de edição só quando há mudança |
+| Lembretes | PASS; horário `20:00` sem segundos |
+| Dados | PASS; export JSON abriu share sheet real, histórico e dupla confirmação validados |
+| Privacidade | PASS; somente documentos legais, sem duplicar Dados nem footer legal |
+| RLS anônima | PASS; 0 linhas em 19 tabelas exportadas |
+| RLS autenticada | PASS; `teste-22-maio@teste.com` retornou 0 linhas de outros usuários em 19 tabelas |
+| Screenshots reais | 14 PNGs em `assets/screenshots/settings-hub/` |
 
 **Coordenação com PR #75:** Quando #75 mergear, este PR rebaseia em `main` (deve ser trivial — conflito previsto só em `app/_layout.tsx` com bloco isolado no fim). Quando ambos mergeados, PR #77 entra com gear icon na Home + remoção da tab bar.
