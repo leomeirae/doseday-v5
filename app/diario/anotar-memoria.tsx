@@ -82,7 +82,7 @@ export default function AnotarMemoriaScreen() {
             multiline
             numberOfLines={8}
             maxLength={NOTES_MAX_LENGTH}
-            placeholder="ex: bati o pé pra não comer doce hoje · domingo foi difícil"
+            placeholder="ex: ansiedade menor essa semana, sono melhor"
             placeholderTextColor={colors.textTertiary}
             selectionColor={colors.brand}
             autoCapitalize="sentences"
@@ -101,6 +101,7 @@ export default function AnotarMemoriaScreen() {
             loading={isPending}
             disabled={!canSubmit}
             testID="anotar-memoria-submit"
+            haptic="medium"
           />
         </View>
       </KeyboardAvoidingView>

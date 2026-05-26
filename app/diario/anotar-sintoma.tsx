@@ -110,7 +110,7 @@ export default function AnotarSintomaScreen() {
             multiline
             numberOfLines={6}
             maxLength={NOTES_MAX_LENGTH}
-            placeholder="ex: náusea leve depois do almoço · azia ao deitar"
+            placeholder="ex: náusea leve depois do almoço"
             placeholderTextColor={colors.textTertiary}
             selectionColor={colors.brand}
             autoCapitalize="sentences"
@@ -149,6 +149,7 @@ export default function AnotarSintomaScreen() {
             loading={isPending}
             disabled={!canSubmit}
             testID="anotar-sintoma-submit"
+            haptic="medium"
           />
         </View>
       </KeyboardAvoidingView>

@@ -132,6 +132,7 @@ export default function PesoRegistrarScreen() {
             }}
             keyboardType="decimal-pad"
             autoCapitalize="none"
+            placeholder={t('addModal.weightPlaceholder')}
             error={errors.weight}
             testID="weight-input"
           />
@@ -192,6 +193,7 @@ export default function PesoRegistrarScreen() {
             loading={isPending}
             disabled={isPending}
             accessibilityLabel={t('addModal.saveButton')}
+            haptic="medium"
           />
         </View>
       </KeyboardAvoidingView>

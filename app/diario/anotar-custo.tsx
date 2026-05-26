@@ -149,6 +149,7 @@ export default function AnotarCustoScreen() {
             loading={isPending}
             disabled={!canSubmit}
             testID="anotar-custo-submit"
+            haptic="medium"
           />
         </View>
       </KeyboardAvoidingView>

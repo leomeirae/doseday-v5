@@ -12,7 +12,9 @@
   "addModal": {
     "titleAdd": "Registre seu peso",
     "titleEdit": "Editar Peso",
-    "weightHint": "Entre 30 e 300 kg",
+    "weightHint": "Peso (kg)",
+    "weightPlaceholder": "ex: 87,2",
+    "weightHelper": "Entre 30 e 300 kg",
     "dateLabel": "Data",
     "notesLabel": "Notas (opcional)",
     "notesPlaceholder": "Como você está se sentindo?",

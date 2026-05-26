@@ -1,5 +1,14 @@
 import { ActivityIndicator, Pressable, Text, StyleSheet } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import { colors, typography, spacing, radius } from '@lib/theme/tokens'
+
+type HapticIntensity = 'light' | 'medium' | 'heavy'
+
+const HAPTIC_STYLE: Record<HapticIntensity, Haptics.ImpactFeedbackStyle> = {
+  light: Haptics.ImpactFeedbackStyle.Light,
+  medium: Haptics.ImpactFeedbackStyle.Medium,
+  heavy: Haptics.ImpactFeedbackStyle.Heavy,
+}
 
 type Props = {
   label: string
@@ -9,6 +18,7 @@ type Props = {
   variant?: 'primary' | 'secondary'
   accessibilityLabel?: string
   testID?: string
+  haptic?: HapticIntensity
 }
 
 export function AuthButton({
@@ -19,13 +29,21 @@ export function AuthButton({
   variant = 'primary',
   accessibilityLabel,
   testID,
+  haptic,
 }: Props) {
   const isPrimary = variant === 'primary'
   const isDisabled = disabled || loading
 
+  function handlePress() {
+    if (haptic) {
+      Haptics.impactAsync(HAPTIC_STYLE[haptic]).catch(() => {})
+    }
+    onPress()
+  }
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={isDisabled}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}

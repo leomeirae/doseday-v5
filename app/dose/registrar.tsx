@@ -243,6 +243,7 @@ export default function RegistrarDoseScreen() {
             onPress={handleSubmit}
             loading={isPending}
             disabled={!hasMedication || isPending}
+            haptic="medium"
           />
         </View>
       </KeyboardAvoidingView>
