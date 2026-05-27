@@ -5,6 +5,11 @@ export type RecentSymptom = {
   date: Date
 }
 
+export type SymptomRecord = RecentSymptom & {
+  id: string
+  notes: string | null
+}
+
 export type FrequentSymptom = {
   type: string
   count: number
@@ -54,6 +59,24 @@ export async function getRecentSymptom(userId: string): Promise<RecentSymptom | 
     type: data.symptom_type,
     date: fromDateOnly(data.symptom_date),
   }
+}
+
+export async function getSymptoms(userId: string): Promise<SymptomRecord[]> {
+  const { data, error } = await supabase
+    .from('symptom_logs')
+    .select('id, symptom_type, symptom_date, notes')
+    .eq('user_id', userId)
+    .order('symptom_date', { ascending: false })
+    .limit(50)
+
+  if (error) throw error
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    type: row.symptom_type,
+    date: fromDateOnly(row.symptom_date),
+    notes: row.notes,
+  }))
 }
 
 function fromDateOnly(value: string): Date {

@@ -17,6 +17,12 @@ export type QuickLogRecord = {
   loggedAt: Date
 }
 
+export type MemoryNoteRecord = {
+  id: string
+  notes: string
+  loggedAt: Date
+}
+
 export type CheckinRecord = {
   id: string
   date: string
@@ -87,6 +93,29 @@ export async function getDiarioSummary(userId: string): Promise<DiarioSummary> {
     recentQuickLogs: (qlRes.data ?? []).map(mapQuickLogRow),
     recentCheckins: (ckRes.data ?? []).map(mapCheckinRow),
   }
+}
+
+export async function getMemoryNotes(userId: string): Promise<MemoryNoteRecord[]> {
+  const { data, error } = await supabase
+    .from('quick_logs')
+    .select('id, notes, logged_at')
+    .eq('user_id', userId)
+    .eq('log_type', 'other')
+    .not('notes', 'is', null)
+    .order('logged_at', { ascending: false })
+    .limit(50)
+
+  if (error) throw error
+
+  return (data ?? []).flatMap((row) => {
+    const notes = row.notes?.trim()
+    if (!notes) return []
+    return [{
+      id: row.id,
+      notes,
+      loggedAt: new Date(row.logged_at),
+    }]
+  })
 }
 
 export async function registerQuickLog(
