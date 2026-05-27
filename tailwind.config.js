@@ -1,0 +1,86 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  presets: [require('nativewind/preset')],
+  content: [
+    './app/**/*.{js,jsx,ts,tsx}',
+    './components/**/*.{js,jsx,ts,tsx}',
+    './contexts/**/*.{js,jsx,ts,tsx}',
+    './hooks/**/*.{js,jsx,ts,tsx}',
+    './lib/**/*.{js,jsx,ts,tsx}',
+  ],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+        'bg-base': '#050B12',
+        'bg-elevated': '#0E1620',
+        'bg-surface': '#1B2433',
+        'text-primary': '#F2F4F7',
+        'text-secondary': '#9CA8B8',
+        'text-tertiary': '#6B7280',
+        'text-inverse': '#050B12',
+        'text-brand': '#00D4AA',
+        'doseday-mint': '#00D4AA',
+        'doseday-mint-dim': '#00B894',
+        'mint-soft': '#A3E6D2',
+        positive: '#00D4AA',
+        warning: '#FFB347',
+        critical: '#E64545',
+        info: '#5BA8D9',
+      },
+      spacing: {
+        xxs: '4px',
+        xs: '8px',
+        sm: '12px',
+        md: '16px',
+        lg: '24px',
+        xl: '32px',
+        xxl: '48px',
+        xxxl: '64px',
+      },
+      borderRadius: {
+        DEFAULT: 'var(--radius)',
+        '2xl': 'var(--radius)',
+        xl: 'calc(var(--radius) - 2px)',
+        lg: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 8px)',
+        xs: '6px',
+        sm: '10px',
+      },
+    },
+  },
+  plugins: [require('tailwindcss-animate')],
+}

@@ -371,3 +371,15 @@ Registrado em 2026-05-27 após sessão Cowork + testes no simulador.
 **Solução.** Pivot documentado em ADR 0007: adotar NativeWind v4 + react-native-reusables. Regras #3 e #4 do `CLAUDE.md` reescritas. Migração progressiva — componentes legados continuam funcionando.
 
 **Princípio.** Regras de stack visual devem ser revisadas quando o produto muda de forma (remoção da tab bar, mudança de ritmo de iteração). Uma regra que bloqueia velocidade sem entregar diferencial visual perceptível é custo sem benefício. Revisar regras anti-pirraça a cada 10-15 prompts implementados ou quando o PO testar o app e identificar gap visual.
+
+## 14.28 Aprendizado 60 — NativeWind Resources aponta para Reusables como caminho controlável, não identidade pronta
+
+Registrado em 2026-05-27 durante o Prompt 41 (setup NativeWind + React Native Reusables).
+
+**Contexto.** O PO trouxe a página NativeWind Resources como referência para acelerar a camada visual do DoseDay. A página expõe caminhos diferentes: NativewindUI, React Native Reusables e gluestack. Para o DoseDay, o objetivo não é importar uma estética pronta, mas ganhar velocidade sem perder o tom clínico e factual da V5.
+
+**Achado.** React Native Reusables é o melhor primeiro alvo porque funciona como base copy-paste adaptável: componentes pequenos, auditáveis e compatíveis com NativeWind v4. NativewindUI e gluestack continuam úteis como referência, mas têm maior risco de trazer identidade visual externa ou superfície arquitetural maior que o necessário neste momento.
+
+**Solução.** Prompt 41 instalou a fundação técnica com NativeWind v4, Tailwind CSS v3, tokens DoseDay no `tailwind.config.js`, `components.json`, `Button` e `Text` do Reusables, além de `PortalHost` no root layout. O smoke test validou `className` e componentes Reusables no simulador antes de remover a rota temporária.
+
+**Princípio.** Recursos visuais externos devem entrar primeiro como infraestrutura e primitives controláveis. Só depois de validar a base técnica o time deve migrar telas reais, sempre adaptando tokens, copy e densidade visual ao produto clínico em vez de aceitar defaults de biblioteca.
