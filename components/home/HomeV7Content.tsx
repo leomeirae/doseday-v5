@@ -49,7 +49,8 @@ export function HomeV7Content() {
   const doseQuery = useDoseSummary()
   const diarioQuery = useDiarioSummary()
   const profileQuery = useProfile()
-  const { data: purchaseSummary } = usePurchaseSummary()
+  const purchaseQuery = usePurchaseSummary()
+  const purchaseSummary = purchaseQuery.data
   const weightQuery = useWeightLogs()
   const symptomQuery = useSymptomMemory()
   const { data: consultationNotes } = useConsultationNotes()
@@ -89,6 +90,7 @@ export function HomeV7Content() {
         void weightQuery.refetch()
       }}
       onPressAdd={() => router.push('/diario/anotar-memoria' as Href)}
+      onPressBody={() => router.push('/memoria' as Href)}
     />
   )
   const observationSection = (
@@ -150,15 +152,15 @@ export function HomeV7Content() {
           </>
         )}
 
-        {purchaseSummary && purchaseSummary.count > 0 && (
-          <>
-            <Divider />
-            <ExpensesSection
-              total={purchaseSummary.total}
-              onPressAdd={() => router.push('/diario/anotar-custo' as Href)}
-            />
-          </>
-        )}
+        <Divider />
+        <ExpensesSection
+          total={purchaseSummary?.total ?? 0}
+          isLoading={purchaseQuery.isLoading}
+          error={purchaseQuery.error ? mapQueryError(purchaseQuery.error) : null}
+          onRetry={() => void purchaseQuery.refetch()}
+          onPressAdd={() => router.push('/diario/anotar-custo' as Href)}
+          onPressBody={() => router.push('/diario/custos' as Href)}
+        />
 
         <Disclaimer />
       </ScrollView>
@@ -166,10 +168,37 @@ export function HomeV7Content() {
   )
 }
 
+function PanelChevron() {
+  return (
+    <SymbolView
+      name="chevron.right"
+      size={14}
+      tintColor={colors.textTertiary}
+    />
+  )
+}
+
 function HeaderMemory() {
+  const router = useRouter()
   return (
     <View style={styles.header}>
-      <Text style={styles.title}>Seu tratamento está organizado até aqui.</Text>
+      <View style={styles.headerTopRow}>
+        <Text style={styles.title}>Seu tratamento está organizado até aqui.</Text>
+        <Pressable
+          onPress={() => router.push('/configuracoes')}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir configurações"
+          accessibilityHint="Abre conta, tratamento, lembretes, dados, privacidade e suporte."
+          hitSlop={10}
+          style={({ pressed }) => [styles.settingsButton, pressed && styles.settingsButtonPressed]}
+        >
+          <SymbolView
+            name="gearshape"
+            size={20}
+            tintColor={colors.textSecondary}
+          />
+        </Pressable>
+      </View>
       <Text style={styles.date}>{formatCurrentDate()}</Text>
     </View>
   )
@@ -254,13 +283,16 @@ function NextDoseSection({
         <Pressable
           onPress={onPressBody}
           accessibilityRole="button"
-          accessibilityLabel="Editar protocolo de dose"
-          accessibilityHint="Abre as configurações do tratamento."
-          style={({ pressed }) => [styles.sectionBody, pressed && styles.sectionBodyPressed]}
+          accessibilityLabel="Ver histórico de doses"
+          accessibilityHint="Abre o histórico completo de doses."
+          style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
         >
-          <Text style={styles.sectionValue}>{capitalize(value)}</Text>
-          <Text style={styles.helper}>{capitalize(helper)}</Text>
-          {medicationDetail && <Text style={styles.protocolDetail}>{medicationDetail}</Text>}
+          <View style={styles.sectionBodyContent}>
+            <Text style={styles.sectionValue}>{capitalize(value)}</Text>
+            <Text style={styles.helper}>{capitalize(helper)}</Text>
+            {medicationDetail && <Text style={styles.protocolDetail}>{medicationDetail}</Text>}
+          </View>
+          <PanelChevron />
         </Pressable>
       )}
     </View>
@@ -312,13 +344,16 @@ function WeightSection({
           accessibilityRole="button"
           accessibilityLabel="Ver histórico de peso"
           accessibilityHint="Abre o histórico completo de peso."
-          style={({ pressed }) => [styles.sectionBody, pressed && styles.sectionBodyPressed]}
+          style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
         >
-          <View style={styles.weightValueRow}>
-            <Text style={styles.weightValue}>{formatNumber(currentWeight)}</Text>
-            <Text style={styles.weightUnit}>kg</Text>
+          <View style={styles.sectionBodyContent}>
+            <View style={styles.weightValueRow}>
+              <Text style={styles.weightValue}>{formatNumber(currentWeight)}</Text>
+              <Text style={styles.weightUnit}>kg</Text>
+            </View>
+            <WeightSparkline logs={logs} />
           </View>
-          <WeightSparkline logs={logs} />
+          <PanelChevron />
         </Pressable>
       ) : (
         <Text style={styles.emptyText}>Nenhum peso registrado ainda.</Text>
@@ -356,12 +391,14 @@ function RecentMemoryTimeline({
   error,
   onRetry,
   onPressAdd,
+  onPressBody,
 }: {
   items: TimelineItem[]
   isLoading: boolean
   error: string | null
   onRetry: () => void
   onPressAdd: () => void
+  onPressBody: () => void
 }) {
   const isEmpty = !isLoading && !error && items.length === 0
 
@@ -370,7 +407,7 @@ function RecentMemoryTimeline({
       <Divider />
       <View>
         <SectionHeaderRow
-          label="Notas recentes"
+          label="Memória recente"
           onPressAdd={onPressAdd}
           addLabel="Anotar nota"
         />
@@ -379,25 +416,38 @@ function RecentMemoryTimeline({
             isLoading={isLoading}
             error={error}
             onRetry={onRetry}
-            loadingLabel="Carregando notas recentes."
+            loadingLabel="Carregando memória recente."
           />
-        ) : isEmpty ? (
-          <Text style={styles.emptyText}>Nenhuma nota registrada ainda.</Text>
         ) : (
-          <View style={styles.timeline}>
-            {items.map((item, index) => (
-              <View key={item.id} style={styles.timelineItem}>
-                <View style={styles.timelineMarkerColumn}>
-                  <View style={[styles.timelineDot, index > 0 && styles.timelineDotMuted]} />
-                  {index < items.length - 1 && <View style={styles.timelineStem} />}
+          <Pressable
+            onPress={onPressBody}
+            accessibilityRole="button"
+            accessibilityLabel="Ver diário completo"
+            accessibilityHint="Abre o histórico completo do diário."
+            style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+          >
+            <View style={styles.sectionBodyContent}>
+              {isEmpty ? (
+                <Text style={styles.emptyText}>Sua memória recente vai aparecer aqui.</Text>
+              ) : (
+                <View style={styles.timeline}>
+                  {items.map((item, index) => (
+                    <View key={item.id} style={styles.timelineItem}>
+                      <View style={styles.timelineMarkerColumn}>
+                        <View style={[styles.timelineDot, index > 0 && styles.timelineDotMuted]} />
+                        {index < items.length - 1 && <View style={styles.timelineStem} />}
+                      </View>
+                      <View style={styles.timelineContent}>
+                        <Text style={styles.timelineDate}>{formatRelativeDay(item.date)}</Text>
+                        <Text style={styles.timelineText}>{item.title}</Text>
+                      </View>
+                    </View>
+                  ))}
                 </View>
-                <View style={styles.timelineContent}>
-                  <Text style={styles.timelineDate}>{formatRelativeDay(item.date)}</Text>
-                  <Text style={styles.timelineText}>{item.title}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
+              )}
+            </View>
+            <PanelChevron />
+          </Pressable>
         )}
       </View>
     </>
@@ -538,10 +588,18 @@ function Disclaimer() {
 
 function ExpensesSection({
   total,
+  isLoading,
+  error,
+  onRetry,
   onPressAdd,
+  onPressBody,
 }: {
   total: number
+  isLoading: boolean
+  error: string | null
+  onRetry: () => void
   onPressAdd: () => void
+  onPressBody: () => void
 }) {
   return (
     <View style={styles.expenses}>
@@ -550,7 +608,31 @@ function ExpensesSection({
         onPressAdd={onPressAdd}
         addLabel="Anotar custo"
       />
-      <Text style={styles.expenseText}>{formatCurrency(total)} registrados no tratamento.</Text>
+      {isLoading || error ? (
+        <SectionReadState
+          isLoading={isLoading}
+          error={error}
+          onRetry={onRetry}
+          loadingLabel="Carregando custos registrados."
+        />
+      ) : (
+        <Pressable
+          onPress={onPressBody}
+          accessibilityRole="button"
+          accessibilityLabel="Ver custos do tratamento"
+          accessibilityHint="Abre a lista completa de custos."
+          style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+        >
+          <View style={styles.sectionBodyContent}>
+            <Text style={styles.expenseText}>
+              {total === 0
+                ? 'Nenhum custo registrado ainda.'
+                : `${formatCurrency(total)} registrados no tratamento.`}
+            </Text>
+          </View>
+          <PanelChevron />
+        </Pressable>
+      )}
     </View>
   )
 }
@@ -702,9 +784,26 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 28,
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  settingsButton: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    width: 44,
+    marginTop: -4,
+  },
+  settingsButtonPressed: {
+    opacity: 0.7,
+  },
   title: {
     ...typography.displayUltralight,
     color: colors.textPrimary,
+    flex: 1,
     letterSpacing: 0,
     marginBottom: spacing.sm,
   },
@@ -743,6 +842,16 @@ const styles = StyleSheet.create({
   },
   sectionBody: {
     paddingBottom: spacing.xs,
+  },
+  sectionBodyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    paddingBottom: spacing.xs,
+  },
+  sectionBodyContent: {
+    flex: 1,
   },
   sectionBodyPressed: {
     opacity: 0.7,
