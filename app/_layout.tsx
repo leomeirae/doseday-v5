@@ -1,7 +1,9 @@
+import '../global.css'
 import '../lib/i18n'
 import { useEffect, useState } from 'react'
 import { Stack, useRouter, useSegments, useRootNavigationState, type Href } from 'expo-router'
 import { QueryClientProvider } from '@tanstack/react-query'
+import { PortalHost } from '@rn-primitives/portal'
 import { queryClient } from '@lib/queryClient'
 import { StatusBar } from 'expo-status-bar'
 import Toast from 'react-native-toast-message'
@@ -229,6 +231,7 @@ export default function RootLayout() {
           </AuthGuard>
         </AuthProvider>
       </QueryClientProvider>
+      <PortalHost />
       <Toast config={toastConfig} />
     </GestureHandlerRootView>
   )

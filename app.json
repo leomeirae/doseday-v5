@@ -47,6 +47,9 @@
       }
     },
     "runtimeVersion": "5.0.0",
+    "web": {
+      "bundler": "metro"
+    },
     "android": {
       "package": "com.doseday.premium"
     }
