@@ -1,7 +1,7 @@
 # CLAUDE.md — Working Memory do DoseDay V5
 
-**Última atualização:** 15 de maio de 2026
-**Status do projeto:** Prompt 02 concluído. PRODUCT.md v1.0 + DESIGN.md finalizados. Aguardando Prompt 03.
+**Última atualização:** 27 de maio de 2026
+**Status do projeto:** Prompt 42a concluído. Telas órfãs funcionais recuperadas do stash e entrypoints integrados. PR #84 aberto. Aguardando Prompt 42b.
 
 ---
 
