@@ -63,3 +63,4 @@ graphify-out/
 
 # Impeccable critique reports (gerados localmente, não comitados)
 .impeccable/critique/
+.codegraph/

@@ -50,7 +50,7 @@ Léo optou por finalizar primeiro a etapa do PR #75 (Pivot Home Sheets, mergeado
 | 12b | Sub-tela Sobre | `app/configuracoes/suporte/sobre.tsx` | ~60 |
 | 13 | Modificar `(tabs)/perfil.tsx` → botão "Abrir Configurações" | edit | ~30 |
 | 14 | Adicionar 10 `<Stack.Screen>` em `app/_layout.tsx` | edit | ~50 |
-| 15 | Atualizar `SETTINGS_DESIGN_DIRECTION.md` §8 §9 + criar `docs/adr/0007-settings-hub-implementation.md` + 3 entradas em `CONTEXT.md` (via grill-with-docs) | edits | ~80 |
+| 15 | Atualizar `SETTINGS_DESIGN_DIRECTION.md` §8 §9 + criar `docs/adr/0008-settings-hub-implementation.md` + 3 entradas em `CONTEXT.md` (via grill-with-docs) | edits | ~80 |
 | 16 | `docs/history.md` entry Prompt 38 | edit | ~5 |
 | 17 | type-check + lint | gates | 3min |
 | 18 | 10 screenshots em `assets/screenshots/settings-hub/` | capture | 30min |

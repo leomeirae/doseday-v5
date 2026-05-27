@@ -383,3 +383,14 @@ Registrado em 2026-05-27 durante o Prompt 41 (setup NativeWind + React Native Re
 **Solução.** Prompt 41 instalou a fundação técnica com NativeWind v4, Tailwind CSS v3, tokens DoseDay no `tailwind.config.js`, `components.json`, `Button` e `Text` do Reusables, além de `PortalHost` no root layout. O smoke test validou `className` e componentes Reusables no simulador antes de remover a rota temporária.
 
 **Princípio.** Recursos visuais externos devem entrar primeiro como infraestrutura e primitives controláveis. Só depois de validar a base técnica o time deve migrar telas reais, sempre adaptando tokens, copy e densidade visual ao produto clínico em vez de aceitar defaults de biblioteca.
+## 14.30 Aprendizado 62 — Exportação LGPD não deve cortar histórico retido
+
+Registrado em 2026-05-26 durante o PR Settings Hub.
+
+**Contexto.** O plano inicial considerava limitar o JSON de exportação a 12 meses para reduzir tamanho de arquivo em contas antigas. Durante a revisão LGPD, isso entrou em conflito com o próprio objetivo do recurso: se o produto ainda retém linhas mais antigas, o pacote de portabilidade não deve omiti-las.
+
+**Solução.** `useExportUserData` exporta todas as linhas armazenadas do usuário autenticado e pagina coleções por `id` com `range()`. O JSON declara `export_scope: 'all_stored_rows'`, deixando explícito que o escopo é integral, não temporal.
+
+**Validação.** A exportação real abriu a share sheet no iPhone 17 simulator com um JSON de 34 KB. RLS foi validada sem sessão (0 linhas anônimas) e com a conta `teste-22-maio@teste.com` (0 linhas de outros usuários) para as 19 tabelas exportadas.
+
+**Princípio.** Otimização de tamanho não pode reduzir direito LGPD sem decisão explícita de retenção. Primeiro garanta isolamento e paginação; só depois discuta política de retenção ou export assíncrono para contas muito grandes.
