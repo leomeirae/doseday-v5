@@ -359,3 +359,15 @@ Registrado em 2026-05-23 durante a Frente 1 P0 IA/compliance.
 3. `prod runtime`: deployado ou ainda pendente.
 
 **Bônus de validação.** Snapshots recuperados de produção em `docs/handoff/edge-functions-snapshot-*` são evidência histórica, não código compilável do app. Excluir esses snapshots de `tsconfig`/ESLint evita que validações locais quebrem por imports Deno remotos antigos sem alterar o registro histórico.
+
+## 14.27 Aprendizado 59 — Regra anti-Tailwind mantida por meses sem questionamento; resultado visual não entregou o esperado
+
+Registrado em 2026-05-27 após sessão Cowork + testes no simulador.
+
+**Contexto.** A regra anti-pirraça #4 do `CLAUDE.md` bloqueava explicitamente NativeWind/Tailwind desde o início da V5 com a justificativa de que "V5 é StyleSheet nativo". A intenção era garantir consistência com Liquid Glass como pilar visual. A regra nunca foi questionada — foi copiada automaticamente em planejamentos, prompts e revisões por meses.
+
+**Achado.** Após testes reais no app, o PO identificou que o resultado visual não estava entregando "moderno + intuitivo". A hipótese é que StyleSheet nativo, sem um sistema de design utilitário, gera lentidão de iteração — cada ajuste de spacing/cor/radius exige modificar objetos de estilo separados sem co-locação. Ao mesmo tempo, a tab bar (principal ponto de Liquid Glass no app) foi removida para dar lugar a navegação via Dashboard cards, esvaziando o argumento "Liquid Glass como pilar".
+
+**Solução.** Pivot documentado em ADR 0007: adotar NativeWind v4 + react-native-reusables. Regras #3 e #4 do `CLAUDE.md` reescritas. Migração progressiva — componentes legados continuam funcionando.
+
+**Princípio.** Regras de stack visual devem ser revisadas quando o produto muda de forma (remoção da tab bar, mudança de ritmo de iteração). Uma regra que bloqueia velocidade sem entregar diferencial visual perceptível é custo sem benefício. Revisar regras anti-pirraça a cada 10-15 prompts implementados ou quando o PO testar o app e identificar gap visual.

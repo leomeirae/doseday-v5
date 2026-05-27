@@ -5,6 +5,9 @@ colors:
   bg-base: "#050B12"
   bg-elevated: "#0E1620"
   bg-surface: "#1B2433"
+  overlay-ink-deep: "rgba(5,11,18,0.36)"
+  border-subtle: "rgba(255,255,255,0.08)"
+  border-faint: "rgba(255,255,255,0.06)"
   brand: "#00D4AA"
   brand-dim: "#00B894"
   mint-soft: "#A3E6D2"
@@ -13,6 +16,7 @@ colors:
   semantic-critical: "#E64545"
   semantic-info: "#5BA8D9"
   semantic-muted: "#5C6878"
+  destructive: "#FF453A"
   text-primary: "#F2F4F7"
   text-secondary: "#9CA8B8"
   text-tertiary: "#6B7280"
@@ -136,7 +140,7 @@ components:
     typography: "{typography.label}"
     padding: "16px 24px"
   button-destructive:
-    backgroundColor: "{colors.semantic-critical}"
+    backgroundColor: "{colors.destructive}"
     textColor: "{colors.text-primary}"
     rounded: "{rounded.md}"
     typography: "{typography.label}"
@@ -155,6 +159,8 @@ components:
     typography: "{typography.body}"
     padding: "12px 16px"
 ---
+
+> **Stack visual desde 2026-05-27:** NativeWind v4 + react-native-reusables (ver [ADR 0007](adr/0007-pivot-stack-visual-nativewind-reusables.md)). Os tokens base documentados abaixo continuam válidos — são a fonte canônica para `tailwind.config.js`. Componentes migram progressivamente. **Liquid Glass é agora opcional, não pilar arquitetural.** Seções que descrevem glass como pilar são contexto histórico.
 
 # Design System: DoseDay V5
 
@@ -196,6 +202,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 
 - **Alert Red** (`#E64545`): Emergência clínica real. Sintoma severo (7+/10), erro grave no dado, alerta que requer ação imediata. Reservado — uso frequente quebra confiança.
 
+- **Destructive Red** (`#FF453A`): Ação irreversível. Exclusivo para excluir conta, excluir dados, encerrar sessão crítica ou outra ação destrutiva confirmada. Não substitui Alert Red para erro comum.
+
 - **Clinical Blue** (`#5BA8D9`): Informação neutra de referência. Marcadores de dose no gráfico, dado de contexto ("média da população"), informação de período. Sem conotação positiva ou negativa.
 
 - **Muted Slate** (`#5C6878`): Estado desativado, item secundário, metadado que não requer atenção. Texto de placeholder, label de campo inativo.
@@ -216,6 +224,26 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 
 - **Inverse Text** (`#050B12`): Texto sobre fundo Vital Mint (botão primário). Único uso de texto escuro.
 
+### Graphite Clinical Home Layer
+
+A Home usa uma camada graphite ligeiramente mais clara que o Clinical Midnight original para resolver legibilidade e affordance sem abandonar dark mode. Essa camada é local da Home até ser validada em device real.
+
+- **Graphite Base** (`#08111B`): fundo da Home. Mais claro que `bg-base`, ainda clínico e noturno.
+- **Graphite Panel** (`#121D2A`): blocos secundários acionáveis, como Peso, Notas, Sintomas e Custos.
+- **Graphite Panel Strong** (`#172637`): card principal da próxima dose.
+- **Graphite Pressed** (`#1C2D40`): feedback de toque em cards.
+- **Graphite Border** (`rgba(171, 187, 207, 0.18)`): borda discreta para separar superfície sem parecer decoração.
+
+**Named Rule: The Graphite Clinical Rule.** Quando uma tela clínica em dark mode parecer preta demais ou pouco intuitiva, primeiro ajuste separação tonal, borda e affordance local. Não clarear `bg-base` global sem validar o blast radius em Settings, forms, onboarding e charts.
+
+Graphite cards podem ter profundidade 2.5D discreta: sombra iOS suave, borda superior iluminada, controles circulares embutidos e badges com superfície própria. Isso cria materialidade sem usar glass em conteúdo. Evitar sombras dramáticas, neon ou mockup 3D decorativo dentro do produto.
+
+**Named Rule: The One Action Home Rule.** A Home é superfície de resumo. Cada card deve ter uma ação principal: abrir a área completa daquele domínio. Não duplicar `adicionar` + `ver histórico` no mesmo bloco. A tela de destino deve reunir histórico e inserção de novo registro. Exceção: uma ação urgente de dose pode aparecer apenas se não houver outra forma clara de completar o estado vazio.
+
+**Named Rule: The Consolidated Memory Rule.** `Memória recente` é um feed automático dos últimos acontecimentos relevantes do tratamento: dose, peso, sintoma, nota livre, custo, check-in e mudança de protocolo quando aplicável. A Home mostra apenas os últimos eventos para orientação rápida; o histórico completo pertence à área de memória.
+
+**Naming Rule: Memory Without Medical Ownership.** Evitar `Notas clínicas` para conteúdo preenchido pela paciente, porque sugere responsabilidade médica. Usar `Memória recente` para timeline mista, `Notas sobre o tratamento` para texto livre da paciente e `Sintomas` quando o dado for sintoma.
+
 ### Clinical Data (gráficos e visualizações)
 
 - **Weight Line** (`#00D4AA`): Linha de peso no gráfico — coincide com brand para reforçar que progresso de peso é dado principal.
@@ -233,6 +261,8 @@ Três backgrounds progressivamente mais claros criam hierarquia sem sombra. Uma 
 **The 30% Glass Rule.** Glass aplica em no máximo 30% da área visível de qualquer tela. Nenhuma área de conteúdo toca glass. Se um card, lista, texto ou gráfico estiver sobre glass, está errado. Glass é camada de navegação, não padrão de card.
 
 **The Semantic Integrity Rule.** Cor semântica (positivo, warning, critical, info) não é reutilizada para fins decorativos. Alert Red em um badge de marketing é um bug, não uma escolha de design.
+
+**The Destructive Action Rule.** `colors.destructive` (`#FF453A`) é reservado exclusivamente para ações irreversíveis, como excluir conta, excluir dados ou encerrar uma sessão crítica. Não usar para erros não-destrutivos, validação de campo, alerta clínico ou estado negativo comum.
 
 ---
 
@@ -325,7 +355,7 @@ Tactile e confident. Raio `md` (14px) — nem arredondado demais (wellness app),
 - **Primary-Glass:** Liquid Glass nativo + tint Vital Mint 8%. Exclusivo de paywall CTA e splash. Nunca em tela de conteúdo.
 - **Secondary:** Border 1px `brand`, background transparente, texto `brand`. Ação alternativa na mesma tela que o primary.
 - **Ghost:** Background transparente, texto `brand`, sem border. Links inline ("Ver histórico completo"), ações terciárias.
-- **Destructive:** Background `semantic-critical` (#E64545), texto `text-primary`. Apenas em ações irreversíveis: cancelar assinatura, deletar dados. Nunca como CTA padrão.
+- **Destructive:** Background `destructive` (#FF453A), texto `text-primary`. Apenas em ações irreversíveis: cancelar assinatura, deletar dados. Nunca como CTA padrão.
 - **Disabled:** Background `bg-surface`, texto `text-disabled` (opacity 0.30), não responde a tap. Nunca finge ser interativo.
 - **Loading state:** Spinner inline, label contextual ("Salvando dose...", "Gerando relatório..."). Nunca "Loading...".
 

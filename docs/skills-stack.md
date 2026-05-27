@@ -15,7 +15,7 @@ O Claude Code do Léo tem **43 skills** instaladas. Este documento define **quan
 | **superpowers** | 13 | Workflow (brainstorm, plans, TDD, debug, code review, parallel agents, git worktrees) |
 | **impeccable** | 1 | Fonte primária de design (UI/UX) |
 | **antigravity-bundle-expo-react-native** | 7 | Stack mobile (RN/Expo, EAS, ASO, CI/CD) |
-| **liquid-glass** | 1 | Reforço da regra de glass na navegação |
+| **liquid-glass** | 1 | Glass opcional em navegação (ADR 0007 — não é mais pilar) |
 | **feature-dev** | 1 | Desenvolvimento guiado de feature ponta-a-ponta |
 | **mattpocock/skills** | 4 | Alinhamento (`grill-me`, `grill-with-docs`), continuidade (`handoff`), arquitetura (`improve-codebase-architecture`) |
 | **standalone** | 16 | UI/UX backup (ui-ux-pro-max), Supabase, Claude API, code review, utilitários |
@@ -27,7 +27,7 @@ O Claude Code do Léo tem **43 skills** instaladas. Este documento define **quan
 | Decisão | Skill primária | Skill de consulta |
 |---|---|---|
 | **Design de tela do zero** | `impeccable:impeccable` (lê PRODUCT.md + DESIGN.md) | `ui-ux-pro-max` apenas se precisar consultar palette/type/chart específico |
-| **Apple HIG iOS 26 / Liquid Glass** | `liquid-glass:liquid-glass` | `impeccable:impeccable` aplica a regra ao componente |
+| **Apple HIG iOS 26 / Liquid Glass** (opcional) | `liquid-glass:liquid-glass` — só se glass agregar ao contexto | `impeccable:impeccable` aplica a regra ao componente |
 | **Animations React Native** | `react-native-best-practices` (New Architecture, Reanimated) | — |
 | **Stack Expo + deploy** | `antigravity-bundle-expo-react-native:*` | `expo` oficial se faltar algo |
 | **Planejamento de feature** | `feature-dev:feature-dev` OR `superpowers:writing-plans` | `superpowers:brainstorming` antes |
@@ -74,7 +74,7 @@ O Claude Code do Léo tem **43 skills** instaladas. Este documento define **quan
 | Tela nova (UI from scratch) | `/impeccable craft` |
 | Tela com fluxos complexos | `/impeccable shape` antes do `craft` |
 | Onboarding / empty state / first-run | `/impeccable onboard` |
-| Tab bar / toolbar / navegação | `liquid-glass:liquid-glass` aplicado, depois `/impeccable craft` |
+| Navegação / Dashboard cards | Tab bar removida (ADR 0007). Navegação via `router.push()` em cards. `liquid-glass` opcional se houver toolbar/header com glass. |
 | Componentes Expo específicos | `antigravity-bundle-expo-react-native:react-native-architecture` |
 | Rotas de API (se usar Expo API Routes) | `antigravity-bundle-expo-react-native:expo-api-routes` |
 | Animation pesada / 120fps / Skia | `react-native-best-practices` |
@@ -144,9 +144,9 @@ Quando o Claude Code receber um prompt, ele deve consultar essa tabela pra escol
 
 | Tipo de tarefa | Skill primária | Skills auxiliares |
 |---|---|---|
-| **Nova tela visual** | `/impeccable craft` | `react-native-best-practices`, `liquid-glass` se tiver navegação |
+| **Nova tela visual** | `/impeccable craft` | `react-native-best-practices`, `expo-tailwind-setup` (NativeWind), `liquid-glass` se tiver glass em navegação |
 | **Refazer uma tela** | `/impeccable distill` ou `bolder`/`quieter` | dependendo do diagnóstico |
-| **Botão / componente único** | `/impeccable craft` | `liquid-glass` se for botão de navegação |
+| **Botão / componente único** | `/impeccable craft` | `liquid-glass` se for botão de navegação com glass (opcional) |
 | **Fluxo de onboarding** | `/impeccable onboard` | `feature-dev` se for grande |
 | **Empty state** | `/impeccable onboard` | — |
 | **Error state** | `/impeccable harden` | — |
@@ -230,27 +230,21 @@ Quando o Claude Code receber um prompt, ele deve consultar essa tabela pra escol
 | `expo-deployment` | Deploy production pra App Store |
 | `expo-dev-client` | Build local ou TestFlight |
 | `expo-api-routes` | Se decidir usar Expo Router API Routes em vez de Supabase Edge Functions |
-| `expo-tailwind-setup` | ⚠️ NÃO USAR. V5 usa StyleSheet nativo + Liquid Glass, não Tailwind/NativeWind |
+| `expo-tailwind-setup` | ✅ USAR para setup NativeWind v4 + react-native-reusables (ADR 0007, pivot 2026-05-27) |
 | `expo-cicd-workflows` | Setup do EAS workflow YAML |
 | `app-store-optimization` | ASO, keywords, screenshots, listing |
 
 **Princípio:** stack mobile é orquestrado por essas skills. Para deploy/CI/ASO, são fonte única.
 
-### 5.4 liquid-glass (1 skill — design system iOS 26+)
+### 5.4 liquid-glass (1 skill — glass opcional iOS 26+)
 
-**Gatilho:** qualquer trabalho com `.glassEffect()`, `.buttonStyle(.glass)`, `GlassEffectContainer`, toolbars, tab bars, sheets.
+> **ADR 0007 (2026-05-27):** Liquid Glass não é mais pilar arquitetural. Tab bar foi removida. Glass é **opcional** — use quando agregar ao UX de navegação.
 
-**Regra central (vinculada ao DESIGN.md):**
+**Gatilho:** trabalho com `.glassEffect()`, `.buttonStyle(.glass)`, `GlassEffectContainer`, toolbars, headers com glass.
 
-> **Glass é exclusivo da camada de navegação.** Tab bars, toolbars, botões de navegação, controles. **NUNCA** aplique glass a:
->
-> - Conteúdo de listas
-> - Tabelas
-> - Texto corrido
-> - Cards de dados clínicos
-> - Áreas de relatório
+**Regra mantida:** Glass não vai em conteúdo (listas, tabelas, texto corrido, cards de dados clínicos, relatórios). Essa restrição continua válida — não é sobre frequência, é sobre onde glass pode aparecer.
 
-Isso reforça a "regra dos 30%" do plano estratégico. Em V5, glass aparece em: tab bar, header de navegação, botões CTA, paywall, splash. **Não aparece em:** cards de check-in, lista de doses, gráfico de peso, relatório clínico.
+Quando glass aparecer (ex: header de modal, toolbar), ele aparece em: header de navegação, botões CTA em paywall, splash. **Não aparece em:** cards de check-in, lista de doses, gráfico de peso, relatório clínico.
 
 ### 5.5 ui-ux-pro-max — uso disciplinado (NÃO é fonte primária)
 
@@ -456,7 +450,7 @@ Não é skill, mas afeta como TODAS as skills operam. Hook `PreToolUse` interpre
 3. superpowers:writing-plans          (plano com checkpoints)
 4. /impeccable craft                  (código sai aqui)
 5. react-native-best-practices        (aplicado durante o craft)
-6. liquid-glass:liquid-glass          (se a tela tiver tab bar ou toolbar)
+6. liquid-glass:liquid-glass          (opcional — se a tela tiver glass em header/toolbar; tab bar foi removida)
 7. /impeccable critique               (review antes de marcar como pronto)
 8. /impeccable polish                 (última passada)
 9. review                             (estrutural)
@@ -508,8 +502,8 @@ Não é skill, mas afeta como TODAS as skills operam. Hook `PreToolUse` interpre
 |---|---|
 | Rodar `impeccable` e `ui-ux-pro-max` ao mesmo tempo gerando UI | Conflito de vocabulário, output Frankenstein |
 | Pular `/impeccable critique` antes de marcar como pronto | Perde a checagem de design system |
-| Aplicar glass em conteúdo (lista, texto, card de dado) | Quebra a regra central do liquid-glass e da V5 |
-| Usar `expo-tailwind-setup` | V5 não usa Tailwind/NativeWind. StyleSheet nativo + Liquid Glass |
+| Aplicar glass em conteúdo (lista, texto, card de dado) | Quebra a regra central — glass só em navegação/header/paywall |
+| Usar `expo-tailwind-setup` sem ler ADR 0007 | Setup requer configuração específica de tokens — ler ADR 0007 + Prompt 41 antes |
 | Skippar `security-review` numa edge function que recebe dado de paciente | LGPD Art. 11. Vazamento = fim do app |
 | Codar sem `superpowers:brainstorming` ou `superpowers:writing-plans` | Patterns ruins entram cedo, sai caro depois |
 | Usar `/impeccable overdrive` em tela clínica | Cinematic não combina com app médico |

@@ -324,9 +324,11 @@ Manter a identidade verde-menta + violeta, mas dessaturar pra ganhar peso clíni
 
 ---
 
-## 10. Estrutura de navegação (tab bar nova)
+## 10. Estrutura de navegação ~~(tab bar nova)~~ → Dashboard cards
 
-### Tab bar — 5 abas (decidido)
+> **Atualização 2026-05-27 (ADR 0007):** Tab bar foi removida. Navegação principal acontece via cards do Dashboard com `router.push()`. O diretório `app/(tabs)/` continua existindo como rota, mas `tabBarStyle: { display: 'none' }` está ativo. O conteúdo abaixo é histórico.
+
+### Tab bar — 5 abas (histórico — removida em 2026-05-27)
 
 | Posição | Aba | Função | Notas |
 |---|---|---|---|
@@ -357,12 +359,12 @@ Princípio: **nunca mais que 3 níveis de profundidade.** Se estiver indo pro 4�
 | 2 | Próxima versão: **5.0.0** (refactor completo, posicionamento novo) | ✅ |
 | 3 | Supabase mantido (mesmo projeto), schema limpo via migrations novas | ✅ |
 | 4 | RevenueCat mantido com trial 14d em produção | ✅ |
-| 5 | Stack Expo SDK 54+ com React Native + Liquid Glass como accent | ✅ |
+| 5 | Stack Expo SDK 54+ com React Native + **NativeWind v4 + react-native-reusables** (pivot ADR 0007, 2026-05-27). Liquid Glass era accent — agora opcional. | ✅ |
 | 6 | Posicionamento: a definir via `/design:ux-copy` (rascunho inicial rejeitado) | ⏸️ |
 | 7 | Freemium. Premium destrava IA recorrente, relatórios além do 1º, exportação | ✅ |
 | 8 | Persona V5.0: Mariana (acompanhada). João (autônomo) entra como feature-stretch | ✅ |
 | 9 | 3 movimentos de IA: Insight do Dia + Memória de Perguntas + Relatório Bilíngue (núcleo obrigatório) | ✅ |
-| 10 | Tab bar: Início / Doses / Diário / Relatórios / Perfil | ✅ |
+| 10 | Tab bar: Início / Doses / Diário / Relatórios / Perfil — **removida em 2026-05-27** (ADR 0007). Navegação via Dashboard cards. | ~~✅~~ histórico |
 | 11 | Custos sai de tab, vira sub-seção em Doses | ✅ |
 | 12 | Glass effect: regra dos 30%, accent em paywall/marcos | ✅ |
 | 13 | Onboarding: 1º insight de IA antes de pedir cadastro | ✅ |
@@ -483,7 +485,7 @@ A V5.0 sobe quando:
 |---|---|---|
 | App | React Native + Expo SDK 54+ | Continuidade, ecossistema, AI-friendly |
 | Routing | Expo Router (file-based) | Padrão Expo, native tabs |
-| UI nativa iOS | expo-glass-effect + Liquid Glass (iOS 26+) | Diferencial visual, native feel |
+| UI / Styling | **NativeWind v4 + react-native-reusables** | Pivot 2026-05-27 (ADR 0007). DX Tailwind + componentes shadcn/ui para RN. Liquid Glass disponível como opcional. |
 | **Design language** | **Impeccable** (skill local) | PRODUCT.md + DESIGN.md como fonte única. 23 comandos especializados. Open source, sem dependência externa |
 | Estado | React Query + Context API | Sem Redux. Suficiente, simples |
 | Backend | Supabase (mantido) | Auth, DB Postgres, RLS, Edge Functions, Storage |
