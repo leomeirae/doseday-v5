@@ -89,7 +89,7 @@ export default function TreatmentNotesScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <AuthButton label="Nova nota" onPress={openAdd} />
+        <AuthButton label="Registrar nota" onPress={openAdd} />
       </View>
     </SafeAreaView>
   )

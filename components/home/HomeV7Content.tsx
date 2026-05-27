@@ -89,7 +89,6 @@ export function HomeV7Content() {
         void diarioQuery.refetch()
         void weightQuery.refetch()
       }}
-      onPressAdd={() => router.push('/diario/anotar-memoria' as Href)}
       onPressBody={() => router.push('/memoria' as Href)}
     />
   )
@@ -99,7 +98,7 @@ export function HomeV7Content() {
       isLoading={symptomQuery.isLoading}
       error={symptomQuery.error ? mapQueryError(symptomQuery.error) : null}
       onRetry={() => void symptomQuery.refetch()}
-      onPressAdd={() => router.push('/diario/anotar-sintoma' as Href)}
+      onPressBody={() => router.push('/memoria' as Href)}
     />
   )
 
@@ -116,7 +115,6 @@ export function HomeV7Content() {
           nextDose={doseSummary?.nextDose ?? null}
           hasDoseHistory={(doseSummary?.history.length ?? 0) > 0}
           onPressBody={() => router.push('/perfil/protocolo')}
-          onPressAdd={() => router.push('/dose/registrar')}
           isLoading={doseQuery.isLoading}
           error={doseQuery.error ? mapQueryError(doseQuery.error) : null}
           onRetry={() => void doseQuery.refetch()}
@@ -135,7 +133,6 @@ export function HomeV7Content() {
             if (needsProfileForWeight) void profileQuery.refetch()
           }}
           onPressBody={() => router.push('/peso/historico' as Href)}
-          onPressAdd={() => router.push('/peso/registrar')}
         />
 
         {hasConsultationNotes ? (
@@ -158,7 +155,6 @@ export function HomeV7Content() {
           isLoading={purchaseQuery.isLoading}
           error={purchaseQuery.error ? mapQueryError(purchaseQuery.error) : null}
           onRetry={() => void purchaseQuery.refetch()}
-          onPressAdd={() => router.push('/diario/anotar-custo' as Href)}
           onPressBody={() => router.push('/diario/custos' as Href)}
         />
 
@@ -204,36 +200,18 @@ function HeaderMemory() {
   )
 }
 
-// Eyebrow + plus button used by every interactive section. The `+` is its own
-// Pressable so the body of the section can have an independent tap handler
-// (e.g. navigate to detail) without event-bubbling conflicts.
+// Eyebrow row used by every interactive section.
 function SectionHeaderRow({
   label,
-  onPressAdd,
-  addLabel,
   trailing,
 }: {
   label: string
-  onPressAdd: () => void
-  addLabel: string
   trailing?: React.ReactNode
 }) {
   return (
     <View style={styles.sectionHeaderRow}>
       <Text style={styles.eyebrow}>{label}</Text>
-      <View style={styles.sectionHeaderTrailing}>
-        {trailing}
-        <Pressable
-          onPress={onPressAdd}
-          hitSlop={10}
-          accessibilityRole="button"
-          accessibilityLabel={addLabel}
-          accessibilityHint="Abre o registro em um sheet."
-          style={({ pressed }) => [styles.addButton, pressed && styles.addButtonPressed]}
-        >
-          <SymbolView name="plus" size={14} tintColor={colors.textSecondary} />
-        </Pressable>
-      </View>
+      {trailing && <View style={styles.sectionHeaderTrailing}>{trailing}</View>}
     </View>
   )
 }
@@ -242,7 +220,6 @@ function NextDoseSection({
   nextDose,
   hasDoseHistory,
   onPressBody,
-  onPressAdd,
   isLoading,
   error,
   onRetry,
@@ -250,7 +227,6 @@ function NextDoseSection({
   nextDose: NextDoseData | null
   hasDoseHistory: boolean
   onPressBody: () => void
-  onPressAdd: () => void
   isLoading: boolean
   error: string | null
   onRetry: () => void
@@ -267,11 +243,7 @@ function NextDoseSection({
 
   return (
     <View style={styles.nextDoseBlock}>
-      <SectionHeaderRow
-        label="Próxima dose"
-        onPressAdd={onPressAdd}
-        addLabel="Anotar dose"
-      />
+      <SectionHeaderRow label="Próxima dose" />
       {isLoading || error ? (
         <SectionReadState
           isLoading={isLoading}
@@ -307,7 +279,6 @@ function WeightSection({
   error,
   onRetry,
   onPressBody,
-  onPressAdd,
 }: {
   currentWeight: number | null
   delta: number | null
@@ -316,7 +287,6 @@ function WeightSection({
   error: string | null
   onRetry: () => void
   onPressBody: () => void
-  onPressAdd: () => void
 }) {
   const trailing =
     delta !== null && !isLoading && !error ? (
@@ -325,12 +295,7 @@ function WeightSection({
 
   return (
     <View>
-      <SectionHeaderRow
-        label="Peso"
-        onPressAdd={onPressAdd}
-        addLabel="Anotar peso"
-        trailing={trailing}
-      />
+      <SectionHeaderRow label="Peso" trailing={trailing} />
       {isLoading || error ? (
         <SectionReadState
           isLoading={isLoading}
@@ -356,7 +321,18 @@ function WeightSection({
           <PanelChevron />
         </Pressable>
       ) : (
-        <Text style={styles.emptyText}>Nenhum peso registrado ainda.</Text>
+        <Pressable
+          onPress={onPressBody}
+          accessibilityRole="button"
+          accessibilityLabel="Ver histórico de peso"
+          accessibilityHint="Abre o histórico completo de peso."
+          style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+        >
+          <View style={styles.sectionBodyContent}>
+            <Text style={styles.emptyText}>Nenhum peso registrado ainda.</Text>
+          </View>
+          <PanelChevron />
+        </Pressable>
       )}
     </View>
   )
@@ -390,14 +366,12 @@ function RecentMemoryTimeline({
   isLoading,
   error,
   onRetry,
-  onPressAdd,
   onPressBody,
 }: {
   items: TimelineItem[]
   isLoading: boolean
   error: string | null
   onRetry: () => void
-  onPressAdd: () => void
   onPressBody: () => void
 }) {
   const isEmpty = !isLoading && !error && items.length === 0
@@ -406,11 +380,7 @@ function RecentMemoryTimeline({
     <>
       <Divider />
       <View>
-        <SectionHeaderRow
-          label="Memória recente"
-          onPressAdd={onPressAdd}
-          addLabel="Anotar nota"
-        />
+        <SectionHeaderRow label="Memória recente" />
         {isLoading || error ? (
           <SectionReadState
             isLoading={isLoading}
@@ -459,23 +429,19 @@ function ObservationMemoryCard({
   isLoading,
   error,
   onRetry,
-  onPressAdd,
+  onPressBody,
 }: {
   symptom: RecentSymptom | null
   isLoading: boolean
   error: string | null
   onRetry: () => void
-  onPressAdd: () => void
+  onPressBody: () => void
 }) {
   return (
     <>
       <Divider />
       <View style={styles.observation}>
-        <SectionHeaderRow
-          label="Sintomas"
-          onPressAdd={onPressAdd}
-          addLabel="Anotar sintoma"
-        />
+        <SectionHeaderRow label="Sintomas" />
         {isLoading || error ? (
           <SectionReadState
             isLoading={isLoading}
@@ -483,13 +449,26 @@ function ObservationMemoryCard({
             onRetry={onRetry}
             loadingLabel="Carregando sintomas."
           />
-        ) : symptom ? (
-          <View style={styles.observationCard}>
-            <SymbolView name="circle" size={16} tintColor={colors.semanticMuted} />
-            <Text style={styles.observationText}>{formatSymptomMemory(symptom)}</Text>
-          </View>
         ) : (
-          <Text style={styles.emptyText}>Nenhum sintoma registrado ainda.</Text>
+          <Pressable
+            onPress={onPressBody}
+            accessibilityRole="button"
+            accessibilityLabel="Ver diário de sintomas"
+            accessibilityHint="Abre o diário para ver sintomas."
+            style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+          >
+            <View style={styles.sectionBodyContent}>
+              {symptom ? (
+                <View style={styles.observationCard}>
+                  <SymbolView name="circle" size={16} tintColor={colors.semanticMuted} />
+                  <Text style={styles.observationText}>{formatSymptomMemory(symptom)}</Text>
+                </View>
+              ) : (
+                <Text style={styles.emptyText}>Nenhum sintoma registrado ainda.</Text>
+              )}
+            </View>
+            <PanelChevron />
+          </Pressable>
         )}
       </View>
     </>
@@ -591,23 +570,17 @@ function ExpensesSection({
   isLoading,
   error,
   onRetry,
-  onPressAdd,
   onPressBody,
 }: {
   total: number
   isLoading: boolean
   error: string | null
   onRetry: () => void
-  onPressAdd: () => void
   onPressBody: () => void
 }) {
   return (
     <View style={styles.expenses}>
-      <SectionHeaderRow
-        label="Custos registrados"
-        onPressAdd={onPressAdd}
-        addLabel="Anotar custo"
-      />
+      <SectionHeaderRow label="Custos registrados" />
       {isLoading || error ? (
         <SectionReadState
           isLoading={isLoading}
@@ -826,19 +799,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     gap: spacing.sm,
-  },
-  addButton: {
-    alignItems: 'center',
-    borderColor: colors.semanticMuted,
-    borderRadius: radius.full,
-    borderWidth: StyleSheet.hairlineWidth,
-    height: 32,
-    justifyContent: 'center',
-    width: 32,
-  },
-  addButtonPressed: {
-    backgroundColor: colors.bgSurface,
-    transform: [{ scale: 0.96 }],
   },
   sectionBody: {
     paddingBottom: spacing.xs,
