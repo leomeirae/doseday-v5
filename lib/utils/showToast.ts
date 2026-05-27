@@ -5,6 +5,7 @@ export function showSuccessToast(message: string): void {
     type: 'success',
     text1: message,
     position: 'bottom',
+    bottomOffset: 85,
     visibilityTime: 2500,
   })
 }
@@ -14,6 +15,7 @@ export function showErrorToast(message: string): void {
     type: 'error',
     text1: message,
     position: 'bottom',
+    bottomOffset: 85,
     visibilityTime: 3500,
   })
 }
