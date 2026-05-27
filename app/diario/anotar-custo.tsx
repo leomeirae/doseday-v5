@@ -91,7 +91,26 @@ export default function AnotarCustoScreen() {
           <SymbolView name="xmark" size={18} tintColor={colors.textSecondary} />
         </Pressable>
         <Text style={styles.headerTitle}>Anotar custo</Text>
-        <View style={styles.headerSpacer} />
+        <Pressable
+          onPress={handleSubmit}
+          disabled={!canSubmit}
+          hitSlop={13}
+          accessibilityLabel="Salvar custo"
+          accessibilityRole="button"
+          style={({ pressed }) => [
+            styles.saveHeaderButton,
+            pressed && styles.saveHeaderButtonPressed,
+          ]}
+        >
+          <Text
+            style={[
+              styles.saveHeaderButtonText,
+              !canSubmit && styles.saveHeaderButtonTextDisabled,
+            ]}
+          >
+            Salvar
+          </Text>
+        </Pressable>
       </View>
 
       <KeyboardAvoidingView
@@ -177,8 +196,22 @@ const styles = StyleSheet.create({
     ...typography.title,
     color: colors.textPrimary,
   },
-  headerSpacer: {
-    width: 18,
+  saveHeaderButton: {
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: spacing.sm,
+  },
+  saveHeaderButtonPressed: {
+    opacity: 0.7,
+  },
+  saveHeaderButtonText: {
+    ...typography.body,
+    color: colors.brand,
+    fontWeight: '600',
+  },
+  saveHeaderButtonTextDisabled: {
+    color: colors.textTertiary,
   },
   scrollContent: {
     gap: spacing.lg,

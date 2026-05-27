@@ -96,7 +96,7 @@ export default function TreatmentCostsScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <AuthButton label="Adicionar custo" onPress={openAdd} />
+        <AuthButton label="Registrar custo" onPress={openAdd} />
       </View>
     </SafeAreaView>
   )
