@@ -52,7 +52,7 @@ Toda mensagem pra colar no Claude Code DEVE conter: caminho do prompt, handoff a
 
 ## Estado do produto (1 parágrafo)
 
-DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em produção). A V4 falhou por baixa retenção (D7 ~6%, 1 pagante em 96 cadastros). V5 reposiciona o produto como **memória inteligente do tratamento com canetas emagrecedoras (GLP-1)** para paciente e médico. Stack: Expo SDK 54+ React Native + Liquid Glass iOS 26+, Supabase mantido, RevenueCat com trial 14d configurado em produção, IA via Edge Functions OpenAI SDK (provedor mantido da V4 — ver Aprendizado #53 + ADR 0003). Bundle ID `com.doseday.premium` preservado. App Store listing também.
+DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em produção). A V4 falhou por baixa retenção (D7 ~6%, 1 pagante em 96 cadastros). V5 reposiciona o produto como **memória inteligente do tratamento com canetas emagrecedoras (GLP-1)** para paciente e médico. Stack: Expo SDK 54+ React Native + **NativeWind v4 + react-native-reusables** como camada visual (ADR 0007, pivot em 2026-05-27), Supabase mantido, RevenueCat com trial 14d configurado em produção, IA via Edge Functions OpenAI SDK (provedor mantido da V4 — ver Aprendizado #53 + ADR 0003). Tab bar removida — navegação principal via cards do Dashboard (`router.push()`). Liquid Glass era pilar visual original (iOS 26+), agora opcional. Bundle ID `com.doseday.premium` preservado. App Store listing também.
 
 ---
 
@@ -60,8 +60,8 @@ DoseDay V5 é a refatoração completa do app DoseDay (atualmente v4.0.1 em prod
 
 1. **NUNCA codar direto.** Prompt → plano + skills + riscos → aguarda aprovação → executa
 2. **NUNCA usar `as any`, `// @ts-ignore`, `// eslint-disable`** sem justificativa explícita no plano
-3. **NUNCA aplicar glass em conteúdo.** Glass é exclusivo da camada de navegação (regra liquid-glass + DESIGN.md)
-4. **NUNCA usar Tailwind/NativeWind.** V5 é StyleSheet nativo
+3. **Glass é opcional, não pilar.** Usar só quando agregar ao UX de navegação — não aplique em conteúdo (cards, listas, dados clínicos). Liquid Glass perdeu prioridade como pilar arquitetural (ver ADR 0007).
+4. **Stack visual: NativeWind v4 + react-native-reusables** (ver ADR 0007). StyleSheet só em componentes legados ainda não migrados ou onde NativeWind não dá conta (animações Reanimated complexas, PlatformColor).
 5. **NUNCA rodar `impeccable` e `ui-ux-pro-max` ao mesmo tempo gerando UI.** Conflito de vocabulário
 6. **SEMPRE `/impeccable critique`** antes de marcar UI como pronta
 7. **SEMPRE `security-review`** em qualquer migration, edge function ou tabela com PHI
@@ -110,8 +110,8 @@ Tabela de referência rápida — quando começar uma tarefa, carregue os auxili
 |---|---|
 | Decisão técnica em prompt MID/HIGH | `@docs/karpathy.md`, `@docs/learnings.md`, handoff anterior, **`npx claude-mem search` no tópico** |
 | Schema Supabase / migration / RLS | `@docs/architecture.md`, `@docs/learnings.md`, skill `supabase-postgres-best-practices` |
-| UI / tela nova / refazer tela | `@docs/DESIGN.md`, skill `/impeccable craft` ou `/impeccable distill` |
-| Tab bar / toolbar / navegação | `@docs/DESIGN.md`, skill `liquid-glass:liquid-glass` |
+| UI / tela nova / refazer tela | `@docs/DESIGN.md`, skill `/impeccable craft` ou `/impeccable distill`, `expo-tailwind-setup` (NativeWind + reusables) |
+| Navegação / Dashboard cards | `@docs/DESIGN.md` — tab bar removida; navegação via `router.push()` em cards do Dashboard (ADR 0007) |
 | IA / Edge Function OpenAI SDK | `@docs/architecture.md` (seção IA), `@docs/learnings.md`, OpenAI Structured Outputs docs |
 | Bash longo / leitura de arquivo grande | `@~/.claude/RTK.md` |
 | Glossário do domínio (Mariana, Movimento 1/2/3, dose) | `@CONTEXT.md` |
@@ -135,7 +135,7 @@ Tabela de referência rápida — quando começar uma tarefa, carregue os auxili
 | App | React Native + Expo SDK 54+ |
 | Linguagem | TypeScript estrito |
 | Routing | Expo Router (file-based) |
-| UI nativa iOS | `@expo/ui` + Liquid Glass (iOS 26+) |
+| UI / Styling | **NativeWind v4 + react-native-reusables** (ADR 0007). `@expo/ui` + Liquid Glass disponíveis como opcionais. |
 | Estado servidor | React Query |
 | Estado cliente | Context API |
 | Validação | Zod |
