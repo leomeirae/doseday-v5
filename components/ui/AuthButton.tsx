@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ActivityIndicator, Pressable, Text, StyleSheet } from 'react-native'
 import { colors, typography, spacing, radius } from '@lib/theme/tokens'
 
@@ -22,16 +23,19 @@ export function AuthButton({
 }: Props) {
   const isPrimary = variant === 'primary'
   const isDisabled = disabled || loading
+  const [pressed, setPressed] = useState(false)
 
   return (
     <Pressable
       onPress={onPress}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       disabled={isDisabled}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       testID={testID}
-      style={({ pressed }) => [
+      style={[
         styles.base,
         isPrimary ? styles.primary : styles.secondary,
         isDisabled && styles.disabled,
@@ -76,7 +80,9 @@ const styles = StyleSheet.create({
   },
   disabled: {
     backgroundColor: colors.bgSurface,
-    borderColor: colors.bgSurface,
+    borderWidth: 1,
+    borderColor: colors.brandDim,
+    opacity: 0.7,
   },
   pressed: {
     transform: [{ scale: 0.98 }],
@@ -91,6 +97,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   labelDisabled: {
-    color: colors.textTertiary,
+    color: colors.brand,
   },
 })
