@@ -1,7 +1,7 @@
 # CLAUDE.md — Working Memory do DoseDay V5
 
 **Última atualização:** 28 de maio de 2026
-**Status do projeto:** Prompt 42e concluído. Card "Próxima dose" no Dashboard corrigido para abrir a aba `/(tabs)/doses`. Tela Memória finalizada como hub completo de registros (Nota, Custo, Dose, Peso em grid 2x2 com copy humana simplificada). type-check e lint válidos. PR #88 aberto.
+**Status do projeto:** Prompt 42f concluído. Chips de local de aplicação visíveis em `/dose/registrar`, navegação segura com fallback para `/index` implementada no dismiss e no botão voltar de `doses.tsx` (chevron.left adicionado). type-check e lint válidos. PR #89 aberto.
 
 
 ---

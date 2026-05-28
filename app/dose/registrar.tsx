@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
+import { useRouter, type Href } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import * as Haptics from 'expo-haptics'
@@ -46,6 +46,14 @@ export default function RegistrarDoseScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showPicker, setShowPicker] = useState(false)
   const autoFilledRef = useRef(false)
+
+  function dismiss() {
+    if (router.canGoBack()) {
+      router.back()
+    } else {
+      router.replace('/(tabs)/index' as Href)
+    }
+  }
 
   useEffect(() => {
     if (autoFilledRef.current || profile?.currentDose == null) return
@@ -94,7 +102,7 @@ export default function RegistrarDoseScreen() {
           }
         }
 
-        router.back()
+        dismiss()
       },
       onError: (err) => {
         showErrorToast(mapQueryError(err))
@@ -108,13 +116,13 @@ export default function RegistrarDoseScreen() {
         visible={showPermissionModal}
         onDismiss={() => {
           setShowPermissionModal(false)
-          router.back()
+          dismiss()
         }}
       />
       {/* Header */}
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.back()}
+          onPress={dismiss}
           hitSlop={13}
           accessibilityLabel="Fechar"
           accessibilityRole="button"
@@ -264,10 +272,9 @@ function Chip({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      style={({ pressed }) => [
+      style={[
         styles.chip,
         selected && styles.chipSelected,
-        pressed && styles.chipPressed,
       ]}
     >
       <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</Text>
@@ -356,11 +363,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: radius.full,
-    backgroundColor: colors.bgElevated,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: colors.bgSurface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.18)',
   },
   chipSelected: {
+    backgroundColor: 'rgba(0,212,170,0.15)',
     borderColor: colors.brand,
     borderWidth: 1,
   },
