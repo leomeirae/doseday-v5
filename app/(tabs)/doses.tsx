@@ -1,6 +1,6 @@
 import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, Pressable, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, useLocalSearchParams } from 'expo-router'
+import { useRouter, useLocalSearchParams, type Href } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
 import { colors, typography, spacing } from '@lib/theme/tokens'
 import { DoseCard } from '@components/doses/DoseCard'
@@ -34,6 +34,20 @@ export default function DosesScreen() {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.headlineRow}>
+            <Pressable
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back()
+                } else {
+                  router.replace('/(tabs)/index' as Href)
+                }
+              }}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Voltar"
+            >
+              <SymbolView name="chevron.left" size={22} tintColor={colors.textPrimary} />
+            </Pressable>
             <Text style={styles.headline}>Doses</Text>
             <Pressable
               onPress={() => router.push('/dose/registrar')}
@@ -88,6 +102,20 @@ export default function DosesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headlineRow}>
+          <Pressable
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back()
+              } else {
+                router.replace('/(tabs)/index' as Href)
+              }
+            }}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Voltar"
+          >
+            <SymbolView name="chevron.left" size={22} tintColor={colors.textPrimary} />
+          </Pressable>
           <Text style={styles.headline}>Doses</Text>
           <Pressable
             onPress={() => router.push('/dose/registrar')}
