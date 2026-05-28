@@ -1,7 +1,7 @@
 # CLAUDE.md — Working Memory do DoseDay V5
 
 **Última atualização:** 28 de maio de 2026
-**Status do projeto:** Prompt 42f concluído. Chips de local de aplicação visíveis em `/dose/registrar`, navegação segura com fallback para `/index` implementada no dismiss e no botão voltar de `doses.tsx` (chevron.left adicionado). type-check e lint válidos. PR #89 aberto.
+**Status do projeto:** Prompt 42g concluído. Layout horizontal do `SettingsRow` corrigido ao adicionar dimensões explícitas no `SymbolView` (ícone/chevron) e contornar bug do NativeWind no `Pressable` via estado local `pressed`. type-check e lint válidos. PR #90 aberto.
 
 
 ---

@@ -52,6 +52,7 @@
 | 2026-05-27 | `42c-MID-redesign-tela-memoria` | ✅ Tela de memória redesenhada como hub interativo com 6 seções: Header, Subtitle, Protocolo (dados reais do `useProfile`), Registro Sintoma Inline (textarea + chips frequentes + salvar), Ações Rápidas (nota/custo), Timeline unificada. Fix toasts `bottomOffset: 85` em `showToast.ts`. `TouchableOpacity` substituiu `Pressable` com função de estilo (interop NativeWind). type-check e lint válidos. | `1d097b3` (PR #86) |
 | 2026-05-28 | `42e-MID-correcoes-ciclo-42` | ✅ Card "Próxima dose" no Dashboard corrigido para abrir a tela `/(tabs)/doses`. Tela Memória concluída como hub completo de registros ao adicionar os botões de Dose e Peso estruturados em grid 2x2. Simplificação de copy de "Anotar nota/custo" para "Nota/Custo". type-check e lint válidos. | (PR #88) |
 | 2026-05-28 | `42f-MID-fix-registrar-dose-navegacao-chips` | ✅ Contraste dos chips de local de aplicação corrigido em `/dose/registrar`. Adicionado helper de dismiss seguro com fallback para `/index`. Chevron de voltar adicionado à tela Doses em ambos os estados (loading e normal). type-check e lint válidos. | `06f43fb` (PR #89) |
+| 2026-05-28 | `42g-LOW-fix-settings-row-layout` | ✅ Adicionado style width/height explícito ao SymbolView (ícone e chevron) em SettingsRow.tsx e corrigido bug de layout do Pressable ao usar state local (onPressIn/onPressOut) em vez de função de estilo. type-check e lint válidos. | `5d87e4c` (PR #90) |
 
 
 (Atualize esta tabela ao final de cada execução bem-sucedida.)
