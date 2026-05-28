@@ -1,7 +1,7 @@
 # CLAUDE.md — Working Memory do DoseDay V5
 
 **Última atualização:** 27 de maio de 2026
-**Status do projeto:** Prompt 42b concluído. Padrão Apple Health aplicado no Dashboard, tab bar escondida (display: 'none'), CTAs de rodapé unificados para custos e notas, e botão Salvar corrigido no header do sheet de anotar custo. PR #85 atualizado.
+**Status do projeto:** Prompt 42c concluído. Tela de memória redesenhada como hub interativo com protocolo atual, sintoma inline (chips e input), botões de nota/custo e timeline unificada. Toasts de bottomOffset elevados para 85. PR #86 aberto.
 
 ---
 
