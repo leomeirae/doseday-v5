@@ -4,7 +4,7 @@ import { useContext } from 'react'
 import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs'
 import { useRouter, type Href } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import Svg, { Circle as SvgCircle, Polyline } from 'react-native-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useConsultationNotes, type ConsultationNote } from '@hooks/useConsultationNotes'
@@ -19,7 +19,8 @@ import type { QuickLogRecord } from '@lib/supabase/queries/diario'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 import type { RecentSymptom } from '@lib/supabase/queries/symptoms'
 import type { WeightLog } from '@lib/supabase/queries/weight'
-import { colors, radius, spacing, typography } from '@lib/theme/tokens'
+import { cn } from '@lib/rnr/utils'
+import { colors, spacing } from '@lib/theme/tokens'
 import { QUICK_LOG_LABELS } from '@lib/validation/diarioSchemas'
 
 const FALLBACK_TAB_BAR_HEIGHT = 96
@@ -103,10 +104,10 @@ export function HomeV7Content() {
   )
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView className="flex-1 bg-bg-base" edges={['top']}>
       <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingBottom: contentPaddingBottom }]}
+        className="flex-1"
+        contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingTop: 22, paddingBottom: contentPaddingBottom }}
         showsVerticalScrollIndicator={false}
       >
         <HeaderMemory />
@@ -177,25 +178,29 @@ function PanelChevron() {
 function HeaderMemory() {
   const router = useRouter()
   return (
-    <View style={styles.header}>
-      <View style={styles.headerTopRow}>
-        <Text style={styles.title}>Seu tratamento está organizado até aqui.</Text>
+    <View className="mb-[28px]">
+      {/* 📐 mb-[28px] — valor original literal 28 */}
+      <View className="flex-row justify-between items-start gap-md">
+        {/* 🏷️ gap-md */}
+        <Text className="flex-1 text-text-primary text-[28px] font-light leading-[34px] mb-sm">
+          {/* 📐 text-[28px] leading-[34px] = displayUltralight; 🏷️ text-text-primary, mb-sm */}
+          Seu tratamento está organizado até aqui.
+        </Text>
         <Pressable
           onPress={() => router.push('/configuracoes')}
           accessibilityRole="button"
           accessibilityLabel="Abrir configurações"
           accessibilityHint="Abre conta, tratamento, lembretes, dados, privacidade e suporte."
           hitSlop={10}
-          style={({ pressed }) => [styles.settingsButton, pressed && styles.settingsButtonPressed]}
+          className="w-[44px] h-[44px] items-center justify-center -mt-[4px] active:opacity-70"
         >
-          <SymbolView
-            name="gearshape"
-            size={20}
-            tintColor={colors.textSecondary}
-          />
+          <SymbolView name="gearshape" size={20} tintColor={colors.textSecondary} />
         </Pressable>
       </View>
-      <Text style={styles.date}>{formatCurrentDate()}</Text>
+      <Text className="text-text-secondary text-[15px] leading-[24px]">
+        {/* 📐 text-[15px] leading-[24px] = bodyClinical */}
+        {formatCurrentDate()}
+      </Text>
     </View>
   )
 }
@@ -209,9 +214,13 @@ function SectionHeaderRow({
   trailing?: React.ReactNode
 }) {
   return (
-    <View style={styles.sectionHeaderRow}>
-      <Text style={styles.eyebrow}>{label}</Text>
-      {trailing && <View style={styles.sectionHeaderTrailing}>{trailing}</View>}
+    <View className="flex-row items-center justify-between mb-sm">
+      {/* 🏷️ mb-sm */}
+      <Text className="text-text-secondary text-[13px] font-bold leading-[18px] uppercase tracking-[1.4px]">
+        {/* 📐 text-[13px] leading-[18px] tracking-[1.4px] = caption bold uppercase */}
+        {label}
+      </Text>
+      {trailing && <View className="flex-row items-center gap-sm">{trailing}</View>}
     </View>
   )
 }
@@ -242,7 +251,7 @@ function NextDoseSection({
     : null
 
   return (
-    <View style={styles.nextDoseBlock}>
+    <View className="mb-[28px]">
       <SectionHeaderRow label="Próxima dose" />
       {isLoading || error ? (
         <SectionReadState
@@ -257,12 +266,21 @@ function NextDoseSection({
           accessibilityRole="button"
           accessibilityLabel="Ver histórico de doses"
           accessibilityHint="Abre o histórico completo de doses."
-          style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+          className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
         >
-          <View style={styles.sectionBodyContent}>
-            <Text style={styles.sectionValue}>{capitalize(value)}</Text>
-            <Text style={styles.helper}>{capitalize(helper)}</Text>
-            {medicationDetail && <Text style={styles.protocolDetail}>{medicationDetail}</Text>}
+          <View className="flex-1">
+            <Text className="text-text-primary text-[18px] font-semibold leading-[24px] mt-xs">
+              {/* 📐 text-[18px] leading-[24px] = subtitle; 🏷️ mt-xs */}
+              {capitalize(value)}
+            </Text>
+            <Text className="text-text-secondary text-[13px] leading-[18px] mt-xxs">
+              {capitalize(helper)}
+            </Text>
+            {medicationDetail && (
+              <Text className="text-text-tertiary text-[13px] font-semibold leading-[18px] mt-xs">
+                {medicationDetail}
+              </Text>
+            )}
           </View>
           <PanelChevron />
         </Pressable>
@@ -290,7 +308,9 @@ function WeightSection({
 }) {
   const trailing =
     delta !== null && !isLoading && !error ? (
-      <Text style={styles.weightDelta}>{formatDelta(delta)}</Text>
+      <Text className="text-text-tertiary text-[13px] font-semibold leading-[18px]">
+        {formatDelta(delta)}
+      </Text>
     ) : null
 
   return (
@@ -309,12 +329,18 @@ function WeightSection({
           accessibilityRole="button"
           accessibilityLabel="Ver histórico de peso"
           accessibilityHint="Abre o histórico completo de peso."
-          style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+          className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
         >
-          <View style={styles.sectionBodyContent}>
-            <View style={styles.weightValueRow}>
-              <Text style={styles.weightValue}>{formatNumber(currentWeight)}</Text>
-              <Text style={styles.weightUnit}>kg</Text>
+          <View className="flex-1">
+            <View className="flex-row items-baseline gap-xs mb-xs">
+              <Text className="text-text-primary text-[48px] font-light leading-[54px]">
+                {/* 📐 text-[48px] leading-[54px] = numberPersonal */}
+                {formatNumber(currentWeight)}
+              </Text>
+              <Text className="text-text-secondary text-[18px] font-semibold leading-[24px]">
+                {/* 📐 text-[18px] leading-[24px] = subtitle */}
+                kg
+              </Text>
             </View>
             <WeightSparkline logs={logs} />
           </View>
@@ -326,10 +352,12 @@ function WeightSection({
           accessibilityRole="button"
           accessibilityLabel="Ver histórico de peso"
           accessibilityHint="Abre o histórico completo de peso."
-          style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+          className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
         >
-          <View style={styles.sectionBodyContent}>
-            <Text style={styles.emptyText}>Nenhum peso registrado ainda.</Text>
+          <View className="flex-1">
+            <Text className="text-text-secondary text-[16px] leading-[22px] mb-lg">
+              Nenhum peso registrado ainda.
+            </Text>
           </View>
           <PanelChevron />
         </Pressable>
@@ -343,7 +371,8 @@ function WeightSparkline({ logs }: { logs: WeightLog[] }) {
   if (!sparkline) return null
 
   return (
-    <View style={styles.sparkline}>
+    <View className="h-[64px] w-full mb-lg mt-xs">
+      {/* 📐 h-[64px]; 🏷️ mb-lg, mt-xs */}
       <Svg width="100%" height="100%" viewBox="0 0 100 48" preserveAspectRatio="none">
         <Polyline
           points={sparkline.points}
@@ -394,22 +423,34 @@ function RecentMemoryTimeline({
             accessibilityRole="button"
             accessibilityLabel="Ver diário completo"
             accessibilityHint="Abre o histórico completo do diário."
-            style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+            className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
           >
-            <View style={styles.sectionBodyContent}>
+            <View className="flex-1">
               {isEmpty ? (
-                <Text style={styles.emptyText}>Sua memória recente vai aparecer aqui.</Text>
+                <Text className="text-text-secondary text-[16px] leading-[22px] mb-lg">
+                  Sua memória recente vai aparecer aqui.
+                </Text>
               ) : (
-                <View style={styles.timeline}>
+                <View className="mb-[28px]">
                   {items.map((item, index) => (
-                    <View key={item.id} style={styles.timelineItem}>
-                      <View style={styles.timelineMarkerColumn}>
-                        <View style={[styles.timelineDot, index > 0 && styles.timelineDotMuted]} />
-                        {index < items.length - 1 && <View style={styles.timelineStem} />}
+                    <View key={item.id} className="flex-row gap-sm min-h-[64px]">
+                      <View className="items-center w-[16px]">
+                        <View
+                          className="rounded-full h-[10px] w-[10px] mt-[4px]"
+                          style={{ backgroundColor: index > 0 ? colors.semanticMuted : colors.textPrimary }}
+                        />
+                        {/* style prop: semanticMuted (#5C6878) não tem token Tailwind */}
+                        {index < items.length - 1 && (
+                          <View className="bg-bg-surface flex-1 mt-xs w-[2px]" />
+                        )}
                       </View>
-                      <View style={styles.timelineContent}>
-                        <Text style={styles.timelineDate}>{formatRelativeDay(item.date)}</Text>
-                        <Text style={styles.timelineText}>{item.title}</Text>
+                      <View className="flex-1 pb-lg">
+                        <Text className="text-text-secondary text-[13px] font-semibold leading-[18px] mb-xxs">
+                          {formatRelativeDay(item.date)}
+                        </Text>
+                        <Text className="text-text-primary text-[15px] leading-[24px]">
+                          {item.title}
+                        </Text>
                       </View>
                     </View>
                   ))}
@@ -440,7 +481,7 @@ function ObservationMemoryCard({
   return (
     <>
       <Divider />
-      <View style={styles.observation}>
+      <View className="mb-[28px]">
         <SectionHeaderRow label="Sintomas" />
         {isLoading || error ? (
           <SectionReadState
@@ -455,16 +496,24 @@ function ObservationMemoryCard({
             accessibilityRole="button"
             accessibilityLabel="Ver diário de sintomas"
             accessibilityHint="Abre o diário para ver sintomas."
-            style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+            className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
           >
-            <View style={styles.sectionBodyContent}>
+            <View className="flex-1">
               {symptom ? (
-                <View style={styles.observationCard}>
+                <View
+                  className="flex-row items-center bg-bg-elevated rounded-[14px] gap-sm mt-md p-md"
+                  style={{ borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.04)' }}
+                >
+                  {/* 📐 rounded-[14px] = radius.md; style prop: hairline border */}
                   <SymbolView name="circle" size={16} tintColor={colors.semanticMuted} />
-                  <Text style={styles.observationText}>{formatSymptomMemory(symptom)}</Text>
+                  <Text className="flex-1 text-text-primary text-[15px] leading-[24px]">
+                    {formatSymptomMemory(symptom)}
+                  </Text>
                 </View>
               ) : (
-                <Text style={styles.emptyText}>Nenhum sintoma registrado ainda.</Text>
+                <Text className="text-text-secondary text-[16px] leading-[22px] mb-lg">
+                  Nenhum sintoma registrado ainda.
+                </Text>
               )}
             </View>
             <PanelChevron />
@@ -481,29 +530,35 @@ function ConsultationMemorySection({ items }: { items: ConsultationNote[] }) {
   return (
     <>
       <Divider />
-      <View style={styles.consultation}>
-        <View style={styles.consultationHeader}>
-          <Text style={styles.eyebrow}>Para a consulta</Text>
-          <View style={styles.consultationBadge}>
-            <Text style={styles.consultationBadgeText}>
+      <View className="mb-[28px]">
+        <View className="flex-row items-center justify-between mb-lg">
+          <Text className="text-text-secondary text-[13px] font-bold leading-[18px] uppercase tracking-[1.4px]">
+            Para a consulta
+          </Text>
+          <View
+            className="bg-bg-elevated rounded-full px-sm py-xxs"
+          >
+            <Text className="text-text-secondary text-[13px] font-semibold leading-[18px]">
               {items.length} {items.length === 1 ? 'item' : 'itens'}
             </Text>
           </View>
         </View>
-        <View style={styles.consultationList}>
+        <View className="gap-sm">
           {items.map((item) => (
-            <View key={item.id} style={styles.consultationItem}>
+            <View key={item.id} className="flex-row items-center gap-sm">
               <SymbolView
                 name={item.completed ? 'checkmark.circle' : 'circle'}
                 size={18}
                 tintColor={colors.semanticMuted}
               />
               <Text
-                style={[
-                  styles.consultationText,
-                  item.completed && styles.consultationTextCompleted,
-                ]}
+                className={cn(
+                  'flex-1 text-text-primary text-[15px] leading-[24px]',
+                  item.completed && 'text-text-tertiary line-through'
+                )}
+                style={item.completed ? { textDecorationColor: colors.semanticMuted } : undefined}
               >
+                {/* cn() para classe condicional; style prop para textDecorationColor (sem suporte TW) */}
                 {item.text}
               </Text>
             </View>
@@ -527,9 +582,9 @@ function SectionReadState({
 }) {
   if (isLoading) {
     return (
-      <View style={styles.readStateLoading}>
+      <View className="flex-row items-center gap-sm mt-md">
         <ActivityIndicator color={colors.textSecondary} size="small" />
-        <Text style={styles.readStateText}>{loadingLabel}</Text>
+        <Text className="text-text-secondary text-[13px] leading-[18px]">{loadingLabel}</Text>
       </View>
     )
   }
@@ -537,28 +592,31 @@ function SectionReadState({
   if (!error) return null
 
   return (
-    <View style={styles.readStateError}>
-      <Text style={styles.readStateText}>{error}</Text>
+    <View className="items-start gap-sm mt-md">
+      <Text className="text-text-secondary text-[13px] leading-[18px]">{error}</Text>
       <Pressable
         onPress={onRetry}
         accessibilityRole="button"
         accessibilityLabel="Tentar novamente"
         accessibilityHint="Tenta carregar esta seção novamente."
-        style={({ pressed }) => [styles.retryButton, pressed && styles.retryButtonPressed]}
+        className="items-center justify-center rounded-full min-h-[44px] px-md active:bg-bg-surface"
+        style={{ borderWidth: 0.5, borderColor: colors.semanticMuted }}
       >
-        <Text style={styles.retryText}>Tentar novamente</Text>
+        {/* style prop: borderColor semanticMuted não tem token TW */}
+        <Text className="text-text-primary text-[13px] font-semibold leading-[18px]">Tentar novamente</Text>
       </Pressable>
     </View>
   )
 }
 
 function Divider() {
-  return <View style={styles.divider} />
+  return <View className="h-px bg-bg-surface mb-[28px]" />
+  /* 🏷️ bg-bg-surface; 📐 mb-[28px] */
 }
 
 function Disclaimer() {
   return (
-    <Text style={styles.disclaimer}>
+    <Text className="text-text-tertiary text-[13px] leading-[20px] px-md text-center">
       Este conteúdo organiza seus registros e não substitui uma conversa com um profissional de
       saúde.
     </Text>
@@ -579,7 +637,7 @@ function ExpensesSection({
   onPressBody: () => void
 }) {
   return (
-    <View style={styles.expenses}>
+    <View className="mb-[28px]">
       <SectionHeaderRow label="Custos registrados" />
       {isLoading || error ? (
         <SectionReadState
@@ -594,10 +652,10 @@ function ExpensesSection({
           accessibilityRole="button"
           accessibilityLabel="Ver custos do tratamento"
           accessibilityHint="Abre a lista completa de custos."
-          style={({ pressed }) => [styles.sectionBodyRow, pressed && styles.sectionBodyPressed]}
+          className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
         >
-          <View style={styles.sectionBodyContent}>
-            <Text style={styles.expenseText}>
+          <View className="flex-1">
+            <Text className="text-text-secondary text-[15px] leading-[24px] mt-sm">
               {total === 0
                 ? 'Nenhum custo registrado ainda.'
                 : `${formatCurrency(total)} registrados no tratamento.`}
@@ -741,282 +799,3 @@ function formatNumber(value: number): string {
 function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1)
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.bgBase,
-  },
-  scroll: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: 22,
-  },
-  header: {
-    marginBottom: 28,
-  },
-  headerTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: spacing.md,
-  },
-  settingsButton: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    width: 44,
-    marginTop: -4,
-  },
-  settingsButtonPressed: {
-    opacity: 0.7,
-  },
-  title: {
-    ...typography.displayUltralight,
-    color: colors.textPrimary,
-    flex: 1,
-    letterSpacing: 0,
-    marginBottom: spacing.sm,
-  },
-  date: {
-    ...typography.bodyClinical,
-    color: colors.textSecondary,
-  },
-  divider: {
-    backgroundColor: colors.bgSurface,
-    height: StyleSheet.hairlineWidth,
-    marginBottom: 28,
-  },
-  sectionHeaderRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  },
-  sectionHeaderTrailing: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  sectionBody: {
-    paddingBottom: spacing.xs,
-  },
-  sectionBodyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  sectionBodyContent: {
-    flex: 1,
-  },
-  sectionBodyPressed: {
-    opacity: 0.7,
-  },
-  nextDoseBlock: {
-    marginBottom: 28,
-  },
-  eyebrow: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '700',
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-  },
-  sectionValue: {
-    ...typography.subtitle,
-    color: colors.textPrimary,
-    marginTop: spacing.xs,
-  },
-  helper: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: spacing.xxs,
-  },
-  protocolDetail: {
-    ...typography.caption,
-    color: colors.textTertiary,
-    fontWeight: '600',
-    marginTop: spacing.xs,
-  },
-  weightDelta: {
-    ...typography.caption,
-    color: colors.textTertiary,
-    fontWeight: '600',
-  },
-  weightValueRow: {
-    alignItems: 'baseline',
-    flexDirection: 'row',
-    gap: spacing.xs,
-    marginBottom: spacing.xs,
-  },
-  weightValue: {
-    ...typography.numberPersonal,
-    color: colors.textPrimary,
-    letterSpacing: 0,
-  },
-  weightUnit: {
-    ...typography.subtitle,
-    color: colors.textSecondary,
-  },
-  emptyText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginBottom: 24,
-  },
-  sparkline: {
-    height: 64,
-    marginBottom: 24,
-    marginTop: spacing.xs,
-    width: '100%',
-  },
-  timeline: {
-    marginBottom: 28,
-  },
-  timelineItem: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    minHeight: 64,
-  },
-  timelineMarkerColumn: {
-    alignItems: 'center',
-    width: 16,
-  },
-  timelineDot: {
-    backgroundColor: colors.textPrimary,
-    borderRadius: radius.full,
-    height: 10,
-    marginTop: 4,
-    width: 10,
-  },
-  timelineDotMuted: {
-    backgroundColor: colors.semanticMuted,
-  },
-  timelineStem: {
-    backgroundColor: colors.bgSurface,
-    flex: 1,
-    marginTop: spacing.xs,
-    width: 2,
-  },
-  timelineContent: {
-    flex: 1,
-    paddingBottom: spacing.lg,
-  },
-  timelineDate: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '600',
-    marginBottom: spacing.xxs,
-  },
-  timelineText: {
-    ...typography.bodyClinical,
-    color: colors.textPrimary,
-  },
-  observation: {
-    marginBottom: 28,
-  },
-  observationCard: {
-    alignItems: 'center',
-    backgroundColor: colors.bgElevated,
-    borderColor: 'rgba(255,255,255,0.04)',
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.md,
-    padding: spacing.md,
-  },
-  observationText: {
-    ...typography.bodyClinical,
-    color: colors.textPrimary,
-    flex: 1,
-  },
-  consultation: {
-    marginBottom: 28,
-  },
-  consultationHeader: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.lg,
-  },
-  consultationBadge: {
-    backgroundColor: colors.bgElevated,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
-  },
-  consultationBadgeText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  consultationList: {
-    gap: spacing.sm,
-  },
-  consultationItem: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  consultationText: {
-    ...typography.bodyClinical,
-    color: colors.textPrimary,
-    flex: 1,
-  },
-  consultationTextCompleted: {
-    color: colors.textTertiary,
-    textDecorationColor: colors.semanticMuted,
-    textDecorationLine: 'line-through',
-  },
-  readStateLoading: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.md,
-  },
-  readStateError: {
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-    marginTop: spacing.md,
-  },
-  readStateText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  retryButton: {
-    alignItems: 'center',
-    borderColor: colors.semanticMuted,
-    borderRadius: radius.full,
-    borderWidth: StyleSheet.hairlineWidth,
-    justifyContent: 'center',
-    minHeight: 44,
-    paddingHorizontal: spacing.md,
-  },
-  retryButtonPressed: {
-    backgroundColor: colors.bgSurface,
-  },
-  retryText: {
-    ...typography.caption,
-    color: colors.textPrimary,
-    fontWeight: '600',
-  },
-  disclaimer: {
-    ...typography.caption,
-    color: colors.textTertiary,
-    lineHeight: 20,
-    paddingHorizontal: spacing.md,
-    textAlign: 'center',
-  },
-  expenses: {
-    marginBottom: 28,
-  },
-  expenseText: {
-    ...typography.bodyClinical,
-    color: colors.textSecondary,
-    marginTop: spacing.sm,
-  },
-})

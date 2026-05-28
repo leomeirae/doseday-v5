@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, Text, View } from 'react-native'
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
@@ -10,7 +10,7 @@ import { WeightStatsCard } from '@components/peso/WeightStatsCard'
 import { useProfile } from '@hooks/useProfile'
 import { useWeightLogs } from '@hooks/useWeightLogs'
 import { showErrorToast } from '@lib/utils/showToast'
-import { colors, elevation, radius, spacing, typography } from '@lib/theme/tokens'
+import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 import type { WeightLog } from '@lib/supabase/queries/weight'
 
 export default function PesoHistoricoScreen() {
@@ -22,7 +22,6 @@ export default function PesoHistoricoScreen() {
     data: weightLogs = [],
     isLoading,
     deleteWeightLog,
-    isDeleting,
   } = useWeightLogs()
 
   function openAdd() {
@@ -69,7 +68,15 @@ export default function PesoHistoricoScreen() {
           <SymbolView name="chevron.left" size={18} tintColor={colors.textSecondary} />
         </RectButton>
         <Text style={styles.headerTitle}>{t('historyModal.title')}</Text>
-        <View style={styles.headerSpacer} />
+        <Pressable
+          onPress={openAdd}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={t('addModal.titleAdd')}
+          style={({ pressed }) => [styles.plusButton, pressed && { opacity: 0.7 }]}
+        >
+          <SymbolView name="plus" size={22} tintColor={colors.brand} />
+        </Pressable>
       </View>
 
       <FlatList
@@ -90,18 +97,7 @@ export default function PesoHistoricoScreen() {
         )}
       />
 
-      {weightLogs.length > 0 && (
-        <RectButton
-          style={[styles.floatingButton, isDeleting && styles.disabled]}
-          onPress={openAdd}
-          enabled={!isDeleting}
-          accessibilityRole="button"
-          accessibilityLabel={t('addModal.titleAdd')}
-        >
-          <SymbolView name="plus" size={18} tintColor={colors.textInverse} />
-          <Text style={styles.floatingButtonText}>{t('addModal.titleAdd')}</Text>
-        </RectButton>
-      )}
+
     </SafeAreaView>
   )
 }
@@ -149,8 +145,11 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: 'center',
   },
-  headerSpacer: {
+  plusButton: {
     width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     paddingHorizontal: spacing.lg,
@@ -181,24 +180,5 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
   },
-  floatingButton: {
-    position: 'absolute',
-    right: spacing.lg,
-    bottom: spacing.lg,
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.full,
-    backgroundColor: colors.brand,
-    ...elevation[2],
-  },
-  floatingButtonText: {
-    ...typography.label,
-    color: colors.textInverse,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
+
 })

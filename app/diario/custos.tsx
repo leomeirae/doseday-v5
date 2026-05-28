@@ -38,7 +38,15 @@ export default function TreatmentCostsScreen() {
           <SymbolView name="chevron.left" size={18} tintColor={colors.textSecondary} />
         </Pressable>
         <Text style={styles.headerTitle}>Custos do tratamento</Text>
-        <View style={styles.headerSpacer} />
+        <Pressable
+          onPress={openAdd}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Registrar custo"
+          style={({ pressed }) => [styles.plusButton, pressed && { opacity: 0.7 }]}
+        >
+          <SymbolView name="plus" size={22} tintColor={colors.brand} />
+        </Pressable>
       </View>
 
       <ScrollView
@@ -95,9 +103,7 @@ export default function TreatmentCostsScreen() {
         )}
       </ScrollView>
 
-      <View style={styles.footer}>
-        <AuthButton label="Registrar custo" onPress={openAdd} />
-      </View>
+
     </SafeAreaView>
   )
 }
@@ -137,8 +143,11 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
-  headerSpacer: {
+  plusButton: {
     width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scroll: {
     flex: 1,
@@ -221,10 +230,5 @@ const styles = StyleSheet.create({
     ...typography.bodyClinical,
     color: colors.textSecondary,
   },
-  footer: {
-    borderTopColor: 'rgba(255,255,255,0.08)',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-  },
+
 })
