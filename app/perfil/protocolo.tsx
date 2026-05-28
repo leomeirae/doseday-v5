@@ -107,10 +107,9 @@ export default function DoseProtocolScreen() {
                   onPress={() => setDaysText(String(days))}
                   accessibilityRole="button"
                   accessibilityLabel={`Usar intervalo de ${days} ${days === 1 ? 'dia' : 'dias'}`}
-                  style={({ pressed }) => [
+                  style={[
                     styles.chip,
                     selected && styles.chipSelected,
-                    pressed && styles.pressed,
                   ]}
                 >
                   <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
@@ -164,9 +163,6 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
-  },
-  pressed: {
-    opacity: 0.65,
   },
   content: {
     paddingBottom: spacing.xxxl,

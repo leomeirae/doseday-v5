@@ -32,10 +32,9 @@ export function SymptomsMultiSelect({ selected, onChange }: Props) {
             accessibilityRole="checkbox"
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={QUICK_LOG_LABELS[type]}
-            style={({ pressed }) => [
+            style={[
               styles.chip,
               isSelected && styles.chipSelected,
-              pressed && styles.chipPressed,
             ]}
           >
             <Text style={[styles.label, isSelected && styles.labelSelected]}>
@@ -68,9 +67,6 @@ const styles = StyleSheet.create({
   chipSelected: {
     borderColor: colors.textPrimary,
     borderWidth: 1,
-  },
-  chipPressed: {
-    transform: [{ scale: 0.96 }],
   },
   label: {
     ...typography.label,

@@ -258,6 +258,9 @@ function DeleteAccountModal({
   onCancel: () => void
   onConfirm: () => void
 }) {
+  const [cancelPressed, setCancelPressed] = useState(false)
+  const [confirmPressed, setConfirmPressed] = useState(false)
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={styles.modalBackdrop}>
@@ -283,12 +286,14 @@ function DeleteAccountModal({
           <View style={styles.modalActions}>
             <Pressable
               onPress={onCancel}
+              onPressIn={() => setCancelPressed(true)}
+              onPressOut={() => setCancelPressed(false)}
               disabled={isPending}
               accessibilityRole="button"
               accessibilityLabel="Cancelar exclusão"
-              style={({ pressed }) => [
+              style={[
                 styles.secondaryButton,
-                pressed && styles.buttonPressed,
+                cancelPressed && styles.buttonPressed,
                 isPending && styles.disabledButton,
               ]}
             >
@@ -297,12 +302,14 @@ function DeleteAccountModal({
 
             <Pressable
               onPress={onConfirm}
+              onPressIn={() => setConfirmPressed(true)}
+              onPressOut={() => setConfirmPressed(false)}
               disabled={!canDelete || isPending}
               accessibilityRole="button"
               accessibilityLabel="Excluir conta"
-              style={({ pressed }) => [
+              style={[
                 styles.destructiveButton,
-                pressed && styles.buttonPressed,
+                confirmPressed && styles.buttonPressed,
                 (!canDelete || isPending) && styles.disabledButton,
               ]}
               testID="settings-delete-final-button"

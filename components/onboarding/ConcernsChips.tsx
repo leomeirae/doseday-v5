@@ -22,10 +22,9 @@ export function ConcernsChips({ options, selected, labelFor, onToggle }: Props) 
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={label}
             testID={`concern-${option}`}
-            style={({ pressed }) => [
+            style={[
               styles.chip,
               isSelected && styles.chipSelected,
-              pressed && styles.chipPressed,
             ]}
           >
             <Text style={[styles.label, isSelected && styles.labelSelected]}>{label}</Text>
@@ -54,9 +53,6 @@ const styles = StyleSheet.create({
   chipSelected: {
     backgroundColor: colors.bgSurface,
     borderColor: colors.brand,
-  },
-  chipPressed: {
-    transform: [{ scale: 0.97 }],
   },
   label: {
     ...typography.label,

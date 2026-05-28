@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 
@@ -20,18 +21,23 @@ export function WelcomeActionDock({
   onCreateAccount,
   onSignIn,
 }: WelcomeActionDockProps) {
+  const [createPressed, setCreatePressed] = useState(false)
+  const [signInPressed, setSignInPressed] = useState(false)
+
   return (
     <View style={styles.dock}>
       <Pressable
         onPress={onCreateAccount}
+        onPressIn={() => setCreatePressed(true)}
+        onPressOut={() => setCreatePressed(false)}
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={createAccountLabel}
         accessibilityHint={createAccountHint}
         accessibilityState={{ disabled, busy: disabled }}
-        style={({ pressed }) => [
+        style={[
           styles.primaryButton,
-          pressed && !disabled ? styles.primaryButtonPressed : null,
+          createPressed && !disabled ? styles.primaryButtonPressed : null,
           disabled ? styles.disabled : null,
         ]}
         testID="welcome-create-account"
@@ -41,14 +47,16 @@ export function WelcomeActionDock({
 
       <Pressable
         onPress={onSignIn}
+        onPressIn={() => setSignInPressed(true)}
+        onPressOut={() => setSignInPressed(false)}
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={signInLabel}
         accessibilityHint={signInHint}
         accessibilityState={{ disabled, busy: disabled }}
-        style={({ pressed }) => [
+        style={[
           styles.secondaryButton,
-          pressed && !disabled ? styles.secondaryButtonPressed : null,
+          signInPressed && !disabled ? styles.secondaryButtonPressed : null,
         ]}
         testID="welcome-sign-in"
       >

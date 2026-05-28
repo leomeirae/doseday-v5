@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 
@@ -20,15 +21,19 @@ export function SelectionCard({
   accessibilityHint,
   testID,
 }: Props) {
+  const [pressed, setPressed] = useState(false)
+
   return (
     <Pressable
       onPress={onPress}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       accessibilityRole="radio"
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
       accessibilityState={{ selected }}
       testID={testID}
-      style={({ pressed }) => [
+      style={[
         styles.card,
         selected && styles.cardSelected,
         pressed && styles.cardPressed,

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { colors, typography, spacing, radius } from '@lib/theme/tokens'
 
@@ -50,6 +51,7 @@ export function EmptyDoseStateCard({
   currentDose,
 }: Props) {
   const { headline, body, ctaLabel } = getContent(treatmentStatus, medicationName, currentDose)
+  const [pressed, setPressed] = useState(false)
 
   return (
     <View style={styles.card}>
@@ -57,9 +59,11 @@ export function EmptyDoseStateCard({
       <Text style={styles.body}>{body}</Text>
       <Pressable
         onPress={onPressRegister}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
         accessibilityRole="button"
         accessibilityLabel={ctaLabel}
-        style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+        style={[styles.cta, pressed && styles.ctaPressed]}
       >
         <Text style={styles.ctaLabel}>{ctaLabel}</Text>
       </Pressable>

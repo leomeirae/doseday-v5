@@ -44,6 +44,7 @@ export default function ConfiguracoesMedicoScreen() {
   const [appointmentDate, setAppointmentDate] = useState<Date | null>(null)
   const [showPicker, setShowPicker] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
+  const [datePressed, setDatePressed] = useState(false)
 
   useEffect(() => {
     setSupport(profile?.hasMedicalSupport ?? null)
@@ -133,11 +134,10 @@ export default function ConfiguracoesMedicoScreen() {
                     accessibilityState={{ selected }}
                     accessibilityLabel={t(`medicalSupport.options.${option}.label`)}
                     accessibilityHint={t(`medicalSupport.options.${option}.caption`)}
-                    style={({ pressed }) => [
+                    style={[
                       styles.option,
                       index < SUPPORT_ORDER.length - 1 && styles.optionDivider,
                       selected && styles.optionSelected,
-                      pressed && styles.optionPressed,
                     ]}
                     testID={`settings-medical-support-${option}`}
                   >
@@ -173,10 +173,12 @@ export default function ConfiguracoesMedicoScreen() {
             <Text style={styles.sectionLabel}>Próxima consulta</Text>
             <Pressable
               onPress={() => setShowPicker((current) => !current)}
+              onPressIn={() => setDatePressed(true)}
+              onPressOut={() => setDatePressed(false)}
               accessibilityRole="button"
               accessibilityLabel="Próxima consulta"
               accessibilityHint="Escolhe a data da próxima consulta."
-              style={({ pressed }) => [styles.dateButton, pressed && styles.dateButtonPressed]}
+              style={[styles.dateButton, datePressed && styles.dateButtonPressed]}
               testID="settings-next-appointment-button"
             >
               <Text style={styles.dateButtonText}>
@@ -284,9 +286,6 @@ const styles = StyleSheet.create({
   },
   optionSelected: {
     backgroundColor: colors.bgSurface,
-  },
-  optionPressed: {
-    opacity: 0.78,
   },
   optionLabel: {
     ...typography.caption,

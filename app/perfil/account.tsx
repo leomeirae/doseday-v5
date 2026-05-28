@@ -31,6 +31,8 @@ export default function AccountScreen() {
   const deleteAccount = useDeleteAccount()
 
   const [name, setName] = useState(profile?.fullName ?? '')
+  const [savePressed, setSavePressed] = useState(false)
+  const [deletePressed, setDeletePressed] = useState(false)
   const isDirty = name.trim() !== (profile?.fullName ?? '').trim()
 
   useEffect(() => {
@@ -111,12 +113,14 @@ export default function AccountScreen() {
             />
             {isDirty && (
               <Pressable
-                style={({ pressed }) => [
+                style={[
                   styles.saveButton,
-                  pressed && styles.saveButtonPressed,
+                  savePressed && styles.saveButtonPressed,
                   updateProfile.isPending && styles.saveButtonDisabled,
                 ]}
                 onPress={handleSave}
+                onPressIn={() => setSavePressed(true)}
+                onPressOut={() => setSavePressed(false)}
                 disabled={updateProfile.isPending}
                 accessibilityLabel={t('name.saveButton')}
                 testID="account-save-button"
@@ -145,12 +149,14 @@ export default function AccountScreen() {
           <Text style={styles.deleteLabel}>{t('delete.label')}</Text>
           <Text style={styles.deleteDescription}>{t('delete.description')}</Text>
           <Pressable
-            style={({ pressed }) => [
+            style={[
               styles.deleteButton,
-              pressed && styles.deleteButtonPressed,
+              deletePressed && styles.deleteButtonPressed,
               isBlocked && styles.deleteButtonDisabled,
             ]}
             onPress={handleDeletePress}
+            onPressIn={() => setDeletePressed(true)}
+            onPressOut={() => setDeletePressed(false)}
             disabled={isBlocked}
             accessibilityLabel={t('delete.button')}
             testID="account-delete-button"

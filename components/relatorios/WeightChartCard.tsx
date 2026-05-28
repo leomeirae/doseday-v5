@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Pressable, Text, View, StyleSheet, useWindowDimensions } from 'react-native'
 import { LineChart } from 'react-native-gifted-charts'
 import { format } from 'date-fns'
@@ -19,6 +20,7 @@ export function WeightChartCard({ data, isLoading, error, onRetry }: Props) {
   const router = useRouter()
   const { width } = useWindowDimensions()
   const chartWidth = Math.min(width - spacing.lg * 4, 328)
+  const [pressed, setPressed] = useState(false)
 
   const first = data[0]
   const latest = data[data.length - 1]
@@ -34,8 +36,10 @@ export function WeightChartCard({ data, isLoading, error, onRetry }: Props) {
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, pressed && !error && styles.cardPressed]}
+      style={[styles.card, pressed && !error && styles.cardPressed]}
       onPress={() => router.push('/peso/historico' as Href)}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       disabled={!!error}
       accessible
       accessibilityRole="button"

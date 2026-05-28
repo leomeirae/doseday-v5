@@ -131,7 +131,7 @@ export default function AnotarSintomaScreen() {
                     onPress={() => insertChip(item.type)}
                     accessibilityRole="button"
                     accessibilityLabel={`Inserir ${labelFor(item.type)}`}
-                    style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+                    style={styles.chip}
                     testID={`anotar-sintoma-chip-${item.type}`}
                   >
                     <Text style={styles.chipLabel}>{labelFor(item.type)}</Text>
@@ -221,9 +221,6 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-  },
-  chipPressed: {
-    transform: [{ scale: 0.96 }],
   },
   chipLabel: {
     ...typography.label,
