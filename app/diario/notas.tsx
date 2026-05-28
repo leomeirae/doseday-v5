@@ -37,7 +37,15 @@ export default function TreatmentNotesScreen() {
           <SymbolView name="chevron.left" size={18} tintColor={colors.textSecondary} />
         </Pressable>
         <Text style={styles.headerTitle}>Notas sobre o tratamento</Text>
-        <View style={styles.headerSpacer} />
+        <Pressable
+          onPress={openAdd}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Registrar nova nota"
+          style={({ pressed }) => [styles.plusButton, pressed && { opacity: 0.7 }]}
+        >
+          <SymbolView name="plus" size={22} tintColor={colors.brand} />
+        </Pressable>
       </View>
 
       <ScrollView
@@ -88,9 +96,7 @@ export default function TreatmentNotesScreen() {
         )}
       </ScrollView>
 
-      <View style={styles.footer}>
-        <AuthButton label="Registrar nota" onPress={openAdd} />
-      </View>
+
     </SafeAreaView>
   )
 }
@@ -131,8 +137,11 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
-  headerSpacer: {
+  plusButton: {
     width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scroll: {
     flex: 1,
@@ -192,10 +201,5 @@ const styles = StyleSheet.create({
     ...typography.bodyClinical,
     color: colors.textPrimary,
   },
-  footer: {
-    borderTopColor: 'rgba(255,255,255,0.08)',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-  },
+
 })
