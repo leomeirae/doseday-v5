@@ -115,7 +115,7 @@ export function HomeV7Content() {
         <NextDoseSection
           nextDose={doseSummary?.nextDose ?? null}
           hasDoseHistory={(doseSummary?.history.length ?? 0) > 0}
-          onPressBody={() => router.push('/perfil/protocolo')}
+          onPressBody={() => router.push('/(tabs)/doses' as Href)}
           isLoading={doseQuery.isLoading}
           error={doseQuery.error ? mapQueryError(doseQuery.error) : null}
           onRetry={() => void doseQuery.refetch()}

@@ -1,7 +1,8 @@
 # CLAUDE.md — Working Memory do DoseDay V5
 
-**Última atualização:** 27 de maio de 2026
-**Status do projeto:** Prompt 42c concluído. Tela de memória redesenhada como hub interativo com protocolo atual, sintoma inline (chips e input), botões de nota/custo e timeline unificada. Toasts de bottomOffset elevados para 85. PR #86 aberto.
+**Última atualização:** 28 de maio de 2026
+**Status do projeto:** Prompt 42e concluído. Card "Próxima dose" no Dashboard corrigido para abrir a aba `/(tabs)/doses`. Tela Memória finalizada como hub completo de registros (Nota, Custo, Dose, Peso em grid 2x2 com copy humana simplificada). type-check e lint válidos. PR #88 aberto.
+
 
 ---
 
