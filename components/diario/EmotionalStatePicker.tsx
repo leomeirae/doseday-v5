@@ -28,9 +28,9 @@ export function EmotionalStatePicker({ value, onChange }: Props) {
             accessibilityRole="radio"
             accessibilityState={{ checked: selected }}
             accessibilityLabel={EMOTIONAL_LABELS[state]}
-            style={({ pressed }) => [
+            style={[
               styles.item,
-              (selected || pressed) && styles.itemSelected,
+              selected && styles.itemSelected,
             ]}
           >
             <Text style={styles.emoji}>{EMOTIONAL_EMOJIS[state]}</Text>

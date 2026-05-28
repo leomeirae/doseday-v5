@@ -108,10 +108,9 @@ export default function DoseScreen() {
                         accessibilityState={{ selected }}
                         accessibilityLabel={`${dose} ${t('dose.mgSuffix')}`}
                         testID={`dose-common-${dose}`}
-                        style={({ pressed }) => [
+                        style={[
                           styles.chip,
                           selected && styles.chipSelected,
-                          pressed && styles.chipPressed,
                         ]}
                       >
                         <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
@@ -158,9 +157,6 @@ const styles = StyleSheet.create({
   chipSelected: {
     backgroundColor: colors.bgSurface,
     borderColor: colors.brand,
-  },
-  chipPressed: {
-    transform: [{ scale: 0.97 }],
   },
   chipLabel: {
     ...typography.label,

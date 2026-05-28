@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import {
   ActivityIndicator,
   Keyboard,
@@ -53,6 +53,8 @@ export function OnboardingShell({
   onClose,
 }: OnboardingShellProps) {
   const primaryDisabled = primaryCTA.disabled || primaryCTA.loading
+  const [primaryPressed, setPrimaryPressed] = useState(false)
+  const [secondaryPressed, setSecondaryPressed] = useState(false)
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -106,6 +108,8 @@ export function OnboardingShell({
         <View style={styles.footer}>
           <Pressable
             onPress={() => { Keyboard.dismiss(); primaryCTA.onPress(); }}
+            onPressIn={() => setPrimaryPressed(true)}
+            onPressOut={() => setPrimaryPressed(false)}
             disabled={primaryDisabled}
             accessibilityRole="button"
             accessibilityLabel={primaryCTA.label}
@@ -114,10 +118,10 @@ export function OnboardingShell({
               busy: primaryCTA.loading,
             }}
             testID={`${step}-primary-cta`}
-            style={({ pressed }) => [
+            style={[
               styles.primaryButton,
               primaryDisabled && styles.disabled,
-              pressed && !primaryDisabled && styles.pressed,
+              primaryPressed && !primaryDisabled && styles.pressed,
             ]}
           >
             {primaryCTA.loading ? (
@@ -130,12 +134,14 @@ export function OnboardingShell({
           {secondaryCTA ? (
             <Pressable
               onPress={secondaryCTA.onPress}
+              onPressIn={() => setSecondaryPressed(true)}
+              onPressOut={() => setSecondaryPressed(false)}
               accessibilityRole="button"
               accessibilityLabel={secondaryCTA.label}
               testID={`${step}-secondary-cta`}
-              style={({ pressed }) => [
+              style={[
                 styles.secondaryButton,
-                pressed && styles.secondaryPressed,
+                secondaryPressed && styles.secondaryPressed,
               ]}
             >
               <Text style={styles.secondaryLabel}>{secondaryCTA.label}</Text>

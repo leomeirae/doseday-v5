@@ -109,10 +109,9 @@ export default function QuickLogScreen() {
                   accessibilityRole="button"
                   accessibilityState={{ selected: intensity === item }}
                   accessibilityLabel={INTENSITY_LABELS[item]}
-                  style={({ pressed }) => [
+                  style={[
                     styles.chip,
                     intensity === item && styles.chipSelected,
-                    pressed && styles.chipPressed,
                   ]}
                 >
                   <Text
@@ -219,9 +218,6 @@ const styles = StyleSheet.create({
   chipSelected: {
     borderColor: colors.textPrimary,
     borderWidth: 1,
-  },
-  chipPressed: {
-    transform: [{ scale: 0.96 }],
   },
   chipLabel: {
     ...typography.label,

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { SymbolView } from 'expo-symbols'
 import { useTranslation } from 'react-i18next'
@@ -11,18 +12,22 @@ type Props = {
 
 export function HomeQuickActions({ hasDose, onPressDose, onPressWeight }: Props) {
   const { t } = useTranslation('home')
+  const [dosePressed, setDosePressed] = useState(false)
+  const [weightPressed, setWeightPressed] = useState(false)
 
   return (
     <View style={styles.row}>
       {hasDose && (
         <Pressable
           onPress={onPressDose}
+          onPressIn={() => setDosePressed(true)}
+          onPressOut={() => setDosePressed(false)}
           accessibilityRole="button"
           accessibilityLabel={t('quickActions.registerDose')}
-          style={({ pressed }) => [
+          style={[
             styles.button,
             styles.buttonPrimary,
-            pressed && styles.buttonPrimaryPressed,
+            dosePressed && styles.buttonPrimaryPressed,
           ]}
         >
           <SymbolView name="syringe" size={20} tintColor={colors.textInverse} />
@@ -32,12 +37,14 @@ export function HomeQuickActions({ hasDose, onPressDose, onPressWeight }: Props)
 
       <Pressable
         onPress={onPressWeight}
+        onPressIn={() => setWeightPressed(true)}
+        onPressOut={() => setWeightPressed(false)}
         accessibilityRole="button"
         accessibilityLabel={t('quickActions.registerWeight')}
-        style={({ pressed }) => [
+        style={[
           styles.button,
           styles.buttonSecondary,
-          pressed && styles.buttonSecondaryPressed,
+          weightPressed && styles.buttonSecondaryPressed,
         ]}
       >
         <SymbolView name="scalemass" size={20} tintColor={colors.textPrimary} />

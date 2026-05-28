@@ -111,10 +111,9 @@ export default function DoseFrequencyScreen() {
                 accessibilityState={{ selected }}
                 accessibilityLabel={t('doseFrequency.optionA11y', { count: days })}
                 testID={`dose-frequency-${days}`}
-                style={({ pressed }) => [
+                style={[
                   styles.chip,
                   selected && styles.chipSelected,
-                  pressed && styles.chipPressed,
                 ]}
               >
                 <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
@@ -177,9 +176,6 @@ const styles = StyleSheet.create({
   chipSelected: {
     backgroundColor: colors.brand,
     borderColor: colors.brand,
-  },
-  chipPressed: {
-    transform: [{ scale: 0.97 }],
   },
   chipLabel: {
     ...typography.label,

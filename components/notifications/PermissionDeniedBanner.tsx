@@ -12,6 +12,7 @@ type Props = {
 
 export function PermissionDeniedBanner({ visible }: Props) {
   const [dismissed, setDismissed] = useState(false)
+  const [ctaPressed, setCtaPressed] = useState(false)
 
   useEffect(() => {
     SecureStore.getItemAsync(DISMISSED_KEY).then((val) => {
@@ -51,8 +52,10 @@ export function PermissionDeniedBanner({ visible }: Props) {
       </View>
 
       <Pressable
-        style={({ pressed }) => [styles.ctaButton, pressed && styles.pressed]}
+        style={[styles.ctaButton, ctaPressed && styles.pressed]}
         onPress={handleOpenSettings}
+        onPressIn={() => setCtaPressed(true)}
+        onPressOut={() => setCtaPressed(false)}
         accessibilityRole="button"
         accessibilityLabel="Abrir Configurações do iPhone"
       >

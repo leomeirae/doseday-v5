@@ -145,6 +145,9 @@ export default function NotificacoesScreen() {
         ? colors.semanticCritical
         : colors.textTertiary
 
+  const [cardPressed, setCardPressed] = useState(false)
+  const [testPressed, setTestPressed] = useState(false)
+
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       {/* Header */}
@@ -168,11 +171,13 @@ export default function NotificacoesScreen() {
       >
         {/* Status card */}
         <Pressable
-          style={({ pressed }) => [
+          style={[
             styles.card,
-            permStatus !== 'granted' && pressed && styles.pressed,
+            permStatus !== 'granted' && cardPressed && styles.pressed,
           ]}
           onPress={handlePermissionPress}
+          onPressIn={() => setCardPressed(true)}
+          onPressOut={() => setCardPressed(false)}
           disabled={permStatus === 'granted'}
           accessibilityRole={permStatus === 'granted' ? undefined : 'button'}
           accessibilityLabel="Permissão de notificações"
@@ -265,12 +270,14 @@ export default function NotificacoesScreen() {
             Envia uma notificação local em 5 segundos para confirmar que o lembrete chega.
           </Text>
           <Pressable
-            style={({ pressed }) => [
+            style={[
               styles.testButton,
               permStatus !== 'granted' && styles.testButtonDisabled,
-              pressed && permStatus === 'granted' && styles.pressed,
+              testPressed && permStatus === 'granted' && styles.pressed,
             ]}
             onPress={handleTestNotification}
+            onPressIn={() => setTestPressed(true)}
+            onPressOut={() => setTestPressed(false)}
             disabled={testLoading || permStatus !== 'granted'}
             accessibilityRole="button"
             accessibilityLabel="Testar notificação"

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
 import type { CheckinRecord } from '@lib/supabase/queries/diario'
 import {
@@ -15,6 +16,8 @@ type Props = {
 }
 
 export function CheckinCard({ todayCheckin, treatmentWeek, onPressCTA }: Props) {
+  const [pressed, setPressed] = useState(false)
+
   if (todayCheckin) {
     const emoji = todayCheckin.emotionalState
       ? EMOTIONAL_EMOJIS[todayCheckin.emotionalState]
@@ -54,9 +57,11 @@ export function CheckinCard({ todayCheckin, treatmentWeek, onPressCTA }: Props) 
       <Text style={styles.ctaSubtitle}>{subtitle}</Text>
       <Pressable
         onPress={onPressCTA}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
         accessibilityRole="button"
         accessibilityLabel="Fazer check-in"
-        style={({ pressed }) => [styles.ctaButton, pressed && styles.ctaButtonPressed]}
+        style={[styles.ctaButton, pressed && styles.ctaButtonPressed]}
       >
         <Text style={styles.ctaButtonLabel}>Fazer check-in</Text>
       </Pressable>

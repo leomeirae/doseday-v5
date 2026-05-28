@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native'
 import { SymbolView } from 'expo-symbols'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -24,6 +25,8 @@ export function PermissionRequestModal({ visible, onDismiss }: Props) {
   const { session } = useSession()
   const userId = session?.user?.id
   const queryClient = useQueryClient()
+  const [allowPressed, setAllowPressed] = useState(false)
+  const [skipPressed, setSkipPressed] = useState(false)
 
   const { mutate: dismiss } = useMutation({
     mutationFn: async () => {
@@ -71,8 +74,10 @@ export function PermissionRequestModal({ visible, onDismiss }: Props) {
           </Text>
 
           <Pressable
-            style={({ pressed }) => [styles.btnPrimary, pressed && styles.pressed]}
+            style={[styles.btnPrimary, allowPressed && styles.pressed]}
             onPress={handleAllow}
+            onPressIn={() => setAllowPressed(true)}
+            onPressOut={() => setAllowPressed(false)}
             accessibilityRole="button"
             accessibilityLabel="Ativar notificações"
           >
@@ -80,8 +85,10 @@ export function PermissionRequestModal({ visible, onDismiss }: Props) {
           </Pressable>
 
           <Pressable
-            style={({ pressed }) => [styles.btnSecondary, pressed && styles.pressed]}
+            style={[styles.btnSecondary, skipPressed && styles.pressed]}
             onPress={handleSkip}
+            onPressIn={() => setSkipPressed(true)}
+            onPressOut={() => setSkipPressed(false)}
             accessibilityRole="button"
             accessibilityLabel="Agora não"
           >
