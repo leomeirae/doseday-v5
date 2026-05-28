@@ -261,14 +261,31 @@ export default function TreatmentMemoryScreen() {
             style={styles.quickActionBtn}
           >
             <SymbolView name="note.text" size={18} tintColor={colors.brand} style={{ width: 18, height: 18 }} />
-            <Text style={styles.quickActionText}>Anotar nota</Text>
+            <Text style={styles.quickActionText}>Nota</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push('/diario/anotar-custo' as Href)}
             style={styles.quickActionBtn}
           >
             <SymbolView name="dollarsign.circle" size={18} tintColor={colors.brand} style={{ width: 18, height: 18 }} />
-            <Text style={styles.quickActionText}>Anotar custo</Text>
+            <Text style={styles.quickActionText}>Custo</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.quickActionsRow, { marginTop: spacing.md }]}>
+          <TouchableOpacity
+            onPress={() => router.push('/dose/registrar' as Href)}
+            style={styles.quickActionBtn}
+          >
+            <SymbolView name="cross.case" size={18} tintColor={colors.brand} style={{ width: 18, height: 18 }} />
+            <Text style={styles.quickActionText}>Dose</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push('/peso/registrar' as Href)}
+            style={styles.quickActionBtn}
+          >
+            <SymbolView name="scalemass" size={18} tintColor={colors.brand} style={{ width: 18, height: 18 }} />
+            <Text style={styles.quickActionText}>Peso</Text>
           </TouchableOpacity>
         </View>
 
