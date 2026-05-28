@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { colors, spacing, typography } from '@lib/theme/tokens'
@@ -29,12 +30,13 @@ export function SettingsRow({
   accessibilityHint,
   testID,
 }: SettingsRowProps) {
+  const [pressed, setPressed] = useState(false)
   const labelColor = destructive ? colors.destructive : colors.textPrimary
   const iconColor = destructive ? colors.destructive : colors.textSecondary
   const accessibilityLabel = value ? `${label}: ${value}` : label
   const rowContent = (
     <>
-      <SymbolView name={icon} size={20} tintColor={iconColor} />
+      <SymbolView name={icon} size={20} tintColor={iconColor} style={{ width: 20, height: 20 }} />
       {stacked && value ? (
         <View style={styles.copy}>
           <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
@@ -54,7 +56,7 @@ export function SettingsRow({
         </>
       )}
       {chevron ? (
-        <SymbolView name="chevron.right" size={14} tintColor={colors.textTertiary} />
+        <SymbolView name="chevron.right" size={14} tintColor={colors.textTertiary} style={{ width: 14, height: 14 }} />
       ) : null}
     </>
   )
@@ -75,13 +77,15 @@ export function SettingsRow({
   return (
     <Pressable
       onPress={onPress}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled }}
       testID={testID}
       disabled={disabled}
-      style={({ pressed }) => [
+      style={[
         styles.row,
         divider && styles.divider,
         pressed && styles.rowPressed,
