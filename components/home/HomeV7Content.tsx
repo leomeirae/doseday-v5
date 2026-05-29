@@ -20,6 +20,7 @@ import { mapQueryError } from '@lib/supabase/queries/errors'
 import type { RecentSymptom } from '@lib/supabase/queries/symptoms'
 import type { WeightLog } from '@lib/supabase/queries/weight'
 import { cn } from '@lib/rnr/utils'
+import { SOURCE_COLORS, getQuickLogSource, type MemorySource } from '@lib/memory/source'
 import { colors, spacing } from '@lib/theme/tokens'
 import { QUICK_LOG_LABELS } from '@lib/validation/diarioSchemas'
 
@@ -31,6 +32,7 @@ type TimelineItem = {
   id: string
   date: Date
   title: string
+  source: MemorySource
 }
 
 const SYMPTOM_LABELS: Record<string, string> = {
@@ -437,9 +439,9 @@ function RecentMemoryTimeline({
                       <View className="items-center w-[16px]">
                         <View
                           className="rounded-full h-[10px] w-[10px] mt-[4px]"
-                          style={{ backgroundColor: index > 0 ? colors.semanticMuted : colors.textPrimary }}
+                          style={{ backgroundColor: SOURCE_COLORS[item.source] }}
                         />
-                        {/* style prop: semanticMuted (#5C6878) não tem token Tailwind */}
+                        {/* style prop: cor por tipo do evento (SOURCE_COLORS); nem toda cor tem token Tailwind */}
                         {index < items.length - 1 && (
                           <View className="bg-bg-surface flex-1 mt-xs w-[2px]" />
                         )}
@@ -673,20 +675,23 @@ function buildTimeline(
   weightLogs: WeightLog[],
   quickLogs: QuickLogRecord[]
 ): TimelineItem[] {
-  const doseItems = doses.slice(0, TIMELINE_SOURCE_LIMIT).map((dose) => ({
+  const doseItems = doses.slice(0, TIMELINE_SOURCE_LIMIT).map((dose): TimelineItem => ({
     id: `dose-${dose.id}`,
     date: dose.applicationDate,
     title: `Dose de ${formatNumber(dose.dose)}mg administrada.`,
+    source: 'dose',
   }))
-  const weightItems = weightLogs.slice(0, TIMELINE_SOURCE_LIMIT).map((weight) => ({
+  const weightItems = weightLogs.slice(0, TIMELINE_SOURCE_LIMIT).map((weight): TimelineItem => ({
     id: `weight-${weight.id}`,
     date: weight.date,
     title: `Peso registrado (${formatNumber(weight.weight)} kg).`,
+    source: 'peso',
   }))
-  const quickLogItems = quickLogs.slice(0, TIMELINE_SOURCE_LIMIT).map((log) => ({
+  const quickLogItems = quickLogs.slice(0, TIMELINE_SOURCE_LIMIT).map((log): TimelineItem => ({
     id: `quick-${log.id}`,
     date: log.loggedAt,
     title: formatQuickLogTitle(log),
+    source: getQuickLogSource(log.logType),
   }))
 
   return [...doseItems, ...weightItems, ...quickLogItems]

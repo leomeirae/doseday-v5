@@ -14,6 +14,7 @@ import { useRegisterSymptom } from '@hooks/useRegisterSymptom'
 import { useFrequentSymptoms } from '@hooks/useFrequentSymptoms'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
+import { SOURCE_COLORS, getQuickLogSource } from '@lib/memory/source'
 import { QUICK_LOG_LABELS, symptomNoteSchema } from '@lib/validation/diarioSchemas'
 import { showErrorToast, showSuccessToast } from '@lib/utils/showToast'
 
@@ -24,15 +25,6 @@ type MemoryEvent = {
   source: 'dose' | 'peso' | 'nota' | 'sintoma' | 'custo' | 'registro'
 }
 
-const SOURCE_COLORS: Record<MemoryEvent['source'], string> = {
-  dose: colors.clinicalDose,
-  peso: colors.mintSoft,
-  nota: '#B8AECF',
-  sintoma: colors.semanticWarning,
-  custo: '#D7B56D',
-  registro: colors.semanticMuted,
-}
-
 const SOURCE_LABELS: Record<MemoryEvent['source'], string> = {
   dose: 'Dose',
   peso: 'Peso',
@@ -41,16 +33,6 @@ const SOURCE_LABELS: Record<MemoryEvent['source'], string> = {
   custo: 'Custo',
   registro: 'Registro',
 }
-
-const symptomQuickLogTypes = new Set([
-  'nausea',
-  'headache',
-  'fatigue',
-  'diarrhea',
-  'constipation',
-  'heartburn',
-  'injection_pain',
-])
 
 const SYMPTOM_LABELS: Record<string, string> = {
   constipation: 'Constipação',
@@ -398,12 +380,6 @@ function buildEvents({
   ]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .slice(0, 50)
-}
-
-function getQuickLogSource(logType: keyof typeof QUICK_LOG_LABELS): MemoryEvent['source'] {
-  if (logType === 'other') return 'nota'
-  if (symptomQuickLogTypes.has(logType)) return 'sintoma'
-  return 'registro'
 }
 
 function formatRelativeDay(date: Date): string {
