@@ -37,6 +37,7 @@ export default function AnotarCustoScreen() {
   const { mutate, isPending } = useRegisterCost()
   const [priceText, setPriceText] = useState('')
   const [description, setDescription] = useState('')
+  const [savePressed, setSavePressed] = useState(false)
 
   const parsedPrice = useMemo(() => parsePriceInput(priceText), [priceText])
   const trimmedDescription = description.trim()
@@ -97,9 +98,11 @@ export default function AnotarCustoScreen() {
           hitSlop={13}
           accessibilityLabel="Salvar custo"
           accessibilityRole="button"
-          style={({ pressed }) => [
+          onPressIn={() => setSavePressed(true)}
+          onPressOut={() => setSavePressed(false)}
+          style={[
             styles.saveHeaderButton,
-            pressed && styles.saveHeaderButtonPressed,
+            savePressed && styles.saveHeaderButtonPressed,
           ]}
         >
           <Text

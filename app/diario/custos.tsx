@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href } from 'expo-router'
@@ -9,6 +10,7 @@ import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 
 export default function TreatmentCostsScreen() {
   const router = useRouter()
+  const [pressed, setPressed] = useState(false)
   const purchasesQuery = usePurchases()
   const purchases = purchasesQuery.data ?? []
   const total = purchases.reduce((sum, purchase) => sum + purchase.price, 0)
@@ -43,7 +45,9 @@ export default function TreatmentCostsScreen() {
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Registrar custo"
-          style={({ pressed }) => [styles.plusButton, pressed && { opacity: 0.7 }]}
+          onPressIn={() => setPressed(true)}
+          onPressOut={() => setPressed(false)}
+          style={[styles.plusButton, pressed && { opacity: 0.7 }]}
         >
           <SymbolView name="plus" size={22} tintColor={colors.brand} />
         </Pressable>

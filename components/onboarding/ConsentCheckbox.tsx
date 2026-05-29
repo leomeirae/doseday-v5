@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { SymbolView } from 'expo-symbols'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
@@ -20,15 +20,19 @@ export function ConsentCheckbox({
   accessibilityLabel,
   testID,
 }: Props) {
+  const [pressed, setPressed] = useState(false)
+
   return (
     <Pressable
       onPress={onToggle}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       accessibilityRole="checkbox"
       accessibilityState={{ checked }}
       accessibilityLabel={accessibilityLabel}
       testID={testID}
       hitSlop={8}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      style={[styles.row, pressed && styles.pressed]}
     >
       <View style={[styles.box, checked && styles.boxChecked]}>
         {checked ? (

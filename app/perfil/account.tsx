@@ -31,6 +31,7 @@ export default function AccountScreen() {
   const deleteAccount = useDeleteAccount()
 
   const [name, setName] = useState(profile?.fullName ?? '')
+  const [backPressed, setBackPressed] = useState(false)
   const [savePressed, setSavePressed] = useState(false)
   const [deletePressed, setDeletePressed] = useState(false)
   const isDirty = name.trim() !== (profile?.fullName ?? '').trim()
@@ -77,8 +78,10 @@ export default function AccountScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable
-          style={({ pressed }) => [styles.backButton, pressed && styles.backPressed]}
+          style={[styles.backButton, backPressed && styles.backPressed]}
           onPress={() => router.back()}
+          onPressIn={() => setBackPressed(true)}
+          onPressOut={() => setBackPressed(false)}
           accessibilityLabel="Voltar"
           accessibilityRole="button"
           hitSlop={12}

@@ -197,6 +197,8 @@ function ConsentHistoryModal({
   rows: ConsentHistoryRow[]
   onClose: () => void
 }) {
+  const [closePressed, setClosePressed] = useState(false)
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.modalBackdrop}>
@@ -210,7 +212,9 @@ function ConsentHistoryModal({
               hitSlop={12}
               accessibilityRole="button"
               accessibilityLabel="Fechar"
-              style={({ pressed }) => [styles.iconButton, pressed && styles.backPressed]}
+              onPressIn={() => setClosePressed(true)}
+              onPressOut={() => setClosePressed(false)}
+              style={[styles.iconButton, closePressed && styles.backPressed]}
             >
               <SymbolView name="xmark" size={16} tintColor={colors.textSecondary} />
             </Pressable>

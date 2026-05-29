@@ -357,6 +357,7 @@ const styles = StyleSheet.create({
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-between',
     gap: spacing.xs,
   },
   chip: {
@@ -366,6 +367,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgSurface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'rgba(255,255,255,0.18)',
+    width: '48%',
+    alignItems: 'center',
   },
   chipSelected: {
     backgroundColor: 'rgba(0,212,170,0.15)',
