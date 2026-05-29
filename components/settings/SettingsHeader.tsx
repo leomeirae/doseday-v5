@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { SymbolView } from 'expo-symbols'
 import { colors, spacing, typography } from '@lib/theme/tokens'
@@ -15,15 +16,19 @@ export function SettingsHeader({
   backAccessibilityLabel,
   testID,
 }: SettingsHeaderProps) {
+  const [pressed, setPressed] = useState(false)
+
   return (
     <View style={styles.header}>
       <Pressable
         onPress={onBack}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
         accessibilityRole="button"
         accessibilityLabel={backAccessibilityLabel}
         hitSlop={12}
         testID={testID}
-        style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
+        style={[styles.backButton, pressed && styles.pressed]}
       >
         <SymbolView name="chevron.left" size={20} tintColor={colors.textSecondary} />
       </Pressable>

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { SymbolView } from 'expo-symbols'
 import type { SFSymbol } from 'sf-symbols-typescript'
@@ -34,16 +35,19 @@ export function SettingsRow({
 }: SettingsRowProps) {
   const labelColor =
     variant === 'destructive' ? colors.semanticCritical : colors.textPrimary
+  const [pressed, setPressed] = useState(false)
 
   return (
     <>
       <Pressable
-        style={({ pressed }) => [
+        style={[
           styles.row,
           pressed && !disabled && styles.rowPressed,
           disabled && styles.rowDisabled,
         ]}
         onPress={disabled ? undefined : onPress}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel ?? label}
         accessibilityHint={accessibilityHint}

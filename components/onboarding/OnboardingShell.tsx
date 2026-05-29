@@ -164,14 +164,18 @@ function IconButton({
   onPress: () => void
   testID: string
 }) {
+  const [pressed, setPressed] = useState(false)
+
   return (
     <Pressable
       onPress={onPress}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       hitSlop={12}
       accessibilityRole="button"
       accessibilityLabel={label}
       testID={testID}
-      style={({ pressed }) => [styles.iconButton, pressed && styles.iconPressed]}
+      style={[styles.iconButton, pressed && styles.iconPressed]}
     >
       <SymbolView name={symbol} size={18} tintColor={colors.textSecondary} />
     </Pressable>

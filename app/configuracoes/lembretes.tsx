@@ -64,6 +64,8 @@ export default function ConfiguracoesLembretesScreen() {
   const queryClient = useQueryClient()
   const { permissionStatus, recheckPermission } = useNotifications()
   const [showTimePicker, setShowTimePicker] = useState(false)
+  const [permissionPressed, setPermissionPressed] = useState(false)
+  const [timePressed, setTimePressed] = useState(false)
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['userSettings', userId],
@@ -156,9 +158,11 @@ export default function ConfiguracoesLembretesScreen() {
                   ? 'Solicita permissão para enviar lembretes.'
                   : undefined
             }
-            style={({ pressed }) => [
+            onPressIn={() => setPermissionPressed(true)}
+            onPressOut={() => setPermissionPressed(false)}
+            style={[
               styles.row,
-              permissionStatus !== 'granted' && pressed && styles.rowPressed,
+              permissionStatus !== 'granted' && permissionPressed && styles.rowPressed,
             ]}
           >
             <SymbolView name="bell.fill" size={20} tintColor={colors.textSecondary} />
@@ -208,7 +212,9 @@ export default function ConfiguracoesLembretesScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Horário da notificação"
                 accessibilityHint="Escolhe o horário do lembrete."
-                style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+                onPressIn={() => setTimePressed(true)}
+                onPressOut={() => setTimePressed(false)}
+                style={[styles.row, timePressed && styles.rowPressed]}
                 testID="settings-notification-time"
               >
                 <SymbolView name="clock" size={20} tintColor={colors.textSecondary} />

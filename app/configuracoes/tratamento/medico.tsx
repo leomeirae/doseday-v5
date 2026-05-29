@@ -45,6 +45,7 @@ export default function ConfiguracoesMedicoScreen() {
   const [showPicker, setShowPicker] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
   const [datePressed, setDatePressed] = useState(false)
+  const [clearPressed, setClearPressed] = useState(false)
 
   useEffect(() => {
     setSupport(profile?.hasMedicalSupport ?? null)
@@ -208,7 +209,9 @@ export default function ConfiguracoesMedicoScreen() {
                 onPress={() => setAppointmentDate(null)}
                 accessibilityRole="button"
                 accessibilityLabel="Remover próxima consulta"
-                style={({ pressed }) => [styles.clearButton, pressed && styles.clearPressed]}
+                onPressIn={() => setClearPressed(true)}
+                onPressOut={() => setClearPressed(false)}
+                style={[styles.clearButton, clearPressed && styles.clearPressed]}
               >
                 <Text style={styles.clearText}>Remover data</Text>
               </Pressable>

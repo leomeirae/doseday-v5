@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href } from 'expo-router'
@@ -15,6 +16,7 @@ import type { WeightLog } from '@lib/supabase/queries/weight'
 
 export default function PesoHistoricoScreen() {
   const router = useRouter()
+  const [pressed, setPressed] = useState(false)
   const { t } = useTranslation('weight')
   const { t: tCommon } = useTranslation('common')
   const { data: profile } = useProfile()
@@ -73,7 +75,9 @@ export default function PesoHistoricoScreen() {
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel={t('addModal.titleAdd')}
-          style={({ pressed }) => [styles.plusButton, pressed && { opacity: 0.7 }]}
+          onPressIn={() => setPressed(true)}
+          onPressOut={() => setPressed(false)}
+          style={[styles.plusButton, pressed && { opacity: 0.7 }]}
         >
           <SymbolView name="plus" size={22} tintColor={colors.brand} />
         </Pressable>

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href } from 'expo-router'
@@ -9,6 +10,7 @@ import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 
 export default function TreatmentNotesScreen() {
   const router = useRouter()
+  const [pressed, setPressed] = useState(false)
   const notesQuery = useMemoryNotes()
   const notes = notesQuery.data ?? []
 
@@ -42,7 +44,9 @@ export default function TreatmentNotesScreen() {
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Registrar nova nota"
-          style={({ pressed }) => [styles.plusButton, pressed && { opacity: 0.7 }]}
+          onPressIn={() => setPressed(true)}
+          onPressOut={() => setPressed(false)}
+          style={[styles.plusButton, pressed && { opacity: 0.7 }]}
         >
           <SymbolView name="plus" size={22} tintColor={colors.brand} />
         </Pressable>
