@@ -1,13 +1,13 @@
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { useContext } from 'react'
+import { useContext, type ComponentProps } from 'react'
 import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs'
 import { useRouter, type Href } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
 import Svg, { Circle as SvgCircle, Polyline } from 'react-native-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useConsultationNotes, type ConsultationNote } from '@hooks/useConsultationNotes'
+import { useConsultationNotes } from '@hooks/useConsultationNotes'
 import { useDiarioSummary } from '@hooks/useDiarioSummary'
 import { useDoseSummary } from '@hooks/useDoseSummary'
 import { useProfile } from '@hooks/useProfile'
@@ -19,14 +19,20 @@ import type { QuickLogRecord } from '@lib/supabase/queries/diario'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 import type { RecentSymptom } from '@lib/supabase/queries/symptoms'
 import type { WeightLog } from '@lib/supabase/queries/weight'
-import { cn } from '@lib/rnr/utils'
 import { SOURCE_COLORS, getQuickLogSource, type MemorySource } from '@lib/memory/source'
-import { colors, spacing } from '@lib/theme/tokens'
+import { colors, elevation, spacing } from '@lib/theme/tokens'
 import { QUICK_LOG_LABELS } from '@lib/validation/diarioSchemas'
 
 const FALLBACK_TAB_BAR_HEIGHT = 96
 const TIMELINE_LIMIT = 4
 const TIMELINE_SOURCE_LIMIT = 2
+
+// Graphite Panel Strong (DESIGN.md — Graphite Clinical Home Layer). Inline,
+// só no card do hero, para o hero dominar por nível de superfície sem editar tokens.
+const HERO_GRAPHITE = '#172637'
+const HAIRLINE = 'rgba(255,255,255,0.06)'
+// Borda mint discreta — só o atalho Peso (Vital Mint Rarity; mint = linha de peso no DESIGN.md).
+const MINT_BORDER = 'rgba(0,212,170,0.45)'
 
 type TimelineItem = {
   id: string
@@ -34,6 +40,42 @@ type TimelineItem = {
   title: string
   source: MemorySource
 }
+
+type QuickAction = {
+  label: string
+  icon: ComponentProps<typeof SymbolView>['name']
+  route: string
+  accessibilityHint: string
+  accent?: boolean
+}
+
+const QUICK_ACTIONS: QuickAction[] = [
+  {
+    label: 'Sintoma',
+    icon: 'cross.case',
+    route: '/diario/anotar-sintoma',
+    accessibilityHint: 'Abre o registro de um novo sintoma.',
+  },
+  {
+    label: 'Nota',
+    icon: 'square.and.pencil',
+    route: '/diario/anotar-memoria',
+    accessibilityHint: 'Abre o registro de uma nova nota sobre o tratamento.',
+  },
+  {
+    label: 'Peso',
+    icon: 'scalemass',
+    route: '/peso/registrar',
+    accessibilityHint: 'Abre o registro de um novo peso.',
+    accent: true,
+  },
+  {
+    label: 'Dose',
+    icon: 'syringe',
+    route: '/dose/registrar',
+    accessibilityHint: 'Abre o registro de uma nova dose.',
+  },
+]
 
 const SYMPTOM_LABELS: Record<string, string> = {
   constipation: 'Constipação',
@@ -79,31 +121,7 @@ export function HomeV7Content() {
   const timelineIsLoading =
     doseQuery.isLoading || diarioQuery.isLoading || weightQuery.isLoading
   const timelineError = doseQuery.error ?? diarioQuery.error ?? weightQuery.error
-  const hasConsultationNotes = consultationNotes.length > 0
   const contentPaddingBottom = tabBarHeight + spacing.xxxl
-  const consultationSection = <ConsultationMemorySection items={consultationNotes} />
-  const recentMemorySection = (
-    <RecentMemoryTimeline
-      items={timeline}
-      isLoading={timelineIsLoading}
-      error={timelineError ? mapQueryError(timelineError) : null}
-      onRetry={() => {
-        void doseQuery.refetch()
-        void diarioQuery.refetch()
-        void weightQuery.refetch()
-      }}
-      onPressBody={() => router.push('/memoria' as Href)}
-    />
-  )
-  const observationSection = (
-    <ObservationMemoryCard
-      symptom={symptomQuery.data ?? null}
-      isLoading={symptomQuery.isLoading}
-      error={symptomQuery.error ? mapQueryError(symptomQuery.error) : null}
-      onRetry={() => void symptomQuery.refetch()}
-      onPressBody={() => router.push('/memoria' as Href)}
-    />
-  )
 
   return (
     <SafeAreaView className="flex-1 bg-bg-base" edges={['top']}>
@@ -114,21 +132,21 @@ export function HomeV7Content() {
       >
         <HeaderMemory />
 
-        <NextDoseSection
+        <NextDoseHero
           nextDose={doseSummary?.nextDose ?? null}
           hasDoseHistory={(doseSummary?.history.length ?? 0) > 0}
-          onPressBody={() => router.push('/(tabs)/doses' as Href)}
           isLoading={doseQuery.isLoading}
           error={doseQuery.error ? mapQueryError(doseQuery.error) : null}
           onRetry={() => void doseQuery.refetch()}
+          onPressDoses={() => router.push('/(tabs)/doses' as Href)}
+          onPressRegister={() => router.push('/dose/registrar' as Href)}
         />
 
-        <Divider />
-
-        <WeightSection
+        <WeightCard
           currentWeight={currentWeight}
           delta={weightDelta}
           logs={weightLogs}
+          updatedAt={latestWeight?.date ?? null}
           isLoading={weightIsLoading}
           error={weightError ? mapQueryError(weightError) : null}
           onRetry={() => {
@@ -138,28 +156,39 @@ export function HomeV7Content() {
           onPressBody={() => router.push('/peso/historico' as Href)}
         />
 
-        {hasConsultationNotes ? (
-          <>
-            {consultationSection}
-            {recentMemorySection}
-            {observationSection}
-          </>
-        ) : (
-          <>
-            {recentMemorySection}
-            {observationSection}
-            {consultationSection}
-          </>
-        )}
+        <QuickActions />
 
-        <Divider />
-        <ExpensesSection
-          total={purchaseSummary?.total ?? 0}
-          isLoading={purchaseQuery.isLoading}
-          error={purchaseQuery.error ? mapQueryError(purchaseQuery.error) : null}
-          onRetry={() => void purchaseQuery.refetch()}
-          onPressBody={() => router.push('/diario/custos' as Href)}
+        <ConsultationCard
+          count={consultationNotes.length}
+          onPress={() => router.push('/diario/anotar-memoria' as Href)}
         />
+
+        <RecentMemoryTimeline
+          items={timeline}
+          isLoading={timelineIsLoading}
+          error={timelineError ? mapQueryError(timelineError) : null}
+          onRetry={() => {
+            void doseQuery.refetch()
+            void diarioQuery.refetch()
+            void weightQuery.refetch()
+          }}
+          onPressBody={() => router.push('/memoria' as Href)}
+        />
+
+        <View className="flex-row gap-sm mb-md">
+          <SymptomMiniCard
+            symptom={symptomQuery.data ?? null}
+            isLoading={symptomQuery.isLoading}
+            error={symptomQuery.error ? mapQueryError(symptomQuery.error) : null}
+          />
+          <ExpenseMiniCard
+            total={purchaseSummary?.total ?? 0}
+            isLoading={purchaseQuery.isLoading}
+            error={purchaseQuery.error ? mapQueryError(purchaseQuery.error) : null}
+            onRetry={() => void purchaseQuery.refetch()}
+            onPress={() => router.push('/diario/custos' as Href)}
+          />
+        </View>
 
         <Disclaimer />
       </ScrollView>
@@ -168,25 +197,17 @@ export function HomeV7Content() {
 }
 
 function PanelChevron() {
-  return (
-    <SymbolView
-      name="chevron.right"
-      size={14}
-      tintColor={colors.textTertiary}
-    />
-  )
+  return <SymbolView name="chevron.right" size={14} tintColor={colors.textTertiary} />
 }
 
 function HeaderMemory() {
   const router = useRouter()
   return (
-    <View className="mb-[28px]">
-      {/* 📐 mb-[28px] — valor original literal 28 */}
+    <View className="mb-lg">
       <View className="flex-row justify-between items-start gap-md">
-        {/* 🏷️ gap-md */}
-        <Text className="flex-1 text-text-primary text-[28px] font-light leading-[34px] mb-sm">
-          {/* 📐 text-[28px] leading-[34px] = displayUltralight; 🏷️ text-text-primary, mb-sm */}
-          Seu tratamento está organizado até aqui.
+        <Text className="flex-1 text-text-primary text-[28px] font-semibold leading-[34px]">
+          {/* 📐 text-[28px] leading-[34px] = headline */}
+          Hoje no seu tratamento
         </Text>
         <Pressable
           onPress={() => router.push('/configuracoes')}
@@ -199,15 +220,15 @@ function HeaderMemory() {
           <SymbolView name="gearshape" size={20} tintColor={colors.textSecondary} />
         </Pressable>
       </View>
-      <Text className="text-text-secondary text-[15px] leading-[24px]">
-        {/* 📐 text-[15px] leading-[24px] = bodyClinical */}
+      <Text className="text-text-secondary text-[13px] leading-[18px] mt-xxs">
+        {/* 📐 text-[13px] leading-[18px] = caption */}
         {formatCurrentDate()}
       </Text>
     </View>
   )
 }
 
-// Eyebrow row used by every interactive section.
+// Eyebrow row used by the full-width section cards.
 function SectionHeaderRow({
   label,
   trailing,
@@ -217,7 +238,6 @@ function SectionHeaderRow({
 }) {
   return (
     <View className="flex-row items-center justify-between mb-sm">
-      {/* 🏷️ mb-sm */}
       <Text className="text-text-secondary text-[13px] font-bold leading-[18px] uppercase tracking-[1.4px]">
         {/* 📐 text-[13px] leading-[18px] tracking-[1.4px] = caption bold uppercase */}
         {label}
@@ -227,33 +247,30 @@ function SectionHeaderRow({
   )
 }
 
-function NextDoseSection({
+// HERO — card de maior destaque. Graphite inline + leve elevação (card clínico flutuante).
+function NextDoseHero({
   nextDose,
   hasDoseHistory,
-  onPressBody,
   isLoading,
   error,
   onRetry,
+  onPressDoses,
+  onPressRegister,
 }: {
   nextDose: NextDoseData | null
   hasDoseHistory: boolean
-  onPressBody: () => void
   isLoading: boolean
   error: string | null
   onRetry: () => void
+  onPressDoses: () => void
+  onPressRegister: () => void
 }) {
-  const value = nextDose ? formatNextDoseValue(nextDose) : 'A definir'
-  const helper = nextDose
-    ? format(nextDose.scheduledDate, "EEEE, d 'de' MMMM", { locale: ptBR })
-    : hasDoseHistory
-      ? 'Defina seu intervalo para calcular a próxima dose.'
-      : 'Anote sua primeira dose para iniciar a memória do tratamento.'
-  const medicationDetail = nextDose
-    ? `${nextDose.medicationName}${nextDose.dose !== null ? ` · ${formatNumber(nextDose.dose)}mg` : ''}`
-    : null
-
   return (
-    <View className="mb-[28px]">
+    <View
+      className="rounded-[14px] p-lg mb-md"
+      style={{ backgroundColor: HERO_GRAPHITE, shadowColor: '#000', ...elevation[1] }}
+    >
+      {/* style prop: backgroundColor graphite inline (sem token); elevation[1] = card clínico flutuante */}
       <SectionHeaderRow label="Próxima dose" />
       {isLoading || error ? (
         <SectionReadState
@@ -262,39 +279,113 @@ function NextDoseSection({
           onRetry={onRetry}
           loadingLabel="Carregando próxima dose."
         />
+      ) : nextDose ? (
+        <NextDoseBody nextDose={nextDose} onPressDoses={onPressDoses} onPressRegister={onPressRegister} />
       ) : (
-        <Pressable
-          onPress={onPressBody}
-          accessibilityRole="button"
-          accessibilityLabel="Ver histórico de doses"
-          accessibilityHint="Abre o histórico completo de doses."
-          className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
-        >
-          <View className="flex-1">
-            <Text className="text-text-primary text-[18px] font-semibold leading-[24px] mt-xs">
-              {/* 📐 text-[18px] leading-[24px] = subtitle; 🏷️ mt-xs */}
-              {capitalize(value)}
-            </Text>
-            <Text className="text-text-secondary text-[13px] leading-[18px] mt-xxs">
-              {capitalize(helper)}
-            </Text>
-            {medicationDetail && (
-              <Text className="text-text-tertiary text-[13px] font-semibold leading-[18px] mt-xs">
-                {medicationDetail}
-              </Text>
-            )}
-          </View>
-          <PanelChevron />
-        </Pressable>
+        <View>
+          <Text className="text-text-secondary text-[16px] leading-[22px] mt-xs mb-md">
+            {hasDoseHistory
+              ? 'Defina seu intervalo para calcular a próxima dose.'
+              : 'Anote sua primeira dose para iniciar a memória do tratamento.'}
+          </Text>
+          {hasDoseHistory ? (
+            <HeroCta label="Ver doses" onPress={onPressDoses} accessibilityLabel="Ver histórico de doses" />
+          ) : (
+            <HeroCta label="Anotar dose" onPress={onPressRegister} accessibilityLabel="Anotar primeira dose" />
+          )}
+        </View>
       )}
     </View>
   )
 }
 
-function WeightSection({
+// Conteúdo do hero quando há próxima dose. Estado define cor do countdown e o CTA.
+// Vital Mint Rarity: no máximo UMA massa mint por estado — ou o countdown ("Hoje") ou o CTA (atrasado), nunca os dois.
+function NextDoseBody({
+  nextDose,
+  onPressDoses,
+  onPressRegister,
+}: {
+  nextDose: NextDoseData
+  onPressDoses: () => void
+  onPressRegister: () => void
+}) {
+  const state = nextDose.isOverdue ? 'overdue' : nextDose.daysUntil === 0 ? 'today' : 'future'
+  const countdownColor =
+    state === 'today'
+      ? colors.brand
+      : state === 'overdue'
+        ? colors.semanticWarning
+        : colors.textPrimary
+  const cta =
+    state === 'overdue'
+      ? { label: 'Registrar dose atrasada', onPress: onPressRegister, variant: 'primary' as const }
+      : state === 'today'
+        ? { label: 'Registrar dose', onPress: onPressRegister, variant: 'outline' as const }
+        : { label: 'Ver doses', onPress: onPressDoses, variant: 'outline' as const }
+
+  return (
+    <View>
+      <Text className="text-text-primary text-[28px] font-bold leading-[34px] mt-xs">
+        {/* 📐 text-[28px] leading-[34px] bold = nome do medicamento (hero) */}
+        {nextDose.medicationName}
+      </Text>
+      {nextDose.dose !== null && (
+        <Text className="text-[18px] font-bold leading-[24px] mt-xxs" style={{ color: colors.semanticInfo }}>
+          {/* style prop: dose em azul clínico (info) */}
+          {formatNumber(nextDose.dose)} mg
+        </Text>
+      )}
+      <Text className="text-text-secondary text-[13px] leading-[18px] mt-sm">
+        {capitalize(format(nextDose.scheduledDate, "EEEE, d 'de' MMMM", { locale: ptBR }))}
+      </Text>
+      <Text className="text-[40px] font-bold leading-[44px] mt-xs" style={{ color: countdownColor }}>
+        {/* style prop: cor do countdown por estado — futuro=branco, hoje=mint, atrasado=âmbar (nunca mint) */}
+        {capitalize(formatNextDoseValue(nextDose))}
+      </Text>
+      <HeroCta label={cta.label} onPress={cta.onPress} variant={cta.variant} accessibilityLabel={cta.label} />
+    </View>
+  )
+}
+
+// CTA do hero. outline = neutro (sem mint); primary = preenchido mint (usado só quando o countdown NÃO é mint).
+function HeroCta({
+  label,
+  onPress,
+  accessibilityLabel,
+  variant = 'outline',
+}: {
+  label: string
+  onPress: () => void
+  accessibilityLabel: string
+  variant?: 'outline' | 'primary'
+}) {
+  const isPrimary = variant === 'primary'
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint="Abre a área de doses do tratamento."
+      className="items-center justify-center rounded-[14px] mt-md py-[14px] active:opacity-70"
+      style={isPrimary ? { backgroundColor: colors.brand } : { borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)' }}
+    >
+      {/* style prop: primary = fundo mint (texto escuro); outline = borda neutra sem token */}
+      <Text
+        className="text-[16px] font-semibold leading-[20px]"
+        style={{ color: isPrimary ? colors.textInverse : colors.textPrimary }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  )
+}
+
+function WeightCard({
   currentWeight,
   delta,
   logs,
+  updatedAt,
   isLoading,
   error,
   onRetry,
@@ -303,21 +394,15 @@ function WeightSection({
   currentWeight: number | null
   delta: number | null
   logs: WeightLog[]
+  updatedAt: Date | null
   isLoading: boolean
   error: string | null
   onRetry: () => void
   onPressBody: () => void
 }) {
-  const trailing =
-    delta !== null && !isLoading && !error ? (
-      <Text className="text-text-tertiary text-[13px] font-semibold leading-[18px]">
-        {formatDelta(delta)}
-      </Text>
-    ) : null
-
   return (
-    <View>
-      <SectionHeaderRow label="Peso" trailing={trailing} />
+    <View className="bg-bg-surface rounded-[14px] p-lg mb-md">
+      <SectionHeaderRow label="Peso" />
       {isLoading || error ? (
         <SectionReadState
           isLoading={isLoading}
@@ -325,41 +410,47 @@ function WeightSection({
           onRetry={onRetry}
           loadingLabel="Carregando peso registrado."
         />
-      ) : currentWeight !== null ? (
-        <Pressable
-          onPress={onPressBody}
-          accessibilityRole="button"
-          accessibilityLabel="Ver histórico de peso"
-          accessibilityHint="Abre o histórico completo de peso."
-          className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
-        >
-          <View className="flex-1">
-            <View className="flex-row items-baseline gap-xs mb-xs">
-              <Text className="text-text-primary text-[48px] font-light leading-[54px]">
-                {/* 📐 text-[48px] leading-[54px] = numberPersonal */}
-                {formatNumber(currentWeight)}
-              </Text>
-              <Text className="text-text-secondary text-[18px] font-semibold leading-[24px]">
-                {/* 📐 text-[18px] leading-[24px] = subtitle */}
-                kg
-              </Text>
-            </View>
-            <WeightSparkline logs={logs} />
-          </View>
-          <PanelChevron />
-        </Pressable>
       ) : (
         <Pressable
           onPress={onPressBody}
           accessibilityRole="button"
           accessibilityLabel="Ver histórico de peso"
           accessibilityHint="Abre o histórico completo de peso."
-          className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
+          className="flex-row items-start justify-between gap-md active:opacity-70"
         >
           <View className="flex-1">
-            <Text className="text-text-secondary text-[16px] leading-[22px] mb-lg">
-              Nenhum peso registrado ainda.
-            </Text>
+            {currentWeight !== null ? (
+              <>
+                <View className="flex-row items-baseline gap-xs">
+                  <Text className="text-text-primary text-[48px] font-light leading-[54px]">
+                    {/* 📐 text-[48px] leading-[54px] light = numberPersonal */}
+                    {formatNumber(currentWeight)}
+                  </Text>
+                  <Text className="text-text-secondary text-[18px] font-semibold leading-[24px]">kg</Text>
+                </View>
+                <Text className="text-text-secondary text-[13px] leading-[18px] mt-xxs">peso atual</Text>
+                {delta !== null && (
+                  <View className="flex-row items-center self-start gap-xs bg-bg-elevated rounded-[10px] px-sm py-xxs mt-sm">
+                    <Text
+                      className="text-[15px] font-bold leading-[20px]"
+                      style={{ color: delta < 0 ? colors.brand : colors.textSecondary }}
+                    >
+                      {/* style prop: cor por SINAL — perda (−) = mint (progresso); ganho/zero = neutro (sem mint) */}
+                      {formatDeltaValue(delta)}
+                    </Text>
+                    <Text className="text-text-tertiary text-[13px] leading-[18px]">desde o início</Text>
+                  </View>
+                )}
+                <WeightSparkline logs={logs} />
+                {updatedAt && (
+                  <Text className="text-text-tertiary text-[13px] leading-[18px]">
+                    {`atualizado ${formatRelativeDay(updatedAt).toLowerCase()}`}
+                  </Text>
+                )}
+              </>
+            ) : (
+              <Text className="text-text-secondary text-[16px] leading-[22px]">Nenhum peso registrado ainda.</Text>
+            )}
           </View>
           <PanelChevron />
         </Pressable>
@@ -373,21 +464,69 @@ function WeightSparkline({ logs }: { logs: WeightLog[] }) {
   if (!sparkline) return null
 
   return (
-    <View className="h-[64px] w-full mb-lg mt-xs">
-      {/* 📐 h-[64px]; 🏷️ mb-lg, mt-xs */}
+    <View className="h-[64px] w-full mb-sm mt-sm">
+      {/* 📐 h-[64px]; 🏷️ mb-sm, mt-sm */}
       <Svg width="100%" height="100%" viewBox="0 0 100 48" preserveAspectRatio="none">
         <Polyline
           points={sparkline.points}
           fill="none"
-          stroke={colors.semanticMuted}
+          stroke={colors.semanticInfo}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={1.2}
+          strokeWidth={1.4}
           vectorEffect="non-scaling-stroke"
         />
-        <SvgCircle cx={sparkline.first.x} cy={sparkline.first.y} r={1.7} fill={colors.semanticMuted} />
-        <SvgCircle cx={sparkline.last.x} cy={sparkline.last.y} r={2.2} fill={colors.mintSoft} />
+        <SvgCircle cx={sparkline.last.x} cy={sparkline.last.y} r={2.4} fill={colors.mintSoft} />
       </Svg>
+    </View>
+  )
+}
+
+function QuickActions() {
+  const router = useRouter()
+  return (
+    <View className="flex-row gap-sm mb-md">
+      {QUICK_ACTIONS.map((action) => (
+        <Pressable
+          key={action.label}
+          onPress={() => router.push(action.route as Href)}
+          accessibilityRole="button"
+          accessibilityLabel={`Registrar ${action.label.toLowerCase()}`}
+          accessibilityHint={action.accessibilityHint}
+          className="flex-1 items-center gap-xs rounded-[14px] py-md bg-bg-elevated active:opacity-70"
+          style={{ borderWidth: action.accent ? 1 : 0.5, borderColor: action.accent ? MINT_BORDER : HAIRLINE }}
+        >
+          {/* style prop: borda (sem token). accent = Peso, único atalho com toque mint (ícone/borda), fundo escuro */}
+          <SymbolView name={action.icon} size={22} tintColor={action.accent ? colors.brand : colors.textSecondary} />
+          <Text className="text-text-primary text-[13px] font-medium leading-[18px]">{action.label}</Text>
+        </Pressable>
+      ))}
+    </View>
+  )
+}
+
+function ConsultationCard({ count, onPress }: { count: number; onPress: () => void }) {
+  return (
+    <View className="bg-bg-surface rounded-[14px] p-lg mb-md">
+      <SectionHeaderRow label="Próxima consulta" />
+      <Text className="text-text-primary text-[18px] font-semibold leading-[24px] mt-xs">
+        {/* 📐 text-[18px] leading-[24px] = subtitle */}
+        {count === 0
+          ? 'Nenhuma dúvida anotada ainda.'
+          : `${count} ${count === 1 ? 'dúvida' : 'dúvidas'} para levar.`}
+      </Text>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel="Anotar dúvida para a consulta"
+        accessibilityHint="Abre o registro de uma nota para levar à consulta."
+        className="self-start justify-center min-h-[44px] mt-xs active:opacity-70"
+      >
+        <Text className="text-[15px] font-semibold leading-[20px]" style={{ color: colors.semanticInfo }}>
+          {/* style prop: CTA terciária em azul clínico (info) */}
+          Anotar dúvida
+        </Text>
+      </Pressable>
     </View>
   )
 }
@@ -408,166 +547,144 @@ function RecentMemoryTimeline({
   const isEmpty = !isLoading && !error && items.length === 0
 
   return (
-    <>
-      <Divider />
-      <View>
-        <SectionHeaderRow label="Memória recente" />
-        {isLoading || error ? (
-          <SectionReadState
-            isLoading={isLoading}
-            error={error}
-            onRetry={onRetry}
-            loadingLabel="Carregando memória recente."
-          />
-        ) : (
-          <Pressable
-            onPress={onPressBody}
-            accessibilityRole="button"
-            accessibilityLabel="Ver diário completo"
-            accessibilityHint="Abre o histórico completo do diário."
-            className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
-          >
-            <View className="flex-1">
-              {isEmpty ? (
-                <Text className="text-text-secondary text-[16px] leading-[22px] mb-lg">
-                  Sua memória recente vai aparecer aqui.
-                </Text>
-              ) : (
-                <View className="mb-[28px]">
-                  {items.map((item, index) => (
-                    <View key={item.id} className="flex-row gap-sm min-h-[64px]">
-                      <View className="items-center w-[16px]">
-                        <View
-                          className="rounded-full h-[10px] w-[10px] mt-[4px]"
-                          style={{ backgroundColor: SOURCE_COLORS[item.source] }}
-                        />
-                        {/* style prop: cor por tipo do evento (SOURCE_COLORS); nem toda cor tem token Tailwind */}
-                        {index < items.length - 1 && (
-                          <View className="bg-bg-surface flex-1 mt-xs w-[2px]" />
-                        )}
-                      </View>
-                      <View className="flex-1 pb-lg">
-                        <Text className="text-text-secondary text-[13px] font-semibold leading-[18px] mb-xxs">
-                          {formatRelativeDay(item.date)}
-                        </Text>
-                        <Text className="text-text-primary text-[15px] leading-[24px]">
-                          {item.title}
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
+    <View className="bg-bg-surface rounded-[14px] p-lg mb-md">
+      <SectionHeaderRow label="Memória recente" />
+      {isLoading || error ? (
+        <SectionReadState
+          isLoading={isLoading}
+          error={error}
+          onRetry={onRetry}
+          loadingLabel="Carregando memória recente."
+        />
+      ) : (
+        <Pressable
+          onPress={onPressBody}
+          accessibilityRole="button"
+          accessibilityLabel="Ver memória completa"
+          accessibilityHint="Abre o histórico completo da memória do tratamento."
+          className="active:opacity-70"
+        >
+          {isEmpty ? (
+            <Text className="text-text-secondary text-[16px] leading-[22px]">
+              Sua memória recente vai aparecer aqui.
+            </Text>
+          ) : (
+            <View className="mt-xs">
+              {items.map((item, index) => (
+                <View key={item.id} className="flex-row gap-sm min-h-[56px]">
+                  <View className="items-center w-[16px]">
+                    <View
+                      className="rounded-full h-[10px] w-[10px] mt-[4px]"
+                      style={{ backgroundColor: SOURCE_COLORS[item.source] }}
+                    />
+                    {/* style prop: cor por tipo do evento (SOURCE_COLORS); nem toda cor tem token Tailwind */}
+                    {index < items.length - 1 && <View className="bg-bg-elevated flex-1 mt-xs w-[2px]" />}
+                  </View>
+                  <View className="flex-1 pb-md">
+                    <Text className="text-text-secondary text-[13px] font-semibold leading-[18px] mb-xxs">
+                      {formatRelativeDay(item.date)}
+                    </Text>
+                    <Text className="text-text-primary text-[15px] leading-[24px]">{item.title}</Text>
+                  </View>
                 </View>
-              )}
+              ))}
+              <View className="flex-row justify-end">
+                <PanelChevron />
+              </View>
             </View>
-            <PanelChevron />
-          </Pressable>
-        )}
-      </View>
-    </>
+          )}
+        </Pressable>
+      )}
+    </View>
   )
 }
 
-function ObservationMemoryCard({
+// Resumo display-only do último sintoma. SEM navegação/chevron: não há tela de sintomas
+// e a Memória recente já é a porta para /memoria (evita duas portas para o mesmo destino).
+function SymptomMiniCard({
   symptom,
   isLoading,
   error,
-  onRetry,
-  onPressBody,
 }: {
   symptom: RecentSymptom | null
   isLoading: boolean
   error: string | null
-  onRetry: () => void
-  onPressBody: () => void
 }) {
   return (
-    <>
-      <Divider />
-      <View className="mb-[28px]">
-        <SectionHeaderRow label="Sintomas" />
-        {isLoading || error ? (
-          <SectionReadState
-            isLoading={isLoading}
-            error={error}
-            onRetry={onRetry}
-            loadingLabel="Carregando sintomas."
-          />
-        ) : (
-          <Pressable
-            onPress={onPressBody}
-            accessibilityRole="button"
-            accessibilityLabel="Ver diário de sintomas"
-            accessibilityHint="Abre o diário para ver sintomas."
-            className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
-          >
-            <View className="flex-1">
-              {symptom ? (
-                <View
-                  className="flex-row items-center bg-bg-elevated rounded-[14px] gap-sm mt-md p-md"
-                  style={{ borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.04)' }}
-                >
-                  {/* 📐 rounded-[14px] = radius.md; style prop: hairline border */}
-                  <SymbolView name="circle" size={16} tintColor={colors.semanticMuted} />
-                  <Text className="flex-1 text-text-primary text-[15px] leading-[24px]">
-                    {formatSymptomMemory(symptom)}
-                  </Text>
-                </View>
-              ) : (
-                <Text className="text-text-secondary text-[16px] leading-[22px] mb-lg">
-                  Nenhum sintoma registrado ainda.
-                </Text>
-              )}
-            </View>
-            <PanelChevron />
-          </Pressable>
-        )}
-      </View>
-    </>
+    <View className="flex-1 bg-bg-surface rounded-[14px] p-md">
+      <Text className="text-text-secondary text-[11px] font-bold leading-[14px] uppercase tracking-[1.2px] mb-sm">
+        Sintomas
+      </Text>
+      {isLoading ? (
+        <ActivityIndicator color={colors.textSecondary} size="small" />
+      ) : error ? (
+        <Text className="text-text-secondary text-[13px] leading-[18px]">Não foi possível carregar.</Text>
+      ) : symptom ? (
+        <>
+          <Text className="text-text-primary text-[20px] font-bold leading-[24px]">
+            {SYMPTOM_LABELS[symptom.type] ?? formatUnknownSymptomType(symptom.type)}
+          </Text>
+          <Text className="text-text-tertiary text-[13px] leading-[18px] mt-xxs">
+            {formatRelativeDay(symptom.date).toLowerCase()}
+          </Text>
+        </>
+      ) : (
+        <Text className="text-text-secondary text-[13px] leading-[18px]">Nenhum sintoma ainda.</Text>
+      )}
+    </View>
   )
 }
 
-function ConsultationMemorySection({ items }: { items: ConsultationNote[] }) {
-  if (items.length === 0) return null
-
+function ExpenseMiniCard({
+  total,
+  isLoading,
+  error,
+  onRetry,
+  onPress,
+}: {
+  total: number
+  isLoading: boolean
+  error: string | null
+  onRetry: () => void
+  onPress: () => void
+}) {
   return (
-    <>
-      <Divider />
-      <View className="mb-[28px]">
-        <View className="flex-row items-center justify-between mb-lg">
-          <Text className="text-text-secondary text-[13px] font-bold leading-[18px] uppercase tracking-[1.4px]">
-            Para a consulta
+    <View className="flex-1 bg-bg-surface rounded-[14px] p-md">
+      <Text className="text-text-secondary text-[11px] font-bold leading-[14px] uppercase tracking-[1.2px] mb-sm">
+        Custos
+      </Text>
+      {isLoading ? (
+        <ActivityIndicator color={colors.textSecondary} size="small" />
+      ) : error ? (
+        <Pressable
+          onPress={onRetry}
+          accessibilityRole="button"
+          accessibilityLabel="Tentar novamente"
+          accessibilityHint="Recarrega os custos."
+          className="min-h-[44px] justify-center active:opacity-70"
+        >
+          <Text className="text-text-secondary text-[13px] leading-[18px]">
+            Não foi possível carregar. Toque para tentar.
           </Text>
-          <View
-            className="bg-bg-elevated rounded-full px-sm py-xxs"
-          >
-            <Text className="text-text-secondary text-[13px] font-semibold leading-[18px]">
-              {items.length} {items.length === 1 ? 'item' : 'itens'}
-            </Text>
+        </Pressable>
+      ) : (
+        <Pressable
+          onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel="Ver custos do tratamento"
+          accessibilityHint="Abre a lista completa de custos."
+          className="active:opacity-70"
+        >
+          <Text className="text-text-primary text-[22px] font-bold leading-[28px]">{formatCurrency(total)}</Text>
+          <Text className="text-text-tertiary text-[13px] leading-[18px] mt-xxs">
+            {total === 0 ? 'nenhum custo ainda' : 'registrados'}
+          </Text>
+          <View className="flex-row justify-end mt-sm">
+            <PanelChevron />
           </View>
-        </View>
-        <View className="gap-sm">
-          {items.map((item) => (
-            <View key={item.id} className="flex-row items-center gap-sm">
-              <SymbolView
-                name={item.completed ? 'checkmark.circle' : 'circle'}
-                size={18}
-                tintColor={colors.semanticMuted}
-              />
-              <Text
-                className={cn(
-                  'flex-1 text-text-primary text-[15px] leading-[24px]',
-                  item.completed && 'text-text-tertiary line-through'
-                )}
-                style={item.completed ? { textDecorationColor: colors.semanticMuted } : undefined}
-              >
-                {/* cn() para classe condicional; style prop para textDecorationColor (sem suporte TW) */}
-                {item.text}
-              </Text>
-            </View>
-          ))}
-        </View>
-      </View>
-    </>
+        </Pressable>
+      )}
+    </View>
   )
 }
 
@@ -611,62 +728,12 @@ function SectionReadState({
   )
 }
 
-function Divider() {
-  return <View className="h-px bg-bg-surface mb-[28px]" />
-  /* 🏷️ bg-bg-surface; 📐 mb-[28px] */
-}
-
 function Disclaimer() {
   return (
     <Text className="text-text-tertiary text-[13px] leading-[20px] px-md text-center">
       Este conteúdo organiza seus registros e não substitui uma conversa com um profissional de
       saúde.
     </Text>
-  )
-}
-
-function ExpensesSection({
-  total,
-  isLoading,
-  error,
-  onRetry,
-  onPressBody,
-}: {
-  total: number
-  isLoading: boolean
-  error: string | null
-  onRetry: () => void
-  onPressBody: () => void
-}) {
-  return (
-    <View className="mb-[28px]">
-      <SectionHeaderRow label="Custos registrados" />
-      {isLoading || error ? (
-        <SectionReadState
-          isLoading={isLoading}
-          error={error}
-          onRetry={onRetry}
-          loadingLabel="Carregando custos registrados."
-        />
-      ) : (
-        <Pressable
-          onPress={onPressBody}
-          accessibilityRole="button"
-          accessibilityLabel="Ver custos do tratamento"
-          accessibilityHint="Abre a lista completa de custos."
-          className="flex-row items-center justify-between gap-md pb-xs active:opacity-70"
-        >
-          <View className="flex-1">
-            <Text className="text-text-secondary text-[15px] leading-[24px] mt-sm">
-              {total === 0
-                ? 'Nenhum custo registrado ainda.'
-                : `${formatCurrency(total)} registrados no tratamento.`}
-            </Text>
-          </View>
-          <PanelChevron />
-        </Pressable>
-      )}
-    </View>
   )
 }
 
@@ -704,14 +771,6 @@ function formatQuickLogTitle(log: QuickLogRecord): string {
   return `Registro: ${QUICK_LOG_LABELS[log.logType]}.`
 }
 
-function formatSymptomMemory(symptom: RecentSymptom): string {
-  const recordedAt = format(symptom.date, "d 'de' MMMM", { locale: ptBR })
-  const label = SYMPTOM_LABELS[symptom.type]
-  return label
-    ? `${label} registrada em ${recordedAt}.`
-    : `${formatUnknownSymptomType(symptom.type)} registrada em ${recordedAt}.`
-}
-
 function formatUnknownSymptomType(type: string): string {
   const normalized = type
     .replace(/[_-]+/g, ' ')
@@ -747,9 +806,8 @@ function formatRelativeDay(date: Date): string {
   return `Há ${days} dias`
 }
 
-function formatDelta(delta: number): string {
-  const value = formatNumber(delta)
-  return `${delta > 0 ? '+' : ''}${value} kg desde o início`
+function formatDeltaValue(delta: number): string {
+  return `${delta > 0 ? '+' : ''}${formatNumber(delta)} kg`
 }
 
 function formatCurrency(value: number): string {

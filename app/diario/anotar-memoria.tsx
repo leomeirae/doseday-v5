@@ -82,7 +82,7 @@ export default function AnotarMemoriaScreen() {
             multiline
             numberOfLines={8}
             maxLength={NOTES_MAX_LENGTH}
-            placeholder="ex: bati o pé pra não comer doce hoje · domingo foi difícil"
+            placeholder="ex: dúvida para levar ao médico"
             placeholderTextColor={colors.textTertiary}
             selectionColor={colors.brand}
             autoCapitalize="sentences"
