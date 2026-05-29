@@ -54,14 +54,12 @@ export default function SignInScreen() {
 
     setLoading(true)
     try {
-      const { session, error } = await signIn(email, password)
+      const { error } = await signIn(email, password)
       if (error) {
         setGeneralError(mapSignInError(error.message))
         return
       }
-      if (session) {
-        router.replace('/(tabs)')
-      }
+      // Sucesso: o gate de auth do root _layout roteia (tabs/onboarding)
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : ''
       setGeneralError(mapSignInError(message))

@@ -228,7 +228,7 @@ export default function RootLayout() {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
-                name="configuracoes"
+                name="configuracoes/index"
                 options={{ headerShown: false }}
               />
               <Stack.Screen
