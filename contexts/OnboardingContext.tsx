@@ -108,22 +108,20 @@ function inferCompletedSteps(data: Partial<OnboardingData>): Set<OnboardingStep>
 
   if (hasAnyProgress) completedSteps.add('welcome')
 
-  if (data.full_name && data.age && data.biological_sex) {
-    completedSteps.add('personal-info')
-  }
-  if (data.initial_weight && data.current_weight && data.height) {
-    completedSteps.add('weight')
-  }
-  if (data.goal_weight) completedSteps.add('goal-weight')
   if (data.treatment_status) completedSteps.add('treatment-status')
   if (data.treatment_status === 'planning' || data.treatment_duration) {
     completedSteps.add('treatment-duration')
   }
   if (data.current_medication) completedSteps.add('medication')
+  // dose engloba a frequência (lembrete) — a frequência é opcional/pulável,
+  // por isso a dose marca a etapa completa sozinha.
   if (data.current_dose !== undefined) completedSteps.add('dose')
-  if (data.dose_frequency_days !== undefined) completedSteps.add('dose-frequency')
+  // weight engloba a meta (goal_weight) na mesma tela.
+  if (data.initial_weight && data.current_weight && data.height && data.goal_weight) {
+    completedSteps.add('weight')
+  }
+  // medical-support engloba o nome do médico (opcional) na mesma tela.
   if (data.has_medical_support) completedSteps.add('medical-support')
-  if (data.has_medical_support === 'no' || data.doctor_name) completedSteps.add('doctor-name')
   if (data.main_concerns && data.main_concerns.length > 0) completedSteps.add('concerns')
   if (data.consent_given) completedSteps.add('consent')
 

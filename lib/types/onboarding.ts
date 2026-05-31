@@ -1,14 +1,10 @@
 export type OnboardingStep =
   | 'welcome'
-  | 'personal-info'
-  | 'weight'
-  | 'goal-weight'
   | 'treatment-status'
   | 'treatment-duration'
   | 'medication'
   | 'dose'
-  | 'dose-frequency'
-  | 'doctor-name'
+  | 'weight'
   | 'medical-support'
   | 'concerns'
   | 'consent'
@@ -17,36 +13,43 @@ export type OnboardingStep =
 
 export const ONBOARDING_STEPS: OnboardingStep[] = [
   'welcome',
-  'personal-info',
-  'weight',
-  'goal-weight',
   'treatment-status',
   'treatment-duration',
   'medication',
   'dose',
-  'dose-frequency',
+  'weight',
   'medical-support',
-  'doctor-name',
   'concerns',
   'consent',
   'loading',
   'result',
 ]
 
-export const REQUIRED_STEPS: ReadonlySet<OnboardingStep> = new Set([
-  'personal-info',
+// Telas de pergunta contadas no "Passo X de N". welcome (intro), loading
+// (transição) e result (recompensa) não contam.
+export const COUNTED_STEPS: OnboardingStep[] = [
+  'treatment-status',
+  'treatment-duration',
+  'medication',
+  'dose',
   'weight',
-  'goal-weight',
+  'medical-support',
+  'concerns',
+  'consent',
+]
+
+// dose engloba a frequência (lembrete), weight engloba a meta (goal_weight),
+// medical-support engloba o nome do médico (opcional).
+export const REQUIRED_STEPS: ReadonlySet<OnboardingStep> = new Set([
   'treatment-status',
   'medication',
   'dose',
-  'dose-frequency',
+  'weight',
   'medical-support',
   'consent',
 ])
 
 export const OPTIONAL_STEPS: ReadonlySet<OnboardingStep> = new Set([
-  'doctor-name',
   'concerns',
 ])
 

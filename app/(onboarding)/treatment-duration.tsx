@@ -9,6 +9,8 @@ import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { colors, spacing, typography } from '@lib/theme/tokens'
 import { TREATMENT_DURATION_OPTIONS } from '@lib/types/onboarding'
 import {
+  COUNTED_STEPS_TOTAL,
+  getCountedStepNumber,
   treatmentDurationSchema,
   type TreatmentDurationInput,
 } from '@lib/validation/onboardingSchemas'
@@ -49,8 +51,8 @@ export default function TreatmentDurationScreen() {
   return (
     <OnboardingShell
       step="treatment-duration"
-      stepNumber={6}
-      totalSteps={14}
+      stepNumber={getCountedStepNumber('treatment-duration')}
+      totalSteps={COUNTED_STEPS_TOTAL}
       headline={t('treatmentDuration.headline')}
       subtitle={t('treatmentDuration.subtitle')}
       onBack={handleBack}

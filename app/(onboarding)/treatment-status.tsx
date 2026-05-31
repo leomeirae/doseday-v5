@@ -9,6 +9,8 @@ import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { colors, spacing, typography } from '@lib/theme/tokens'
 import { TREATMENT_STATUS_OPTIONS } from '@lib/types/onboarding'
 import {
+  COUNTED_STEPS_TOTAL,
+  getCountedStepNumber,
   treatmentStatusSchema,
   type TreatmentStatusInput,
 } from '@lib/validation/onboardingSchemas'
@@ -46,14 +48,14 @@ export default function TreatmentStatusScreen() {
 
   function handleBack() {
     goBack()
-    router.replace('/(onboarding)/goal-weight' as Href)
+    router.replace('/(onboarding)/welcome' as Href)
   }
 
   return (
     <OnboardingShell
       step="treatment-status"
-      stepNumber={5}
-      totalSteps={14}
+      stepNumber={getCountedStepNumber('treatment-status')}
+      totalSteps={COUNTED_STEPS_TOTAL}
       headline={t('treatmentStatus.headline')}
       subtitle={t('treatmentStatus.subtitle')}
       onBack={handleBack}

@@ -10,8 +10,13 @@
     "step": "Passo {{current}} de {{total}}"
   },
   "welcome": {
-    "headline": "Vamos organizar seu tratamento.",
-    "body": "Em alguns minutos, o DoseDay aprende sobre você e prepara a memória do seu tratamento. Cada pergunta tem um motivo claro.",
+    "headline": "Sua memória de tratamento, organizada.",
+    "body": "Tudo entre uma consulta e outra. Anotado.",
+    "bullets": {
+      "doses": "Doses e lembretes no lugar certo",
+      "weight": "Peso e evolução, semana a semana",
+      "memory": "Sintomas e dúvidas pra levar na consulta"
+    },
     "cta": "Começar"
   },
   "personalInfo": {
@@ -69,7 +74,7 @@
     "options": {
       "starting": {
         "label": "Começando agora",
-        "caption": "Primeira aplicação foi essa semana"
+        "caption": "Primeira dose foi essa semana"
       },
       "ongoing": {
         "label": "Em tratamento",
@@ -131,26 +136,28 @@
     }
   },
   "dose": {
-    "headline": "Você já sabe a dose inicial?",
-    "subtitle": "Se ainda não souber, você pode ajustar depois.",
+    "headline": "Qual a sua dose atual?",
+    "subtitle": "A dose que você usa hoje. Se ainda não souber, pode ajustar depois.",
     "doseLabel": "Dose",
     "mgSuffix": "mg",
     "commonDosesLabel": "Doses comuns pra {{medication}}",
     "skipDose": "Ainda não sei",
+    "frequencyTitle": "Lembrete da dose",
+    "frequencySubtitle": "A cada quantos dias? Usamos isso só pra te lembrar — você pode ajustar depois.",
+    "frequencyNote": "Se o protocolo mudar, edite depois nas configurações. O histórico anterior continua preservado.",
     "errors": {
       "doseRange": "Dose entre 0,25 e 30 mg",
       "required": "Informe sua dose"
     }
   },
   "doseFrequency": {
-    "headline": "Qual intervalo entre as aplicações?",
     "subtitle": "Use o intervalo combinado com quem te acompanha, ou o intervalo que você está seguindo. O DoseDay só usa esse dado para calcular a próxima dose.",
     "optionOne": "{{count}} dia",
     "optionOther": "{{count}} dias",
     "optionA11y": "Usar intervalo de {{count}} dias",
     "otherLabel": "Outro intervalo",
     "placeholder": "Ex: 12",
-    "inputA11y": "Intervalo entre aplicações em dias",
+    "inputA11y": "Intervalo entre doses em dias",
     "daysSuffix": "dias",
     "error": "Use um número inteiro entre 1 e 90.",
     "note": "Se o protocolo mudar, edite depois no Perfil. O histórico anterior continua preservado.",
@@ -185,8 +192,8 @@
     }
   },
   "concerns": {
-    "headline": "O que mais te preocupa?",
-    "subtitle": "Selecione quantas quiser. Vamos ficar de olho nessas áreas. Você pode pular.",
+    "headline": "O que você quer acompanhar?",
+    "subtitle": "Escolha o que o DoseDay deve lembrar por você. Você pode ajustar isso depois.",
     "options": {
       "nausea": "Náusea",
       "weight": "Peso parado",
@@ -215,9 +222,18 @@
     }
   },
   "result": {
-    "headline": "Bem-vindo, {{name}}.",
+    "headline": "Sua memória de tratamento está pronta.",
+    "subtitle": "Tudo o que você anotou aqui já está sendo lembrado por você.",
     "goalCardLabel": "Meta de peso",
     "contextSectionLabel": "Como o DoseDay vai acompanhar",
+    "summary": {
+      "title": "O que vou lembrar por você",
+      "reminderLabel": "Lembrete da dose",
+      "reminderValue_one": "A cada {{count}} dia",
+      "reminderValue_other": "A cada {{count}} dias",
+      "trackingLabel": "Acompanhando",
+      "doctorLabel": "Acompanhamento médico"
+    },
     "insightFallback": {
       "treatmentStage": "Você está na semana {{week}} do {{medication}} {{dose}}mg.",
       "nextDose": "Sua próxima dose recomendada: {{day}}.",
@@ -226,7 +242,7 @@
     },
     "nextStepTitle": "Próximo passo",
     "disclaimer": "Isso é uma anotação inteligente, não orientação médica. Sempre fale com um profissional de saúde.",
-    "cta": "Começar a usar"
+    "cta": "Abrir meu tratamento"
   },
   "consent": {
     "title": "Antes de começar",
