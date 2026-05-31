@@ -7,7 +7,12 @@ import { ConcernsChips } from '@components/onboarding/ConcernsChips'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { CONCERN_OPTIONS, type OnboardingConcern } from '@lib/types/onboarding'
-import { concernsSchema, type ConcernsInput } from '@lib/validation/onboardingSchemas'
+import {
+  COUNTED_STEPS_TOTAL,
+  concernsSchema,
+  getCountedStepNumber,
+  type ConcernsInput,
+} from '@lib/validation/onboardingSchemas'
 
 const NEXT: Href = '/(onboarding)/consent' as Href
 
@@ -43,18 +48,14 @@ export default function ConcernsScreen() {
 
   function handleBack() {
     goBack()
-    if (state.data.has_medical_support === 'no') {
-      router.replace('/(onboarding)/medical-support' as Href)
-    } else {
-      router.replace('/(onboarding)/doctor-name' as Href)
-    }
+    router.replace('/(onboarding)/medical-support' as Href)
   }
 
   return (
     <OnboardingShell
       step="concerns"
-      stepNumber={12}
-      totalSteps={15}
+      stepNumber={getCountedStepNumber('concerns')}
+      totalSteps={COUNTED_STEPS_TOTAL}
       headline={t('concerns.headline')}
       subtitle={t('concerns.subtitle')}
       onBack={handleBack}

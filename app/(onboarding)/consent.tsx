@@ -5,6 +5,10 @@ import { Alert, StyleSheet, Text, View } from 'react-native'
 import { ConsentCheckbox } from '@components/onboarding/ConsentCheckbox'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { useOnboarding } from '@contexts/OnboardingContext'
+import {
+  COUNTED_STEPS_TOTAL,
+  getCountedStepNumber,
+} from '@lib/validation/onboardingSchemas'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 
 export default function ConsentScreen() {
@@ -37,8 +41,8 @@ export default function ConsentScreen() {
   return (
     <OnboardingShell
       step="consent"
-      stepNumber={13}
-      totalSteps={15}
+      stepNumber={getCountedStepNumber('consent')}
+      totalSteps={COUNTED_STEPS_TOTAL}
       headline={t('consent.title')}
       subtitle={t('consent.subtitle')}
       onBack={handleBack}
