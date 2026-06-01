@@ -3,7 +3,13 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recomendado) ou superpowers:executing-plans para implementar este plano task-by-task. Steps usam checkbox (`- [ ]`).
 
 **Data:** 2026-06-01
-**Status:** ✅ APROVADO POR LÉO (2026-06-01) — em execução. Subfases 1-4 nesta entrega; Subfase 5 aguarda novo "ok".
+**Status:** ✅ SUBFASES 1-4 IMPLEMENTADAS E VALIDADAS EM QA (2026-06-01). Subfase 5 aguarda "ok" do Léo.
+
+> **Descobertas da QA que alteraram o plano:**
+> 1. Rota do paywall usa `presentation: 'modal'` (não `formSheet`): formSheet do RN Screens não limita a altura do conteúdo — conteúdo maior que o detent é cortado e o ScrollView interno não rola. Modal (pageSheet) continua sendo um sheet visualmente (decisão #4 preservada).
+> 2. CTA + restore + legal ficam em footer FIXO fora do ScrollView (sempre alcançáveis sem scroll).
+> 3. Feedbacks de ação (restore não encontrado, erro, indisponível) renderizam no footer fixo, não no fim do scroll (onde ficavam invisíveis).
+> 4. Jest não estava instalado de fato no repo (só o script + @types). Instalado jest@29.7.0 (devDependency, --legacy-peer-deps consistente com o lock existente). Isso revelou 1 teste pré-existente quebrado em `lib/symptoms/extractType` (não relacionado a este PR, não corrigido — diff cirúrgico).
 **Brief:** `docs/release/2026-06-01-reta-final-brief.md`
 **Branch:** `feature/paywall-freemium-fase1` (base `origin/main` = `1564344`, inclui #102)
 

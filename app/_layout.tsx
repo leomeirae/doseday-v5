@@ -173,11 +173,12 @@ export default function RootLayout() {
                 <Stack.Screen
                   name="paywall"
                   options={{
-                    presentation: 'formSheet',
+                    // 'modal' (pageSheet) e não 'formSheet': o conteúdo do paywall é mais
+                    // alto que a tela e precisa de altura limitada pra ScrollView + footer
+                    // fixo funcionarem. formSheet do RN Screens não limita a altura do
+                    // conteúdo (ele cresce além do detent e é cortado).
+                    presentation: 'modal',
                     headerShown: false,
-                    sheetAllowedDetents: [1.0],
-                    sheetGrabberVisible: true,
-                    sheetCornerRadius: 20,
                   }}
                 />
                 <Stack.Screen name="peso/historico" options={{ headerShown: false }} />

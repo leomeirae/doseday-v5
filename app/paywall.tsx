@@ -230,8 +230,16 @@ export default function PaywallScreen() {
             {t('paywall.pricing.fromStore')}
           </Text>
         </View>
+      </ScrollView>
 
-        {/* Estados de feedback inline */}
+      {/* Footer FIXO: CTA + restore + legal sempre alcançáveis sem scroll.
+          Conteúdo maior que o detent não rola de forma confiável dentro de
+          formSheet nativo — ações críticas nunca podem depender disso. */}
+      <View
+        className="px-lg pt-sm gap-sm"
+        style={{ borderTopWidth: 0.5, borderTopColor: 'rgba(255,255,255,0.06)' }}
+      >
+        {/* Feedback das ações do footer — renderiza AQUI (visível), nunca no fim do scroll */}
         {status === 'unavailable' ? (
           <View
             className="rounded-[14px] p-md gap-xxs"
@@ -264,87 +272,80 @@ export default function PaywallScreen() {
             <Text className="text-text-primary text-[16px] font-semibold leading-[20px]">
               {t('paywall.restore.notFoundTitle')}
             </Text>
-            <Text className="text-text-secondary text-[15px] leading-[24px]">
+            <Text className="text-text-secondary text-[13px] leading-[18px]">
               {t('paywall.restore.notFoundMessage')}
             </Text>
           </View>
         ) : null}
-
-        {/* CTA principal */}
-        <View className="gap-sm">
-          <Pressable
-            onPress={() => void handleSubscribe()}
-            disabled={processing}
-            accessibilityRole="button"
-            accessibilityLabel={t('paywall.cta.startTrial')}
-            accessibilityHint="Inicia a assinatura Premium com período de teste."
-            accessibilityState={{ disabled: processing, busy: processing }}
-            testID="paywall-cta-subscribe"
-            className="rounded-[14px] items-center justify-center min-h-[52px] active:opacity-90"
-            style={{ backgroundColor: processing ? colors.brandDim : colors.brand }}
-          >
-            {processing ? (
-              <View className="flex-row items-center gap-xs">
-                <ActivityIndicator size="small" color={colors.textInverse} />
-                <Text className="text-text-inverse text-[16px] font-semibold leading-[20px]">
-                  {t('paywall.cta.processing')}
-                </Text>
-              </View>
-            ) : (
+        <Pressable
+          onPress={() => void handleSubscribe()}
+          disabled={processing}
+          accessibilityRole="button"
+          accessibilityLabel={t('paywall.cta.startTrial')}
+          accessibilityHint="Inicia a assinatura Premium com período de teste."
+          accessibilityState={{ disabled: processing, busy: processing }}
+          testID="paywall-cta-subscribe"
+          className="rounded-[14px] items-center justify-center min-h-[52px] active:opacity-90"
+          style={{ backgroundColor: processing ? colors.brandDim : colors.brand }}
+        >
+          {processing ? (
+            <View className="flex-row items-center gap-xs">
+              <ActivityIndicator size="small" color={colors.textInverse} />
               <Text className="text-text-inverse text-[16px] font-semibold leading-[20px]">
-                {t('paywall.cta.startTrial')}
+                {t('paywall.cta.processing')}
               </Text>
-            )}
-          </Pressable>
-          <Text className="text-text-secondary text-[13px] leading-[18px] text-center">
-            {t('paywall.cta.trialNote')}
-          </Text>
+            </View>
+          ) : (
+            <Text className="text-text-inverse text-[16px] font-semibold leading-[20px]">
+              {t('paywall.cta.startTrial')}
+            </Text>
+          )}
+        </Pressable>
+        <Text className="text-text-secondary text-[13px] leading-[18px] text-center">
+          {t('paywall.cta.trialNote')}
+        </Text>
 
-          {/* Restore — obrigatório de compliance, sempre visível */}
-          <Pressable
-            onPress={() => void handleRestore()}
-            disabled={processing}
-            accessibilityRole="button"
-            accessibilityLabel={t('paywall.cta.restorePurchases')}
-            accessibilityHint="Restaura uma assinatura comprada anteriormente."
-            testID="paywall-cta-restore"
-            className="items-center justify-center min-h-[44px] active:opacity-70"
+        {/* Restore — obrigatório de compliance, sempre visível sem scroll */}
+        <Pressable
+          onPress={() => void handleRestore()}
+          disabled={processing}
+          accessibilityRole="button"
+          accessibilityLabel={t('paywall.cta.restorePurchases')}
+          accessibilityHint="Restaura uma assinatura comprada anteriormente."
+          testID="paywall-cta-restore"
+          className="items-center justify-center min-h-[44px] active:opacity-70"
+        >
+          <Text
+            className="text-[15px] font-semibold leading-[20px]"
+            style={{ color: colors.brand }}
           >
-            <Text
-              className="text-[16px] font-semibold leading-[20px]"
-              style={{ color: colors.brand }}
-            >
-              {t('paywall.cta.restorePurchases')}
+            {t('paywall.cta.restorePurchases')}
+          </Text>
+        </Pressable>
+
+        <View className="flex-row justify-center gap-lg">
+          <Pressable
+            onPress={() => void Linking.openURL(TERMS_URL)}
+            accessibilityRole="link"
+            accessibilityLabel={t('paywall.legal.terms')}
+            className="min-h-[44px] justify-center active:opacity-70"
+          >
+            <Text className="text-text-tertiary text-[13px] leading-[18px] underline">
+              {t('paywall.legal.terms')}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => void Linking.openURL(PRIVACY_URL)}
+            accessibilityRole="link"
+            accessibilityLabel={t('paywall.legal.privacy')}
+            className="min-h-[44px] justify-center active:opacity-70"
+          >
+            <Text className="text-text-tertiary text-[13px] leading-[18px] underline">
+              {t('paywall.legal.privacy')}
             </Text>
           </Pressable>
         </View>
-
-        {/* Footer legal */}
-        <View className="items-center gap-xs">
-          <View className="flex-row gap-lg">
-            <Pressable
-              onPress={() => void Linking.openURL(TERMS_URL)}
-              accessibilityRole="link"
-              accessibilityLabel={t('paywall.legal.terms')}
-              className="min-h-[44px] justify-center active:opacity-70"
-            >
-              <Text className="text-text-tertiary text-[13px] leading-[18px] underline">
-                {t('paywall.legal.terms')}
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => void Linking.openURL(PRIVACY_URL)}
-              accessibilityRole="link"
-              accessibilityLabel={t('paywall.legal.privacy')}
-              className="min-h-[44px] justify-center active:opacity-70"
-            >
-              <Text className="text-text-tertiary text-[13px] leading-[18px] underline">
-                {t('paywall.legal.privacy')}
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
+      </View>
     </PaywallShell>
   )
 }
