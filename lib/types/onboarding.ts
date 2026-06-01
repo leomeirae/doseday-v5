@@ -108,13 +108,14 @@ export interface OnboardingData {
   biological_sex: BiologicalSex
   initial_weight: number
   current_weight: number
-  height: number
+  height?: number | null
   goal_weight: number
   treatment_status: TreatmentStatus
   treatment_duration?: TreatmentDuration | null
   current_medication: OnboardingMedication
   current_dose?: number | null
   dose_frequency_days?: number | null
+  dose_frequency_source?: string | null
   doctor_name?: string
   has_medical_support: MedicalSupport
   main_concerns?: OnboardingConcern[]
@@ -135,3 +136,42 @@ export interface OnboardingState {
   isSubmitting: boolean
   error: Error | null
 }
+
+export function getValidOnboardingSteps(status?: TreatmentStatus): OnboardingStep[] {
+  const steps: OnboardingStep[] = ['welcome', 'treatment-status']
+  if (status && status !== 'planning' && status !== 'starting') {
+    steps.push('treatment-duration')
+  }
+  steps.push(
+    'medication',
+    'dose',
+    'weight',
+    'medical-support',
+    'concerns',
+    'consent',
+    'loading',
+    'result'
+  )
+  return steps
+}
+
+export function getNextOnboardingStep(
+  step: OnboardingStep,
+  status?: TreatmentStatus
+): OnboardingStep {
+  const steps = getValidOnboardingSteps(status)
+  const idx = steps.indexOf(step)
+  if (idx === -1) return 'welcome'
+  return steps[Math.min(idx + 1, steps.length - 1)]
+}
+
+export function getPreviousOnboardingStep(
+  step: OnboardingStep,
+  status?: TreatmentStatus
+): OnboardingStep {
+  const steps = getValidOnboardingSteps(status)
+  const idx = steps.indexOf(step)
+  if (idx === -1) return 'welcome'
+  return steps[Math.max(idx - 1, 0)]
+}
+

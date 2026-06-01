@@ -8,7 +8,6 @@ import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { InsightDisclaimer } from '@components/ui/InsightDisclaimer'
 import { useOnboarding } from '@contexts/OnboardingContext'
 import {
-  buildOnboardingInsightInput,
   shouldRequestInsight,
   useOnboardingInsight,
 } from '@hooks/useOnboardingInsight'
@@ -22,17 +21,26 @@ export default function ResultScreen() {
   const { t } = useTranslation('onboarding')
   const { state, complete } = useOnboarding()
 
+  const status = state.data.treatment_status ?? 'ongoing'
   const requestInsight = shouldRequestInsight(state.data)
   const insight = useOnboardingInsight(state.data, requestInsight)
 
-  const input = buildOnboardingInsightInput(state.data)
-
   // Recap "memória pronta" — só dados já coletados, sem payload novo.
   const summaryRows: { label: string; value: string }[] = []
+  if (state.data.current_medication) {
+    const medName = state.data.current_medication
+    const medDose = state.data.current_dose != null ? ` · ${state.data.current_dose}mg` : ''
+    summaryRows.push({
+      label: 'Medicamento',
+      value: `${medName}${medDose}`,
+    })
+  }
   if (state.data.dose_frequency_days != null) {
     summaryRows.push({
       label: t('result.summary.reminderLabel'),
-      value: t('result.summary.reminderValue', { count: state.data.dose_frequency_days }),
+      value: state.data.dose_frequency_days === 1
+        ? 'A cada 1 dia'
+        : `A cada ${state.data.dose_frequency_days} dias`,
     })
   }
   if (state.data.main_concerns && state.data.main_concerns.length > 0) {
@@ -49,34 +57,48 @@ export default function ResultScreen() {
   }
 
   const facts: string[] = []
-  if (
-    requestInsight &&
-    input.treatment_week &&
-    state.data.current_medication &&
-    state.data.current_dose
-  ) {
+  const med = state.data.current_medication
+  const dose = state.data.current_dose
+  const currentWeight = state.data.current_weight
+  const goalWeight = state.data.goal_weight
+
+  // Fact 1: Contexto de tratamento específico do branch
+  if (status === 'planning') {
     facts.push(
-      t('result.insightFallback.treatmentStage', {
-        week: input.treatment_week,
-        medication: state.data.current_medication,
-        dose: state.data.current_dose,
-      })
+      `Seu tratamento com ${med} está configurado para começar. Vamos te ajudar a registrar a primeira aplicação e lembrar o dia correto.`
+    )
+  } else if (status === 'starting' && med && dose) {
+    facts.push(
+      `Você está iniciando o ${med} ${dose}mg esta semana. Fique atento aos efeitos comuns dos primeiros dias.`
+    )
+  } else if (status === 'ongoing' && med && dose) {
+    facts.push(
+      `Sua rotina do ${med} ${dose}mg está organizada. Registre suas doses para manter o histórico exato.`
+    )
+  } else if (status === 'restart' && med && dose) {
+    facts.push(
+      `Sua retomada do ${med} ${dose}mg está configurada. Vamos reorganizar seu histórico a partir desta fase.`
     )
   }
-  if (
-    state.data.current_weight != null &&
-    state.data.goal_weight != null &&
-    state.data.current_weight > state.data.goal_weight
-  ) {
-    const deltaRaw = state.data.current_weight - state.data.goal_weight
+
+  // Fact 2: Meta de peso (com delta em relação ao peso atual)
+  if (currentWeight != null && goalWeight != null && currentWeight > goalWeight) {
+    const delta = currentWeight - goalWeight
+    const deltaStr = Number.isInteger(delta) ? String(delta) : delta.toFixed(1)
     facts.push(
-      t('result.insightFallback.weightGoal', {
-        goal: state.data.goal_weight,
-        delta: Number.isInteger(deltaRaw) ? String(deltaRaw) : deltaRaw.toFixed(1),
-      })
+      `Faltam ${deltaStr}kg para sua meta de peso (${goalWeight}kg). Acompanharemos cada conquista com você.`
     )
   }
-  facts.push(t('result.insightFallback.support'))
+
+  // Fact 3: Foco/Preocupações (se houver)
+  if (state.data.main_concerns && state.data.main_concerns.length > 0) {
+    const concernsStr = state.data.main_concerns.map((c) => t(`concerns.options.${c}`).toLowerCase()).join(', ')
+    facts.push(
+      `Priorizaremos dicas e monitoramento personalizado para: ${concernsStr}.`
+    )
+  } else {
+    facts.push(t('result.insightFallback.support'))
+  }
 
   async function handleComplete() {
     try {
@@ -86,13 +108,16 @@ export default function ResultScreen() {
     }
   }
 
+  const headline = t(`result.headline_${status}`, { defaultValue: t('result.headline') })
+  const subtitle = t(`result.subtitle_${status}`, { defaultValue: t('result.subtitle') })
+
   return (
     <OnboardingShell
       step="result"
       stepNumber={getCountedStepNumber('result')}
       totalSteps={COUNTED_STEPS_TOTAL}
-      headline={t('result.headline')}
-      subtitle={t('result.subtitle')}
+      headline={headline}
+      subtitle={subtitle}
       showBack={false}
       primaryCTA={{
         label: t('result.cta'),

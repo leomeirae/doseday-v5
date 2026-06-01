@@ -33,6 +33,7 @@ type OnboardingProfileRow = Pick<
   | 'current_medication'
   | 'current_dose'
   | 'dose_frequency_days'
+  | 'dose_frequency_source'
   | 'doctor_name'
   | 'has_medical_support'
   | 'main_concerns'
@@ -98,6 +99,9 @@ function mapProfileToOnboardingData(profile: OnboardingProfileRow): Partial<Onbo
   }
   data.current_dose = profile.current_dose !== null ? Number(profile.current_dose) : null
   data.dose_frequency_days = profile.dose_frequency_days
+  if (profile.dose_frequency_source !== null) {
+    data.dose_frequency_source = profile.dose_frequency_source
+  }
   if (profile.doctor_name !== null) data.doctor_name = profile.doctor_name
   if (isOneOf<MedicalSupport>(profile.has_medical_support, MEDICAL_SUPPORT_OPTIONS)) {
     data.has_medical_support = profile.has_medical_support
@@ -121,7 +125,9 @@ function toProfileUpdate(data: Partial<PersistableOnboardingData>): UserProfileU
   }
   if (data.initial_weight !== undefined) update.initial_weight = data.initial_weight
   if (data.current_weight !== undefined) update.current_weight = data.current_weight
-  if (data.height !== undefined) update.height = mapHeightToDatabase(data.height)
+  if (data.height !== undefined) {
+    update.height = data.height === null ? null : mapHeightToDatabase(data.height)
+  }
   if (data.goal_weight !== undefined) update.goal_weight = data.goal_weight
   if (data.treatment_status !== undefined) update.treatment_status = data.treatment_status
   if (data.treatment_duration !== undefined) {
@@ -132,6 +138,9 @@ function toProfileUpdate(data: Partial<PersistableOnboardingData>): UserProfileU
   if (data.dose_frequency_days !== undefined) {
     update.dose_frequency_days = data.dose_frequency_days
     update.dose_frequency_source = data.dose_frequency_days === null ? null : 'user_confirmed'
+  }
+  if (data.dose_frequency_source !== undefined) {
+    update.dose_frequency_source = data.dose_frequency_source
   }
   if (data.doctor_name !== undefined) {
     const doctorName = data.doctor_name.trim()
@@ -161,6 +170,7 @@ export async function getOnboardingProgress(userId: string): Promise<OnboardingP
       current_medication,
       current_dose,
       dose_frequency_days,
+      dose_frequency_source,
       doctor_name,
       has_medical_support,
       main_concerns,

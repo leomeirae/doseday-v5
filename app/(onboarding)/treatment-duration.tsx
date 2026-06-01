@@ -7,7 +7,7 @@ import { SelectionCard } from '@components/onboarding/SelectionCard'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { colors, spacing, typography } from '@lib/theme/tokens'
-import { TREATMENT_DURATION_OPTIONS } from '@lib/types/onboarding'
+import { TREATMENT_DURATION_OPTIONS, getNextOnboardingStep, getPreviousOnboardingStep } from '@lib/types/onboarding'
 import {
   COUNTED_STEPS_TOTAL,
   getCountedStepNumber,
@@ -40,12 +40,14 @@ export default function TreatmentDurationScreen() {
 
   const onSubmit = handleSubmit(async (data) => {
     await submitStep('treatment-duration', data)
-    router.replace('/(onboarding)/medication' as Href)
+    const nextStep = getNextOnboardingStep('treatment-duration', state.data.treatment_status)
+    router.replace(`/(onboarding)/${nextStep}` as Href)
   })
 
   function handleBack() {
     goBack()
-    router.replace('/(onboarding)/treatment-status' as Href)
+    const prevStep = getPreviousOnboardingStep('treatment-duration', state.data.treatment_status)
+    router.replace(`/(onboarding)/${prevStep}` as Href)
   }
 
   return (

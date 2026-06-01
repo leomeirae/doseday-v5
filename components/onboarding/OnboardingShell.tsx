@@ -28,16 +28,16 @@ export type OnboardingShellProps = {
   stepNumber: number
   totalSteps: number
   headline: string
-  subtitle?: string
+  subtitle?: string | undefined
   children: ReactNode
   primaryCTA: CTA
   secondaryCTA?: {
     label: string
     onPress: () => void
-  }
-  showBack?: boolean
-  onBack?: () => void
-  onClose?: () => void
+  } | undefined
+  showBack?: boolean | undefined
+  onBack?: () => void | undefined
+  onClose?: () => void | undefined
 }
 
 export function OnboardingShell({

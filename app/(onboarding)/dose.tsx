@@ -3,7 +3,7 @@ import { Controller, type DefaultValues } from 'react-hook-form'
 import { useRouter, type Href } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import type { z } from 'zod'
+import { z } from 'zod'
 import { NumericInput } from '@components/onboarding/NumericInput'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
@@ -11,14 +11,16 @@ import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 import { COMMON_DOSES } from '@lib/types/onboarding'
 import {
   COUNTED_STEPS_TOTAL,
-  doseSchema,
   getCountedStepNumber,
-  type DoseInput,
 } from '@lib/validation/onboardingSchemas'
 
 const INTERVAL_OPTIONS = [1, 7, 10, 14] as const
 const NEXT: Href = '/(onboarding)/weight' as Href
 const PREVIOUS: Href = '/(onboarding)/medication' as Href
+
+interface DoseFormValues {
+  current_dose?: number | null | string
+}
 
 export default function DoseScreen() {
   const { t } = useTranslation('onboarding')
@@ -28,15 +30,37 @@ export default function DoseScreen() {
   const medication = state.data.current_medication
   const commonDoses = medication ? COMMON_DOSES[medication] : []
 
-  const defaultValues = useMemo<DefaultValues<DoseInput>>(
+  const defaultValues = useMemo<DefaultValues<DoseFormValues>>(
     () => ({
-      ...(state.data.current_dose != null ? { current_dose: state.data.current_dose } : {}),
+      ...(state.data.current_dose != null ? { current_dose: String(state.data.current_dose) } : {}),
     }),
     [state.data.current_dose]
   )
 
-  const { control, handleSubmit, formState, reset } = useOnboardingForm<DoseInput>(
-    doseSchema as z.ZodType<DoseInput, DoseInput>,
+  const schema = useMemo(() => {
+    if (state.data.treatment_status === 'planning') {
+      return z.object({
+        current_dose: z
+          .union([
+            z.coerce.number().positive('Dose deve ser maior que zero').max(20, 'Dose máxima é 20 mg'),
+            z.null(),
+            z.undefined(),
+            z.literal(''),
+          ])
+          .optional()
+          .nullable(),
+      })
+    }
+    return z.object({
+      current_dose: z.coerce
+        .number()
+        .positive('Dose deve ser maior que zero')
+        .max(20, 'Dose máxima é 20 mg'),
+    })
+  }, [state.data.treatment_status])
+
+  const { control, handleSubmit, formState, reset } = useOnboardingForm<DoseFormValues>(
+    schema,
     defaultValues
   )
 
@@ -74,10 +98,11 @@ export default function DoseScreen() {
 
   const onSubmit = handleSubmit(async (data) => {
     if (frequencyInvalid) return
-    const payload = doseSchema.parse(data)
+    const payload = schema.parse(data) as DoseFormValues
     await submitStep('dose', {
-      current_dose: payload.current_dose,
+      current_dose: payload.current_dose ? Number(payload.current_dose) : null,
       dose_frequency_days: buildFrequency(),
+      dose_frequency_source: buildFrequency() !== null ? 'user_confirmed' : null,
     })
     router.replace(NEXT)
   })
@@ -87,6 +112,7 @@ export default function DoseScreen() {
     await submitStep('dose', {
       current_dose: null,
       dose_frequency_days: buildFrequency(),
+      dose_frequency_source: 'user_confirmed',
     })
     router.replace(NEXT)
   }
@@ -96,13 +122,17 @@ export default function DoseScreen() {
     router.replace(PREVIOUS)
   }
 
+  const status = state.data.treatment_status ?? 'ongoing'
+  const headline = t(`dose.headline_${status}`, { defaultValue: t('dose.headline') })
+  const subtitle = t(`dose.subtitle_${status}`, { defaultValue: t('dose.subtitle') })
+
   return (
     <OnboardingShell
       step="dose"
       stepNumber={getCountedStepNumber('dose')}
       totalSteps={COUNTED_STEPS_TOTAL}
-      headline={t('dose.headline')}
-      subtitle={t('dose.subtitle')}
+      headline={headline}
+      subtitle={subtitle}
       onBack={handleBack}
       primaryCTA={{
         label: t('common.continue'),
@@ -110,10 +140,10 @@ export default function DoseScreen() {
         disabled: !formState.isValid || frequencyInvalid || !state.isHydrated,
         loading: formState.isSubmitting,
       }}
-      secondaryCTA={{
+      secondaryCTA={status === 'planning' ? {
         label: t('dose.skipDose'),
         onPress: handleSkipDose,
-      }}
+      } : undefined}
     >
       <View style={styles.stack}>
         <Controller
@@ -124,7 +154,7 @@ export default function DoseScreen() {
               <NumericInput
                 label={t('dose.doseLabel')}
                 suffix={t('dose.mgSuffix')}
-                value={field.value}
+                value={field.value ?? undefined}
                 onChangeText={field.onChange}
                 error={fieldState.error?.message}
                 testID="dose-input"
