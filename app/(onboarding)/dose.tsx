@@ -8,21 +8,13 @@ import { NumericInput } from '@components/onboarding/NumericInput'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
-import type { OnboardingMedication } from '@lib/types/onboarding'
+import { COMMON_DOSES } from '@lib/types/onboarding'
 import {
   COUNTED_STEPS_TOTAL,
   doseSchema,
   getCountedStepNumber,
   type DoseInput,
 } from '@lib/validation/onboardingSchemas'
-
-const COMMON_DOSES: Record<OnboardingMedication, number[]> = {
-  Mounjaro: [2.5, 5, 7.5, 10, 12.5, 15],
-  Ozempic: [0.25, 0.5, 1, 2],
-  Wegovy: [0.25, 0.5, 1, 1.7, 2.4],
-  Saxenda: [0.6, 1.2, 1.8, 2.4, 3],
-  Trulicity: [0.75, 1.5, 3, 4.5],
-}
 
 const INTERVAL_OPTIONS = [1, 7, 10, 14] as const
 const NEXT: Href = '/(onboarding)/weight' as Href

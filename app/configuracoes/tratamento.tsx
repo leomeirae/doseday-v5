@@ -64,7 +64,8 @@ export default function ConfiguracoesTratamentoScreen() {
             label="Medicamento atual"
             value={dose ? `${medication} · ${dose}` : medication}
             stacked
-            chevron={false}
+            onPress={() => open('/perfil/protocolo' as Href)}
+            accessibilityHint="Edita medicação, dose e intervalo entre aplicações."
             testID="settings-treatment-medication"
           />
           <SettingsRow

@@ -12,39 +12,108 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href } from 'expo-router'
+import { useTranslation } from 'react-i18next'
+import { NumericInput } from '@components/onboarding/NumericInput'
+import { SelectionCard } from '@components/onboarding/SelectionCard'
 import { SettingsHeader } from '@components/settings/SettingsHeader'
 import { AuthButton } from '@components/ui/AuthButton'
 import { useProfile } from '@hooks/useProfile'
 import { useSession } from '@hooks/useSession'
 import { useUpdateDoseProtocol } from '@hooks/useUpdateProfile'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
+import {
+  COMMON_DOSES,
+  MEDICATION_OPTIONS,
+  type OnboardingMedication,
+} from '@lib/types/onboarding'
+import { formatMedicationName } from '@lib/utils/formatMedicationName'
 import { showSuccessToast } from '@lib/utils/showToast'
 
 const SUGGESTED_INTERVALS = [1, 7, 10, 14] as const
+const MAX_DOSE_MG = 20
+
+// Normaliza o valor do banco pra uma opção conhecida do enum. Dados legados da V4
+// podem ter sufixo (ex: "Mounjaro (Tirzepatida)") — formatMedicationName resolve.
+function toMedicationOption(value: string | null): OnboardingMedication | null {
+  if (value === null) return null
+  const normalized = formatMedicationName(value)
+  return MEDICATION_OPTIONS.includes(normalized as OnboardingMedication)
+    ? (normalized as OnboardingMedication)
+    : null
+}
 
 export default function DoseProtocolScreen() {
   const router = useRouter()
+  const { t } = useTranslation('onboarding')
   const { session } = useSession()
   const { data: profile } = useProfile()
   const updateDoseProtocol = useUpdateDoseProtocol(session?.user?.id ?? '')
+
+  const [medication, setMedication] = useState<OnboardingMedication | null>(null)
+  const [doseText, setDoseText] = useState('')
   const [daysText, setDaysText] = useState('')
 
+  const savedMedication = toMedicationOption(profile?.currentMedication ?? null)
+  const savedDose = profile?.currentDose ?? null
+  const savedDays = profile?.doseFrequencyDays ?? null
+
+  // Hidratação por campo: só preenche valores existentes (não apaga o que o usuário digitou).
   useEffect(() => {
-    if (profile?.doseFrequencyDays == null) return
-    setDaysText(String(profile.doseFrequencyDays))
+    if (savedMedication !== null) setMedication(savedMedication)
+  }, [savedMedication])
+
+  useEffect(() => {
+    if (profile?.currentDose != null) setDoseText(String(profile.currentDose))
+  }, [profile?.currentDose])
+
+  useEffect(() => {
+    if (profile?.doseFrequencyDays != null) setDaysText(String(profile.doseFrequencyDays))
   }, [profile?.doseFrequencyDays])
 
+  // --- Dose: vazio = null ("a definir"); preenchida = positiva até 20 mg ---
+  const parsedDose = useMemo(() => {
+    if (doseText.trim() === '') return null
+    const value = Number(doseText.trim().replace(',', '.'))
+    return Number.isFinite(value) ? value : null
+  }, [doseText])
+
+  const doseInvalid =
+    doseText.trim() !== '' &&
+    (parsedDose === null || parsedDose <= 0 || parsedDose > MAX_DOSE_MG)
+
+  // --- Frequência: vazio = null ("configurar depois"); preenchida = inteiro 1-90 ---
   const parsedDays = useMemo(() => {
-    const normalized = daysText.trim().replace(',', '.')
-    if (normalized === '') return null
-    const value = Number(normalized)
+    if (daysText.trim() === '') return null
+    const value = Number(daysText.trim())
     return Number.isInteger(value) ? value : null
   }, [daysText])
 
-  const isValid = parsedDays !== null && parsedDays >= 1 && parsedDays <= 90
-  const savedDays = profile?.doseFrequencyDays ?? null
-  const isDirty = isValid && parsedDays !== savedDays
+  const daysInvalid =
+    daysText.trim() !== '' && (parsedDays === null || parsedDays < 1 || parsedDays > 90)
+
+  const isValid = !doseInvalid && !daysInvalid
+  const isDirty =
+    medication !== savedMedication ||
+    (doseInvalid ? false : parsedDose !== savedDose) ||
+    (daysInvalid ? false : parsedDays !== savedDays)
   const isBlocked = updateDoseProtocol.isPending || !session?.user?.id
+
+  const commonDoses = medication ? COMMON_DOSES[medication] : []
+
+  // Copy por status: quem ainda não começou vê "dose inicial", não "dose atual".
+  const treatmentStatus = profile?.treatmentStatus
+  const doseLabel =
+    treatmentStatus === 'planning' || treatmentStatus === 'starting'
+      ? 'Dose inicial'
+      : 'Dose atual'
+
+  function selectMedication(option: OnboardingMedication) {
+    // Trocar de medicação limpa a dose — doses não são equivalentes entre medicações.
+    if (option !== medication && doseText.trim() !== '') {
+      setDoseText('')
+    }
+    setMedication(option)
+  }
 
   function goBack() {
     if (router.canGoBack()) {
@@ -58,13 +127,27 @@ export default function DoseProtocolScreen() {
   function handleSave() {
     if (!session?.user?.id) return
 
-    if (!isValid || parsedDays === null) {
-      Alert.alert('', 'Informe um intervalo entre 1 e 90 dias.')
+    if (doseInvalid) {
+      Alert.alert('', `Informe uma dose entre 0 e ${MAX_DOSE_MG} mg ou deixe em branco.`)
       return
     }
 
+    if (daysInvalid) {
+      Alert.alert('', 'Informe um intervalo entre 1 e 90 dias ou deixe em branco.')
+      return
+    }
+
+    // Se o usuário não mexeu na medicação, preserva o valor original do banco
+    // (dados legados podem ter nomes fora do enum, ex: "Mounjaro (Tirzepatida)").
+    const medicationToSave =
+      medication !== savedMedication ? medication : (profile?.currentMedication ?? null)
+
     updateDoseProtocol.mutate(
-      { doseFrequencyDays: parsedDays },
+      {
+        currentMedication: medicationToSave,
+        currentDose: parsedDose,
+        doseFrequencyDays: parsedDays,
+      },
       {
         onSuccess: () => {
           showSuccessToast('Protocolo salvo')
@@ -78,7 +161,7 @@ export default function DoseProtocolScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <SettingsHeader
-        title="Protocolo"
+        title="Medicação e protocolo"
         onBack={goBack}
         backAccessibilityLabel="Voltar"
       />
@@ -92,10 +175,78 @@ export default function DoseProtocolScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          {/* --- Medicamento --- */}
+          <Text style={styles.title}>Medicamento</Text>
+          <Text style={styles.description}>
+            A medicação que você usa ou vai usar no tratamento.
+          </Text>
+          <View style={styles.options} accessibilityRole="radiogroup">
+            {MEDICATION_OPTIONS.map((option) => (
+              <SelectionCard
+                key={option}
+                title={t(`medication.options.${option}.label`)}
+                caption={t(`medication.options.${option}.caption`)}
+                selected={medication === option}
+                onPress={() => selectMedication(option)}
+                accessibilityLabel={t(`medication.options.${option}.label`)}
+                accessibilityHint={t(`medication.options.${option}.caption`)}
+                testID={`protocolo-medication-${option}`}
+              />
+            ))}
+          </View>
+
+          <View style={styles.sectionDivider} />
+
+          {/* --- Dose --- */}
+          <Text style={styles.title}>{doseLabel}</Text>
+          <Text style={styles.description}>
+            Se ainda não souber, deixe em branco — dá pra completar depois.
+          </Text>
+          <NumericInput
+            label={doseLabel}
+            suffix="mg"
+            value={doseText}
+            onChangeText={setDoseText}
+            error={
+              doseInvalid ? `Use um valor entre 0 e ${MAX_DOSE_MG} mg.` : undefined
+            }
+            placeholder="ex: 5"
+            testID="protocolo-dose-input"
+          />
+          {commonDoses.length > 0 && medication ? (
+            <View style={styles.doseChipsGroup}>
+              <Text style={styles.fieldLabel}>Doses comuns de {medication}</Text>
+              <View style={styles.chips} accessibilityRole="radiogroup">
+                {commonDoses.map((dose) => {
+                  const selected = parsedDose === dose
+                  return (
+                    <Pressable
+                      key={dose}
+                      onPress={() => setDoseText(String(dose))}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected }}
+                      accessibilityLabel={`${dose} mg`}
+                      testID={`protocolo-dose-common-${dose}`}
+                      style={[styles.chip, selected && styles.chipSelected]}
+                    >
+                      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+                        {String(dose).replace('.', ',')} mg
+                      </Text>
+                    </Pressable>
+                  )
+                })}
+              </View>
+            </View>
+          ) : null}
+
+          <View style={styles.sectionDivider} />
+
+          {/* --- Intervalo entre aplicações --- */}
           <Text style={styles.title}>Intervalo entre aplicações</Text>
           <Text style={styles.description}>
             Defina o intervalo combinado com quem te acompanha ou o intervalo que você está
-            seguindo. O DoseDay usa esse dado para calcular a próxima dose.
+            seguindo. O DoseDay usa esse dado para calcular a próxima dose. Se ainda não
+            souber, deixe em branco.
           </Text>
 
           <View style={styles.chips}>
@@ -131,11 +282,12 @@ export default function DoseProtocolScreen() {
               style={styles.input}
               maxLength={2}
               accessibilityLabel="Intervalo entre aplicações em dias"
+              testID="protocolo-frequency-input"
             />
             <Text style={styles.inputSuffix}>dias</Text>
           </View>
 
-          {daysText.trim() !== '' && !isValid && (
+          {daysInvalid && (
             <Text style={styles.errorText}>Use um número inteiro entre 1 e 90.</Text>
           )}
 
@@ -146,9 +298,11 @@ export default function DoseProtocolScreen() {
           </View>
 
           <AuthButton
-            label={updateDoseProtocol.isPending ? 'Salvando...' : 'Salvar protocolo'}
+            label={updateDoseProtocol.isPending ? 'Salvando...' : 'Salvar'}
             onPress={handleSave}
-            disabled={isBlocked || !isDirty}
+            disabled={isBlocked || !isDirty || !isValid}
+            accessibilityLabel="Salvar medicação e protocolo"
+            testID="protocolo-save"
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -179,6 +333,19 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.xl,
   },
+  options: {
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  sectionDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    marginVertical: spacing.xl,
+  },
+  doseChipsGroup: {
+    gap: spacing.xs,
+    marginTop: spacing.md,
+  },
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -190,6 +357,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     borderWidth: 1,
     minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },

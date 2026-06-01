@@ -76,6 +76,16 @@ export const MEDICATION_OPTIONS = [
 ] as const
 export type OnboardingMedication = (typeof MEDICATION_OPTIONS)[number]
 
+// Doses comuns por medicação (mg) — usadas como chips de atalho no onboarding
+// (dose.tsx) e no editor de protocolo (perfil/protocolo.tsx).
+export const COMMON_DOSES: Record<OnboardingMedication, number[]> = {
+  Mounjaro: [2.5, 5, 7.5, 10, 12.5, 15],
+  Ozempic: [0.25, 0.5, 1, 2],
+  Wegovy: [0.25, 0.5, 1, 1.7, 2.4],
+  Saxenda: [0.6, 1.2, 1.8, 2.4, 3],
+  Trulicity: [0.75, 1.5, 3, 4.5],
+}
+
 export const MEDICAL_SUPPORT_OPTIONS = ['yes', 'no', 'sometimes'] as const
 export type MedicalSupport = (typeof MEDICAL_SUPPORT_OPTIONS)[number]
 

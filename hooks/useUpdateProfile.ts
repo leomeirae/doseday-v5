@@ -4,7 +4,11 @@ import type { Profile } from '@lib/supabase/queries/profile'
 import type { MedicalSupport } from '@lib/types/onboarding'
 
 type UpdateDoseProtocolInput = {
-  doseFrequencyDays: number
+  // string (não enum) de propósito: preserva nomes legados da V4 fora do enum
+  // quando o usuário salva sem mexer na medicação.
+  currentMedication: string | null
+  currentDose: number | null
+  doseFrequencyDays: number | null
 }
 
 type UpdateGoalWeightInput = {
@@ -51,17 +55,24 @@ export function useUpdateDoseProtocol(userId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ doseFrequencyDays }: UpdateDoseProtocolInput) => {
+    mutationFn: async ({
+      currentMedication,
+      currentDose,
+      doseFrequencyDays,
+    }: UpdateDoseProtocolInput) => {
       const { error } = await supabase
         .from('user_profiles')
         .update({
+          current_medication: currentMedication,
+          current_dose: currentDose,
           dose_frequency_days: doseFrequencyDays,
-          dose_frequency_source: 'user_edited',
+          // null quando não há intervalo definido (mesma regra do onboarding).
+          dose_frequency_source: doseFrequencyDays === null ? null : 'user_edited',
         })
         .eq('user_id', userId)
       if (error) throw error
     },
-    onMutate: async ({ doseFrequencyDays }) => {
+    onMutate: async ({ currentMedication, currentDose, doseFrequencyDays }) => {
       await Promise.all([
         queryClient.cancelQueries({ queryKey: ['profile', userId] }),
         queryClient.cancelQueries({ queryKey: ['doseSummary', userId] }),
@@ -71,8 +82,10 @@ export function useUpdateDoseProtocol(userId: string) {
         old
           ? {
               ...old,
+              currentMedication,
+              currentDose,
               doseFrequencyDays,
-              doseFrequencySource: 'user_edited',
+              doseFrequencySource: doseFrequencyDays === null ? null : 'user_edited',
             }
           : old
       )
