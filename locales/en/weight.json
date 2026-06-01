@@ -14,8 +14,6 @@
     "titleEdit": "Edit Weight",
     "weightHint": "Between 30 and 300 kg",
     "dateLabel": "Date",
-    "notesLabel": "Notes (optional)",
-    "notesPlaceholder": "How are you feeling?",
     "reminderTitle": "When to remind?",
     "saveButton": "Save",
     "savingButton": "Saving...",

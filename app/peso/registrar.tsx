@@ -43,6 +43,8 @@ export default function PesoRegistrarScreen() {
 
   const [weightText, setWeightText] = useState('')
   const [date, setDate] = useState(() => new Date())
+  // Coluna `notes` retida no banco: o estado preserva notas existentes ao editar
+  // (round-trip), mas o campo não é mais exibido na UI — peso é registro rápido.
   const [notes, setNotes] = useState('')
   const [showPicker, setShowPicker] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -168,21 +170,6 @@ export default function PesoRegistrarScreen() {
             )}
             {!!errors.date && <Text style={styles.errorText}>{errors.date}</Text>}
           </View>
-
-          <TextField
-            label={t('addModal.notesLabel')}
-            value={notes}
-            onChangeText={(value) => {
-              setNotes(value)
-              if (errors.notes) setErrors((current) => ({ ...current, notes: '' }))
-            }}
-            multiline
-            numberOfLines={4}
-            maxLength={500}
-            placeholder={t('addModal.notesPlaceholder')}
-            error={errors.notes}
-            testID="weight-notes-input"
-          />
         </ScrollView>
 
         <View style={styles.footer}>
