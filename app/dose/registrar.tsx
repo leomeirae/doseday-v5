@@ -149,9 +149,9 @@ export default function RegistrarDoseScreen() {
             <Text style={styles.fieldLabel}>Medicamento</Text>
             <Pressable
               style={styles.readOnlyField}
-              onPress={!hasMedication ? () => router.push('/(tabs)/perfil') : undefined}
+              onPress={!hasMedication ? () => router.push('/perfil/protocolo' as Href) : undefined}
               accessibilityRole={!hasMedication ? 'button' : 'none'}
-              accessibilityHint={!hasMedication ? 'Toque para configurar no perfil' : undefined}
+              accessibilityHint={!hasMedication ? 'Toque para definir sua medicação' : undefined}
             >
               <Text
                 numberOfLines={1}
