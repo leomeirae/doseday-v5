@@ -14,6 +14,7 @@ export function useRegisterCost() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purchaseSummary', userId] })
+      queryClient.invalidateQueries({ queryKey: ['purchases', userId] })
     },
   })
 }
