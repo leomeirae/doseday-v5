@@ -109,7 +109,12 @@ function inferCompletedSteps(data: Partial<OnboardingData>): Set<OnboardingStep>
   if (hasAnyProgress) completedSteps.add('welcome')
 
   if (data.treatment_status) completedSteps.add('treatment-status')
-  if (data.treatment_status === 'planning' || data.treatment_duration) {
+  // 'planning' → null; 'starting' → '<1m' (auto-setado); ambos pulam a tela.
+  if (
+    data.treatment_status === 'planning' ||
+    data.treatment_status === 'starting' ||
+    data.treatment_duration
+  ) {
     completedSteps.add('treatment-duration')
   }
   if (data.current_medication) completedSteps.add('medication')
