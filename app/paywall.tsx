@@ -212,15 +212,14 @@ export default function PaywallScreen() {
           />
         </View>
 
-        {/* Planos (placeholder Fase 1 — preço real virá da App Store) */}
+        {/* Planos (Fase 1: sem número de preço; valor real virá da App Store na Fase 2) */}
         <View className="gap-sm">
           {MOCK_PLANS.map((plan) => (
             <PaywallPlanCard
               key={plan.id}
               title={t(plan.titleKey)}
-              pricePlaceholder={t('paywall.pricing.placeholder')}
+              priceNote={t('paywall.pricing.viaAppStore')}
               periodLabel={t(plan.periodKey)}
-              badgeLabel={plan.badgeKey ? t(plan.badgeKey) : null}
               selected={selectedPlan === plan.id}
               onPress={() => setSelectedPlan(plan.id)}
               testID={`paywall-plan-${plan.id}`}

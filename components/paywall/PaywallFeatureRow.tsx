@@ -18,12 +18,9 @@ export function PaywallFeatureRow({ icon, title, description }: Props) {
       accessible
       accessibilityLabel={`${title}. ${description}`}
     >
-      <View
-        className="w-[44px] h-[44px] rounded-full items-center justify-center"
-        style={{ backgroundColor: 'rgba(0,212,170,0.12)' }}
-      >
-        {/* style prop: mint a 12% não tem token Tailwind (brand-fade do DESIGN.md) */}
-        <SymbolView name={icon} size={20} tintColor={colors.brand} />
+      {/* Ícone neutro (Vital Mint Rarity Rule: mint reservado pro CTA e seleção) */}
+      <View className="w-[44px] h-[44px] rounded-full items-center justify-center bg-bg-elevated">
+        <SymbolView name={icon} size={20} tintColor={colors.textSecondary} />
       </View>
       <View className="flex-1">
         <Text className="text-text-primary text-[18px] font-semibold leading-[24px]">
