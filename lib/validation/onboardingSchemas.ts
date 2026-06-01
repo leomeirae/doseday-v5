@@ -71,7 +71,9 @@ export const weightWithGoalSchema = z
       .number()
       .int('Use centímetros')
       .min(120, 'Mínimo 120 cm')
-      .max(220, 'Máximo 220 cm'),
+      .max(220, 'Máximo 220 cm')
+      .optional()
+      .nullable(),
     goal_weight: z.coerce
       .number()
       .min(30, 'Mínimo 30 kg')
@@ -179,12 +181,4 @@ export function getCountedStepNumber(step: OnboardingStep): number {
   return COUNTED_STEPS.indexOf(step) + 1
 }
 
-export function getNextOnboardingStep(step: OnboardingStep): OnboardingStep {
-  const index = ONBOARDING_STEPS.indexOf(step)
-  return ONBOARDING_STEPS[Math.min(index + 1, ONBOARDING_STEPS.length - 1)]
-}
 
-export function getPreviousOnboardingStep(step: OnboardingStep): OnboardingStep {
-  const index = ONBOARDING_STEPS.indexOf(step)
-  return ONBOARDING_STEPS[Math.max(index - 1, 0)]
-}

@@ -7,7 +7,7 @@ import { SelectionCard } from '@components/onboarding/SelectionCard'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { colors, spacing, typography } from '@lib/theme/tokens'
-import { MEDICATION_OPTIONS } from '@lib/types/onboarding'
+import { MEDICATION_OPTIONS, getPreviousOnboardingStep } from '@lib/types/onboarding'
 import {
   COUNTED_STEPS_TOTAL,
   getCountedStepNumber,
@@ -45,11 +45,8 @@ export default function MedicationScreen() {
 
   function handleBack() {
     goBack()
-    const backRoute =
-      state.data.treatment_status === 'planning'
-        ? '/(onboarding)/treatment-status'
-        : '/(onboarding)/treatment-duration'
-    router.replace(backRoute as Href)
+    const prevStep = getPreviousOnboardingStep('medication', state.data.treatment_status)
+    router.replace(`/(onboarding)/${prevStep}` as Href)
   }
 
   return (

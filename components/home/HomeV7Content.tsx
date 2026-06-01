@@ -140,6 +140,8 @@ export function HomeV7Content() {
           onRetry={() => void doseQuery.refetch()}
           onPressDoses={() => router.push('/(tabs)/doses' as Href)}
           onPressRegister={() => router.push('/dose/registrar' as Href)}
+          medicationName={profile?.currentMedication ?? null}
+          currentDose={profile?.currentDose ?? null}
         />
 
         <WeightCard
@@ -154,6 +156,7 @@ export function HomeV7Content() {
             if (needsProfileForWeight) void profileQuery.refetch()
           }}
           onPressBody={() => router.push('/peso/historico' as Href)}
+          goalWeight={profile?.goalWeight ?? null}
         />
 
         <QuickActions />
@@ -256,6 +259,8 @@ function NextDoseHero({
   onRetry,
   onPressDoses,
   onPressRegister,
+  medicationName,
+  currentDose,
 }: {
   nextDose: NextDoseData | null
   hasDoseHistory: boolean
@@ -264,6 +269,8 @@ function NextDoseHero({
   onRetry: () => void
   onPressDoses: () => void
   onPressRegister: () => void
+  medicationName?: string | null
+  currentDose?: number | null
 }) {
   return (
     <View
@@ -286,7 +293,11 @@ function NextDoseHero({
           <Text className="text-text-secondary text-[16px] leading-[22px] mt-xs mb-md">
             {hasDoseHistory
               ? 'Defina seu intervalo para calcular a próxima dose.'
-              : 'Anote sua primeira dose para iniciar a memória do tratamento.'}
+              : medicationName
+                ? currentDose != null
+                  ? `Prepare-se para aplicar sua primeira dose de ${medicationName} ${currentDose}mg.`
+                  : `Prepare-se para aplicar sua primeira dose de ${medicationName}.`
+                : 'Anote sua primeira dose para iniciar a memória do tratamento.'}
           </Text>
           {hasDoseHistory ? (
             <HeroCta label="Ver doses" onPress={onPressDoses} accessibilityLabel="Ver histórico de doses" />
@@ -390,6 +401,7 @@ function WeightCard({
   error,
   onRetry,
   onPressBody,
+  goalWeight,
 }: {
   currentWeight: number | null
   delta: number | null
@@ -399,6 +411,7 @@ function WeightCard({
   error: string | null
   onRetry: () => void
   onPressBody: () => void
+  goalWeight: number | null
 }) {
   return (
     <View className="bg-bg-surface rounded-[14px] p-lg mb-md">
@@ -429,6 +442,11 @@ function WeightCard({
                   <Text className="text-text-secondary text-[18px] font-semibold leading-[24px]">kg</Text>
                 </View>
                 <Text className="text-text-secondary text-[13px] leading-[18px] mt-xxs">peso atual</Text>
+                {goalWeight !== null && (
+                  <Text className="text-text-tertiary text-[13px] leading-[18px] mt-xxs">
+                    Meta: {formatNumber(goalWeight)} kg
+                  </Text>
+                )}
                 {delta !== null && (
                   <View className="flex-row items-center self-start gap-xs bg-bg-elevated rounded-[10px] px-sm py-xxs mt-sm">
                     <Text

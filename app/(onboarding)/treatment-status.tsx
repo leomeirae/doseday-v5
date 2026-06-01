@@ -7,7 +7,7 @@ import { SelectionCard } from '@components/onboarding/SelectionCard'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { colors, spacing, typography } from '@lib/theme/tokens'
-import { TREATMENT_STATUS_OPTIONS } from '@lib/types/onboarding'
+import { TREATMENT_STATUS_OPTIONS, getNextOnboardingStep } from '@lib/types/onboarding'
 import {
   COUNTED_STEPS_TOTAL,
   getCountedStepNumber,
@@ -40,16 +40,11 @@ export default function TreatmentStatusScreen() {
     await submitStep('treatment-status', data)
     if (data.treatment_status === 'planning') {
       await submitStep('treatment-duration', { treatment_duration: null })
-      router.replace('/(onboarding)/medication' as Href)
     } else if (data.treatment_status === 'starting') {
-      // 'starting' = primeira dose esta semana → duração implícita < 1 mês.
-      // Auto-setamos '<1m' para que deriveTreatmentWeek retorne treatment_week=2
-      // e a IA consiga contextualizar a fase inicial. A tela não faz sentido aqui.
       await submitStep('treatment-duration', { treatment_duration: '<1m' })
-      router.replace('/(onboarding)/medication' as Href)
-    } else {
-      router.replace('/(onboarding)/treatment-duration' as Href)
     }
+    const nextStep = getNextOnboardingStep('treatment-status', data.treatment_status)
+    router.replace(`/(onboarding)/${nextStep}` as Href)
   })
 
   function handleBack() {

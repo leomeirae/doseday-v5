@@ -138,6 +138,14 @@
   "dose": {
     "headline": "Qual a sua dose atual?",
     "subtitle": "A dose que você usa hoje. Se ainda não souber, pode ajustar depois.",
+    "headline_planning": "Você já sabe qual será sua dose inicial?",
+    "subtitle_planning": "Se seu médico já definiu a dose que você vai começar. Se não souber, clique em 'Ainda não sei'.",
+    "headline_starting": "Qual a sua dose inicial?",
+    "subtitle_starting": "A primeira dose que você tomou essa semana.",
+    "headline_ongoing": "Qual a sua dose atual?",
+    "subtitle_ongoing": "A dose que você usa hoje no seu tratamento.",
+    "headline_restart": "Qual será sua dose de retomada?",
+    "subtitle_restart": "A dose com a qual você vai reiniciar o tratamento.",
     "doseLabel": "Dose",
     "mgSuffix": "mg",
     "commonDosesLabel": "Doses comuns pra {{medication}}",
@@ -146,7 +154,7 @@
     "frequencySubtitle": "A cada quantos dias? Usamos isso só pra te lembrar — você pode ajustar depois.",
     "frequencyNote": "Se o protocolo mudar, edite depois nas configurações. O histórico anterior continua preservado.",
     "errors": {
-      "doseRange": "Dose entre 0,25 e 30 mg",
+      "doseRange": "Dose entre 0,25 e 20 mg",
       "required": "Informe sua dose"
     }
   },
@@ -224,6 +232,14 @@
   "result": {
     "headline": "Sua memória de tratamento está pronta.",
     "subtitle": "Tudo o que você anotou aqui já está sendo lembrado por você.",
+    "headline_planning": "Sua preparação está pronta.",
+    "subtitle_planning": "Tudo pronto para você começar seu tratamento.",
+    "headline_starting": "Sua primeira semana está organizada.",
+    "subtitle_starting": "Começo do tratamento registrado com sucesso.",
+    "headline_ongoing": "Sua memória de tratamento está pronta.",
+    "subtitle_ongoing": "Tudo o que você anotou aqui já está sendo lembrado por você.",
+    "headline_restart": "Sua retomada está organizada.",
+    "subtitle_restart": "Pronto para retomar o tratamento com força.",
     "goalCardLabel": "Meta de peso",
     "contextSectionLabel": "Como o DoseDay vai acompanhar",
     "summary": {

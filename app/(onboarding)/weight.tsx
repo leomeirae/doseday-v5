@@ -9,6 +9,7 @@ import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { WeightDeltaDisplay } from '@components/onboarding/WeightDeltaDisplay'
 import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { spacing } from '@lib/theme/tokens'
+import { getNextOnboardingStep, getPreviousOnboardingStep } from '@lib/types/onboarding'
 import {
   COUNTED_STEPS_TOTAL,
   getCountedStepNumber,
@@ -17,7 +18,7 @@ import {
 } from '@lib/validation/onboardingSchemas'
 
 export default function WeightScreen() {
-  const { t } = useTranslation('onboarding')
+  const t = useTranslation('onboarding').t
   const { state, submitStep, goBack } = useOnboarding()
   const router = useRouter()
 
@@ -29,10 +30,9 @@ export default function WeightScreen() {
       ...(state.data.current_weight !== undefined
         ? { current_weight: state.data.current_weight }
         : {}),
-      ...(state.data.height !== undefined ? { height: state.data.height } : {}),
       ...(state.data.goal_weight !== undefined ? { goal_weight: state.data.goal_weight } : {}),
     }),
-    [state.data.current_weight, state.data.goal_weight, state.data.height, state.data.initial_weight]
+    [state.data.current_weight, state.data.goal_weight, state.data.initial_weight]
   )
 
   const { control, handleSubmit, formState, reset, watch } = useOnboardingForm<WeightWithGoalInput>(
@@ -48,13 +48,20 @@ export default function WeightScreen() {
 
   const onSubmit = handleSubmit(async (data) => {
     const payload = weightWithGoalSchema.parse(data)
-    await submitStep('weight', payload)
-    router.replace('/(onboarding)/medical-support' as Href)
+    await submitStep('weight', {
+      initial_weight: payload.initial_weight,
+      current_weight: payload.current_weight,
+      goal_weight: payload.goal_weight,
+      height: null,
+    })
+    const nextStep = getNextOnboardingStep('weight', state.data.treatment_status)
+    router.replace(`/(onboarding)/${nextStep}` as Href)
   })
 
   function handleBack() {
     goBack()
-    router.replace('/(onboarding)/dose' as Href)
+    const prevStep = getPreviousOnboardingStep('weight', state.data.treatment_status)
+    router.replace(`/(onboarding)/${prevStep}` as Href)
   }
 
   return (
@@ -100,21 +107,6 @@ export default function WeightScreen() {
                 onChangeText={field.onChange}
                 error={fieldState.error?.message}
                 testID="weight-current"
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="height"
-            render={({ field, fieldState }) => (
-              <NumericInput
-                label={t('weight.heightLabel')}
-                suffix={t('weight.cmSuffix')}
-                value={field.value}
-                onChangeText={field.onChange}
-                error={fieldState.error?.message}
-                decimals={false}
-                testID="weight-height"
               />
             )}
           />

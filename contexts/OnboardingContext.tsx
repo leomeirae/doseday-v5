@@ -26,11 +26,9 @@ import {
   type OnboardingState,
   type OnboardingStep,
   type PersistableOnboardingData,
-} from '@lib/types/onboarding'
-import {
   getNextOnboardingStep,
   getPreviousOnboardingStep,
-} from '@lib/validation/onboardingSchemas'
+} from '@lib/types/onboarding'
 
 type OnboardingContextValue = {
   state: OnboardingState
@@ -119,10 +117,19 @@ function inferCompletedSteps(data: Partial<OnboardingData>): Set<OnboardingStep>
   }
   if (data.current_medication) completedSteps.add('medication')
   // dose engloba a frequência (lembrete) — a frequência é opcional/pulável,
-  // por isso a dose marca a etapa completa sozinha.
-  if (data.current_dose !== undefined) completedSteps.add('dose')
-  // weight engloba a meta (goal_weight) na mesma tela.
-  if (data.initial_weight && data.current_weight && data.height && data.goal_weight) {
+  // por isso a dose marca a etapa completa sozinha. Exige valor não-nulo ou que etapas posteriores estejam completas.
+  const hasDoseValue =
+    (data.current_dose !== undefined && data.current_dose !== null) ||
+    data.dose_frequency_source === 'user_confirmed'
+  const isWeightOrLaterComplete =
+    !!(data.initial_weight && data.current_weight && data.goal_weight) ||
+    !!data.has_medical_support ||
+    data.consent_given === true
+  if (hasDoseValue || isWeightOrLaterComplete) {
+    completedSteps.add('dose')
+  }
+  // weight engloba a meta (goal_weight) na mesma tela — sem exigir a altura (height).
+  if (data.initial_weight && data.current_weight && data.goal_weight) {
     completedSteps.add('weight')
   }
   // medical-support engloba o nome do médico (opcional) na mesma tela.
@@ -149,6 +156,9 @@ function toPersistableData(data: Partial<OnboardingData>): Partial<PersistableOn
   if (data.current_dose !== undefined) persistable.current_dose = data.current_dose
   if (data.dose_frequency_days !== undefined) {
     persistable.dose_frequency_days = data.dose_frequency_days
+  }
+  if (data.dose_frequency_source !== undefined) {
+    persistable.dose_frequency_source = data.dose_frequency_source
   }
   if (data.doctor_name !== undefined) persistable.doctor_name = data.doctor_name
   if (data.has_medical_support !== undefined) {
@@ -208,7 +218,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     async (step: OnboardingStep, data: Partial<OnboardingData>) => {
       dispatch({ type: 'update-data', data })
       dispatch({ type: 'mark-completed', step })
-      dispatch({ type: 'set-step', step: getNextOnboardingStep(step) })
+      
+      const currentStatus = data.treatment_status ?? state.data.treatment_status
+      dispatch({ type: 'set-step', step: getNextOnboardingStep(step, currentStatus) })
 
       try {
         await persist(data)
@@ -219,7 +231,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         showErrorToast(mapQueryError(error))
       }
     },
-    [persist]
+    [persist, state.data.treatment_status]
   )
 
   const complete = useCallback(async () => {
@@ -247,8 +259,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     () => ({
       state,
       currentStep: state.currentStep,
-      advance: () => dispatch({ type: 'set-step', step: getNextOnboardingStep(state.currentStep) }),
-      goBack: () => dispatch({ type: 'set-step', step: getPreviousOnboardingStep(state.currentStep) }),
+      advance: () => dispatch({ type: 'set-step', step: getNextOnboardingStep(state.currentStep, state.data.treatment_status) }),
+      goBack: () => dispatch({ type: 'set-step', step: getPreviousOnboardingStep(state.currentStep, state.data.treatment_status) }),
       setCurrentStep: (step) => dispatch({ type: 'set-step', step }),
       updateField: (key, fieldValue) => dispatch({ type: 'update-data', data: { [key]: fieldValue } }),
       submitStep,
@@ -270,7 +282,8 @@ export function useOnboarding(): OnboardingContextValue {
 }
 
 export function useOnboardingForm<T extends FieldValues>(
-  schema: z.ZodType<T, T>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  schema: z.ZodType<T, any, any>,
   defaultValues: DefaultValues<T>
 ): UseFormReturn<T, unknown, T> {
   return useForm<T, unknown, T>({
