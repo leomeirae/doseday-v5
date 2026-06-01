@@ -170,6 +170,16 @@ export default function RootLayout() {
                     sheetCornerRadius: 20,
                   }}
                 />
+                <Stack.Screen
+                  name="paywall"
+                  options={{
+                    presentation: 'formSheet',
+                    headerShown: false,
+                    sheetAllowedDetents: [1.0],
+                    sheetGrabberVisible: true,
+                    sheetCornerRadius: 20,
+                  }}
+                />
                 <Stack.Screen name="peso/historico" options={{ headerShown: false }} />
                 <Stack.Screen
                   name="peso/registrar"
