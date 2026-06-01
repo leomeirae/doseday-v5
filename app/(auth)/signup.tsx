@@ -65,12 +65,11 @@ export default function SignUpScreen() {
         setGeneralError(mapSignUpError(error.message))
         return
       }
-      if (session) {
-        router.replace('/(tabs)')
-      } else {
-        // Email confirmation required
+      if (!session) {
+        // Sem sessão: confirmação de email pendente — mostra a mensagem
         setGeneralError('Verifique seu email para ativar a conta.')
       }
+      // Com sessão: o gate de auth do root _layout roteia (onboarding p/ conta nova)
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : ''
       setGeneralError(mapSignUpError(message))
