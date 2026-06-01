@@ -12,7 +12,11 @@ import {
   shouldRequestInsight,
   useOnboardingInsight,
 } from '@hooks/useOnboardingInsight'
-import { spacing, typography, colors } from '@lib/theme/tokens'
+import {
+  COUNTED_STEPS_TOTAL,
+  getCountedStepNumber,
+} from '@lib/validation/onboardingSchemas'
+import { radius, spacing, typography, colors } from '@lib/theme/tokens'
 
 export default function ResultScreen() {
   const { t } = useTranslation('onboarding')
@@ -21,8 +25,28 @@ export default function ResultScreen() {
   const requestInsight = shouldRequestInsight(state.data)
   const insight = useOnboardingInsight(state.data, requestInsight)
 
-  const firstName = state.data.full_name?.trim().split(' ')[0] ?? ''
   const input = buildOnboardingInsightInput(state.data)
+
+  // Recap "memória pronta" — só dados já coletados, sem payload novo.
+  const summaryRows: { label: string; value: string }[] = []
+  if (state.data.dose_frequency_days != null) {
+    summaryRows.push({
+      label: t('result.summary.reminderLabel'),
+      value: t('result.summary.reminderValue', { count: state.data.dose_frequency_days }),
+    })
+  }
+  if (state.data.main_concerns && state.data.main_concerns.length > 0) {
+    summaryRows.push({
+      label: t('result.summary.trackingLabel'),
+      value: state.data.main_concerns.map((c) => t(`concerns.options.${c}`)).join(' · '),
+    })
+  }
+  if (state.data.doctor_name) {
+    summaryRows.push({
+      label: t('result.summary.doctorLabel'),
+      value: state.data.doctor_name,
+    })
+  }
 
   const facts: string[] = []
   if (
@@ -44,10 +68,11 @@ export default function ResultScreen() {
     state.data.goal_weight != null &&
     state.data.current_weight > state.data.goal_weight
   ) {
+    const deltaRaw = state.data.current_weight - state.data.goal_weight
     facts.push(
       t('result.insightFallback.weightGoal', {
         goal: state.data.goal_weight,
-        delta: (state.data.current_weight - state.data.goal_weight).toFixed(1),
+        delta: Number.isInteger(deltaRaw) ? String(deltaRaw) : deltaRaw.toFixed(1),
       })
     )
   }
@@ -64,9 +89,10 @@ export default function ResultScreen() {
   return (
     <OnboardingShell
       step="result"
-      stepNumber={15}
-      totalSteps={15}
-      headline={t('result.headline', { name: firstName })}
+      stepNumber={getCountedStepNumber('result')}
+      totalSteps={COUNTED_STEPS_TOTAL}
+      headline={t('result.headline')}
+      subtitle={t('result.subtitle')}
       showBack={false}
       primaryCTA={{
         label: t('result.cta'),
@@ -76,6 +102,17 @@ export default function ResultScreen() {
       }}
     >
       <View style={styles.stack}>
+        {summaryRows.length > 0 ? (
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryTitle}>{t('result.summary.title')}</Text>
+            {summaryRows.map((row) => (
+              <View key={row.label} style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>{row.label}</Text>
+                <Text style={styles.summaryValue}>{row.value}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
         {insight.data ? (
           <>
             <InsightStageCard
@@ -134,5 +171,30 @@ const styles = StyleSheet.create({
   },
   stack: {
     gap: spacing.sm,
+  },
+  summaryCard: {
+    backgroundColor: colors.bgElevated,
+    borderRadius: radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.08)',
+    padding: spacing.md,
+    gap: spacing.md,
+  },
+  summaryTitle: {
+    ...typography.label,
+    color: colors.textPrimary,
+  },
+  summaryRow: {
+    gap: spacing.xxs,
+  },
+  summaryLabel: {
+    ...typography.caption,
+    color: colors.textTertiary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  summaryValue: {
+    ...typography.body,
+    color: colors.textPrimary,
   },
 })

@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   BIOLOGICAL_SEX_OPTIONS,
   CONCERN_OPTIONS,
+  COUNTED_STEPS,
   MEDICAL_SUPPORT_OPTIONS,
   MEDICATION_OPTIONS,
   ONBOARDING_STEPS,
@@ -54,6 +55,32 @@ export const goalWeightSchema = z.object({
     .min(30, 'Mínimo 30 kg')
     .max(300, 'Máximo 300 kg'),
 })
+
+// Tela "Peso e meta" — funde peso (inicial/atual/altura) + meta (goal_weight).
+export const weightWithGoalSchema = z
+  .object({
+    initial_weight: z.coerce
+      .number()
+      .min(30, 'Mínimo 30 kg')
+      .max(300, 'Máximo 300 kg'),
+    current_weight: z.coerce
+      .number()
+      .min(30, 'Mínimo 30 kg')
+      .max(300, 'Máximo 300 kg'),
+    height: z.coerce
+      .number()
+      .int('Use centímetros')
+      .min(120, 'Mínimo 120 cm')
+      .max(220, 'Máximo 220 cm'),
+    goal_weight: z.coerce
+      .number()
+      .min(30, 'Mínimo 30 kg')
+      .max(300, 'Máximo 300 kg'),
+  })
+  .refine((data) => Math.abs(data.initial_weight - data.current_weight) <= 120, {
+    message: 'Confira os pesos informados',
+    path: ['current_weight'],
+  })
 
 export const treatmentStatusSchema = z.object({
   treatment_status: z.enum(TREATMENT_STATUS_OPTIONS),
@@ -111,15 +138,11 @@ export const resultSchema = z.object({})
 
 export const ONBOARDING_STEP_SCHEMAS = {
   welcome: welcomeSchema,
-  'personal-info': personalInfoSchema,
-  weight: weightSchema,
-  'goal-weight': goalWeightSchema,
   'treatment-status': treatmentStatusSchema,
   'treatment-duration': treatmentDurationSchema,
   medication: medicationSchema,
   dose: doseSchema,
-  'dose-frequency': doseFrequencySchema,
-  'doctor-name': doctorNameSchema,
+  weight: weightWithGoalSchema,
   'medical-support': medicalSupportSchema,
   concerns: concernsSchema,
   consent: consentSchema,
@@ -130,6 +153,7 @@ export const ONBOARDING_STEP_SCHEMAS = {
 export type WelcomeInput = z.infer<typeof welcomeSchema>
 export type PersonalInfoInput = z.infer<typeof personalInfoSchema>
 export type WeightInput = z.infer<typeof weightSchema>
+export type WeightWithGoalInput = z.infer<typeof weightWithGoalSchema>
 export type GoalWeightInput = z.infer<typeof goalWeightSchema>
 export type TreatmentStatusInput = z.infer<typeof treatmentStatusSchema>
 export type TreatmentDurationInput = z.infer<typeof treatmentDurationSchema>
@@ -145,6 +169,14 @@ export type OnboardingStepData = Partial<OnboardingData>
 
 export function getOnboardingStepNumber(step: OnboardingStep): number {
   return ONBOARDING_STEPS.indexOf(step) + 1
+}
+
+// Progresso "Passo X de N" considera só as telas de pergunta (COUNTED_STEPS).
+// Retorna 0 para welcome/loading/result (não contam) — o caller esconde o label.
+export const COUNTED_STEPS_TOTAL = COUNTED_STEPS.length
+
+export function getCountedStepNumber(step: OnboardingStep): number {
+  return COUNTED_STEPS.indexOf(step) + 1
 }
 
 export function getNextOnboardingStep(step: OnboardingStep): OnboardingStep {

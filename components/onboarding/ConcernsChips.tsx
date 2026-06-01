@@ -1,4 +1,5 @@
 import { StyleSheet, Pressable, Text, View } from 'react-native'
+import { SymbolView } from 'expo-symbols'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 
 type Props = {
@@ -27,6 +28,9 @@ export function ConcernsChips({ options, selected, labelFor, onToggle }: Props) 
               isSelected && styles.chipSelected,
             ]}
           >
+            {isSelected ? (
+              <SymbolView name="checkmark" size={13} tintColor={colors.brand} />
+            ) : null}
             <Text style={[styles.label, isSelected && styles.labelSelected]}>{label}</Text>
           </Pressable>
         )
@@ -43,6 +47,9 @@ const styles = StyleSheet.create({
   },
   chip: {
     minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
     justifyContent: 'center',
     paddingHorizontal: spacing.md,
     borderRadius: radius.full,
@@ -51,7 +58,7 @@ const styles = StyleSheet.create({
     borderColor: colors.semanticMuted,
   },
   chipSelected: {
-    backgroundColor: colors.bgSurface,
+    backgroundColor: 'rgba(0,212,170,0.10)',
     borderColor: colors.brand,
   },
   label: {

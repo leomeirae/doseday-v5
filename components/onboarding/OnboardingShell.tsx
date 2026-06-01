@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SymbolView } from 'expo-symbols'
+import { useTranslation } from 'react-i18next'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 import type { OnboardingStep } from '@lib/types/onboarding'
 
@@ -52,7 +53,10 @@ export function OnboardingShell({
   onBack,
   onClose,
 }: OnboardingShellProps) {
+  const { t } = useTranslation('onboarding')
   const primaryDisabled = primaryCTA.disabled || primaryCTA.loading
+  const showProgress = stepNumber >= 1
+  const progressRatio = Math.max(0, Math.min(1, stepNumber / totalSteps))
   const [primaryPressed, setPrimaryPressed] = useState(false)
   const [secondaryPressed, setSecondaryPressed] = useState(false)
 
@@ -88,9 +92,16 @@ export function OnboardingShell({
           </View>
         </View>
 
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${(stepNumber / totalSteps) * 100}%` }]} />
-        </View>
+        {showProgress ? (
+          <View style={styles.progress}>
+            <Text style={styles.progressLabel}>
+              {t('progress.step', { current: stepNumber, total: totalSteps })}
+            </Text>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progressRatio * 100}%` }]} />
+            </View>
+          </View>
+        ) : null}
 
         <ScrollView
           style={styles.flex}
@@ -204,13 +215,25 @@ const styles = StyleSheet.create({
   headerSideEnd: {
     alignItems: 'flex-end',
   },
+  progress: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.sm,
+    gap: spacing.xs,
+  },
+  progressLabel: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    letterSpacing: 0.3,
+  },
   progressTrack: {
-    height: 2,
+    height: 3,
+    borderRadius: radius.full,
     backgroundColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden',
   },
   progressFill: {
-    height: 2,
-    borderRadius: 1,
+    height: 3,
+    borderRadius: radius.full,
     backgroundColor: colors.brand,
   },
   iconButton: {
@@ -258,7 +281,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.65,
   },
   pressed: {
     transform: [{ scale: 0.98 }],

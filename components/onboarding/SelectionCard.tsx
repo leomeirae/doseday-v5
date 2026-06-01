@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { SymbolView } from 'expo-symbols'
 import { colors, radius, spacing, typography } from '@lib/theme/tokens'
 
 type Props = {
@@ -44,7 +45,9 @@ export function SelectionCard({
         {caption ? <Text style={styles.caption}>{caption}</Text> : null}
       </View>
       <View style={[styles.radio, selected && styles.radioSelected]}>
-        {selected ? <View style={styles.radioDot} /> : null}
+        {selected ? (
+          <SymbolView name="checkmark" size={12} tintColor={colors.textInverse} />
+        ) : null}
       </View>
     </Pressable>
   )
@@ -65,7 +68,7 @@ const styles = StyleSheet.create({
   },
   cardSelected: {
     borderColor: colors.brand,
-    backgroundColor: colors.bgSurface,
+    backgroundColor: 'rgba(0,212,170,0.10)',
   },
   cardPressed: {
     transform: [{ scale: 0.99 }],
@@ -93,11 +96,6 @@ const styles = StyleSheet.create({
   },
   radioSelected: {
     borderColor: colors.brand,
-  },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: radius.full,
     backgroundColor: colors.brand,
   },
 })

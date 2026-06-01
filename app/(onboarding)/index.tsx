@@ -5,20 +5,19 @@ import { View, Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors, spacing, typography } from '@lib/theme/tokens'
 import { useOnboarding } from '@contexts/OnboardingContext'
-import { getOnboardingStepNumber } from '@lib/validation/onboardingSchemas'
-import { ONBOARDING_STEPS, type OnboardingStep } from '@lib/types/onboarding'
+import {
+  COUNTED_STEPS_TOTAL,
+  getCountedStepNumber,
+} from '@lib/validation/onboardingSchemas'
+import { type OnboardingStep } from '@lib/types/onboarding'
 
 const IMPLEMENTED_ROUTES: Partial<Record<OnboardingStep, Href>> = {
   welcome: '/(onboarding)/welcome' as Href,
-  'personal-info': '/(onboarding)/personal-info' as Href,
-  weight: '/(onboarding)/weight' as Href,
-  'goal-weight': '/(onboarding)/goal-weight' as Href,
   'treatment-status': '/(onboarding)/treatment-status' as Href,
   'treatment-duration': '/(onboarding)/treatment-duration' as Href,
   medication: '/(onboarding)/medication' as Href,
   dose: '/(onboarding)/dose' as Href,
-  'dose-frequency': '/(onboarding)/dose-frequency' as Href,
-  'doctor-name': '/(onboarding)/doctor-name' as Href,
+  weight: '/(onboarding)/weight' as Href,
   'medical-support': '/(onboarding)/medical-support' as Href,
   concerns: '/(onboarding)/concerns' as Href,
   consent: '/(onboarding)/consent' as Href,
@@ -30,7 +29,7 @@ export default function OnboardingIndexScreen() {
   const { t } = useTranslation('onboarding')
   const { state, currentStep } = useOnboarding()
   const router = useRouter()
-  const stepNumber = getOnboardingStepNumber(currentStep)
+  const stepNumber = getCountedStepNumber(currentStep)
 
   useEffect(() => {
     if (!state.isHydrated) return
@@ -41,9 +40,11 @@ export default function OnboardingIndexScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.container}>
-        <Text style={styles.kicker}>
-          {t('progress.step', { current: stepNumber, total: ONBOARDING_STEPS.length })}
-        </Text>
+        {stepNumber > 0 ? (
+          <Text style={styles.kicker}>
+            {t('progress.step', { current: stepNumber, total: COUNTED_STEPS_TOTAL })}
+          </Text>
+        ) : null}
         <Text style={styles.title}>{t('welcome.headline')}</Text>
         <Text style={styles.body}>{t('welcome.body')}</Text>
       </View>

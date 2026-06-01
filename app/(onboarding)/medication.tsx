@@ -8,7 +8,12 @@ import { OnboardingShell } from '@components/onboarding/OnboardingShell'
 import { useOnboarding, useOnboardingForm } from '@contexts/OnboardingContext'
 import { colors, spacing, typography } from '@lib/theme/tokens'
 import { MEDICATION_OPTIONS } from '@lib/types/onboarding'
-import { medicationSchema, type MedicationInput } from '@lib/validation/onboardingSchemas'
+import {
+  COUNTED_STEPS_TOTAL,
+  getCountedStepNumber,
+  medicationSchema,
+  type MedicationInput,
+} from '@lib/validation/onboardingSchemas'
 
 export default function MedicationScreen() {
   const { t } = useTranslation('onboarding')
@@ -50,8 +55,8 @@ export default function MedicationScreen() {
   return (
     <OnboardingShell
       step="medication"
-      stepNumber={7}
-      totalSteps={14}
+      stepNumber={getCountedStepNumber('medication')}
+      totalSteps={COUNTED_STEPS_TOTAL}
       headline={t('medication.headline')}
       subtitle={t('medication.subtitle')}
       onBack={handleBack}
