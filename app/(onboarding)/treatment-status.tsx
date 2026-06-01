@@ -41,6 +41,12 @@ export default function TreatmentStatusScreen() {
     if (data.treatment_status === 'planning') {
       await submitStep('treatment-duration', { treatment_duration: null })
       router.replace('/(onboarding)/medication' as Href)
+    } else if (data.treatment_status === 'starting') {
+      // 'starting' = primeira dose esta semana → duração implícita < 1 mês.
+      // Auto-setamos '<1m' para que deriveTreatmentWeek retorne treatment_week=2
+      // e a IA consiga contextualizar a fase inicial. A tela não faz sentido aqui.
+      await submitStep('treatment-duration', { treatment_duration: '<1m' })
+      router.replace('/(onboarding)/medication' as Href)
     } else {
       router.replace('/(onboarding)/treatment-duration' as Href)
     }
