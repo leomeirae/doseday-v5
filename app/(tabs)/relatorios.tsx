@@ -2,7 +2,7 @@ import { Pressable, ScrollView, Text, View, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
-import { colors, radius, spacing, typography } from '@lib/theme/tokens'
+import { colors, spacing, typography } from '@lib/theme/tokens'
 import { PremiumGate } from '@components/subscription/PremiumGate'
 import { WeightChartCard } from '@components/relatorios/WeightChartCard'
 import { DoseAdherenceCard } from '@components/relatorios/DoseAdherenceCard'
@@ -11,6 +11,8 @@ import { AdherenceRingCard } from '@components/relatorios/AdherenceRingCard'
 import { useWeightHistory } from '@hooks/useWeightHistory'
 import { useDoseAdherence } from '@hooks/useDoseAdherence'
 import { useSymptomDistribution } from '@hooks/useSymptomDistribution'
+import { useMemorySummary } from '@hooks/useMemorySummary'
+import { MemorySummaryBlock } from '@components/relatorios/MemorySummaryBlock'
 import { mapQueryError } from '@lib/supabase/queries/errors'
 
 export default function RelatoriosScreen() {
@@ -40,7 +42,7 @@ export default function RelatoriosScreen() {
             >
               <SymbolView name="chevron.left" size={22} tintColor={colors.textPrimary} />
             </Pressable>
-            <Text style={styles.headline}>Relatórios</Text>
+            <Text style={styles.headline}>Memória do tratamento</Text>
             <View style={styles.headlineSpacer} />
           </View>
           <Text style={styles.subtitle}>Sua memória do tratamento organizada para a consulta.</Text>
@@ -60,9 +62,16 @@ function RelatoriosContent() {
   const weight = useWeightHistory()
   const dose = useDoseAdherence()
   const symptoms = useSymptomDistribution()
+  const summary = useMemorySummary()
 
   return (
     <>
+      <MemorySummaryBlock
+        data={summary.data}
+        isLoading={summary.isLoading}
+        error={summary.error ? mapQueryError(summary.error) : null}
+      />
+
       <WeightChartCard
         data={weight.data ?? []}
         isLoading={weight.isLoading}
@@ -98,22 +107,6 @@ function RelatoriosContent() {
           void dose.refetch()
         }}
       />
-
-      <View
-        style={styles.reportPlaceholder}
-        accessible
-        accessibilityLabel="Relatórios médicos em breve"
-      >
-        <View style={styles.placeholderIcon}>
-          <SymbolView name="doc.text" size={24} tintColor={colors.semanticInfo} />
-        </View>
-        <View style={styles.placeholderCopy}>
-          <Text style={styles.placeholderTitle}>Relatórios médicos</Text>
-          <Text style={styles.placeholderText}>
-            Em breve: gere um PDF claro para levar a quem acompanha seu tratamento.
-          </Text>
-        </View>
-      </View>
     </>
   )
 }
@@ -150,35 +143,5 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     marginTop: spacing.xs,
-  },
-  reportPlaceholder: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    backgroundColor: colors.bgElevated,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.06)',
-  },
-  placeholderIcon: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 44,
-    height: 44,
-    borderRadius: radius.full,
-    backgroundColor: 'rgba(91,168,217,0.12)',
-  },
-  placeholderCopy: {
-    flex: 1,
-  },
-  placeholderTitle: {
-    ...typography.subtitle,
-    color: colors.textPrimary,
-  },
-  placeholderText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: spacing.xxs,
   },
 })
