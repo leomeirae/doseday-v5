@@ -394,3 +394,13 @@ Registrado em 2026-05-26 durante o PR Settings Hub.
 **Validação.** A exportação real abriu a share sheet no iPhone 17 simulator com um JSON de 34 KB. RLS foi validada sem sessão (0 linhas anônimas) e com a conta `teste-22-maio@teste.com` (0 linhas de outros usuários) para as 19 tabelas exportadas.
 
 **Princípio.** Otimização de tamanho não pode reduzir direito LGPD sem decisão explícita de retenção. Primeiro garanta isolamento e paginação; só depois discuta política de retenção ou export assíncrono para contas muito grandes.
+
+## 14.31 Aprendizado 63 — MCP do App Store Connect instalado e operacional (escopo de usuário)
+
+Registrado em 2026-06-02 após instalação e teste com a API real da Apple.
+
+**Contexto.** Pra preparar a Fase 2 (RevenueCat/IAP nativo) e o ciclo de TestFlight/release, foi instalado o MCP server `app-store-connect` (JoshuaRileyDev/app-store-connect-mcp-server) no escopo de usuário (`~/.claude.json`) — disponível em todos os projetos, não só no DoseDay. A chave `.p8` da API da Apple vive em `~/.appstoreconnect/private_keys/` (fora do repo, permissão 600).
+
+**Achado.** O Claude Code tem acesso direto (ferramentas `mcp__app-store-connect__*`) a: apps e bundle IDs, builds, TestFlight (grupos beta, testers, feedback com screenshots), App Store versions/localizations, analytics/vendas e dispositivos. Teste real listou os 4 apps da conta, incluindo o DoseDay V5 (`com.doseday.premium`, App ID 6756668672). Descoberta bônus: o webhook server-to-server Apple → RevenueCat (V2, produção e sandbox) **já está configurado** no App Store Connect do DoseDay V5 — integração de notificação de assinatura pronta antes mesmo do SDK nativo entrar no app.
+
+**Princípio.** Operações de App Store Connect (verificar produtos IAP, status de revisão, criar grupo beta, adicionar testers, conferir feedback do TestFlight) devem ser feitas via MCP direto pelo Claude Code/Cowork — sem pedir pro Léo abrir o site da Apple (regra 29). Antes de qualquer tarefa de release ou Fase 2, lembrar que essa ferramenta existe e usá-la.

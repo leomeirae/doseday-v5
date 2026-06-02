@@ -84,6 +84,9 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     const inWelcomeGroup = currentGroup === '(welcome)'
     const inAuthGroup = currentGroup === '(auth)'
     const inOnboardingGroup = currentGroup === '(onboarding)'
+    // Paywall é modal global: pode abrir por cima do onboarding (teaser do result,
+    // Subfase 5) sem ser tratado como fuga do fluxo de onboarding.
+    const inPaywall = currentGroup === 'paywall'
     const onboardingCompleted = profile?.onboardingCompletedAt != null
 
     if (!session && !welcomeSeen && inAuthGroup) {
@@ -111,7 +114,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       router.replace('/(welcome)' as Href)
     } else if (!session && welcomeSeen && !inAuthGroup) {
       router.replace('/(auth)/signin')
-    } else if (session && !onboardingCompleted && !inOnboardingGroup) {
+    } else if (session && !onboardingCompleted && !inOnboardingGroup && !inPaywall) {
       router.replace('/(onboarding)' as Href)
     } else if (
       session &&

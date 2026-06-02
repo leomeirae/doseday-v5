@@ -8,7 +8,7 @@ import {
   LoadingStepIndicator,
   type LoadingStepStatus,
 } from '@components/onboarding/LoadingStepIndicator'
-import { PulseAnimation } from '@components/onboarding/PulseAnimation'
+import { LoadingProgressRing } from '@components/onboarding/LoadingProgressRing'
 import { useOnboarding } from '@contexts/OnboardingContext'
 import { useOnboardingInsight } from '@hooks/useOnboardingInsight'
 import { colors, spacing, typography } from '@lib/theme/tokens'
@@ -71,7 +71,10 @@ export default function LoadingScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.center}>
-        <PulseAnimation reducedMotion={reducedMotion} />
+        <LoadingProgressRing
+          progress={stepIndex / STEP_KEYS.length}
+          reducedMotion={reducedMotion}
+        />
         <View style={styles.copy}>
           <Text style={styles.headline}>{headline}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>

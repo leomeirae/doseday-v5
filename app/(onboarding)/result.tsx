@@ -5,6 +5,7 @@ import { InsightCard } from '@components/onboarding/InsightCard'
 import { InsightGoalCard } from '@components/onboarding/InsightGoalCard'
 import { InsightStageCard } from '@components/onboarding/InsightStageCard'
 import { OnboardingShell } from '@components/onboarding/OnboardingShell'
+import { PremiumTeaserCard } from '@components/onboarding/PremiumTeaserCard'
 import { InsightDisclaimer } from '@components/ui/InsightDisclaimer'
 import { useOnboarding } from '@contexts/OnboardingContext'
 import {
@@ -158,6 +159,7 @@ export default function ResultScreen() {
               label={t('result.contextSectionLabel')}
               bullets={insight.data.contextBullets}
             />
+            <PremiumTeaserCard testID="result-premium-teaser" />
             <InsightDisclaimer
               text={insight.data.disclaimer}
               style={styles.disclaimerFull}
@@ -168,6 +170,7 @@ export default function ResultScreen() {
             {facts.map((fact, index) => (
               <InsightCard key={index} body={fact} testID={`result-fact-${index}`} />
             ))}
+            <PremiumTeaserCard testID="result-premium-teaser" />
             <InsightDisclaimer
               text={t('result.disclaimer')}
               style={styles.disclaimerFull}
