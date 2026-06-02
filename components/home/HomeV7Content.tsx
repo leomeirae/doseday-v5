@@ -113,13 +113,12 @@ export function HomeV7Content() {
   const timeline = buildTimeline(
     doseSummary?.history ?? [],
     weightLogs,
-    diarioSummary?.recentQuickLogs ?? []
+    diarioSummary?.recentQuickLogs ?? [],
   )
   const needsProfileForWeight = weightLogs.length === 0
   const weightIsLoading = weightQuery.isLoading || (needsProfileForWeight && profileQuery.isLoading)
   const weightError = weightQuery.error ?? (needsProfileForWeight ? profileQuery.error : null)
-  const timelineIsLoading =
-    doseQuery.isLoading || diarioQuery.isLoading || weightQuery.isLoading
+  const timelineIsLoading = doseQuery.isLoading || diarioQuery.isLoading || weightQuery.isLoading
   const timelineError = doseQuery.error ?? diarioQuery.error ?? weightQuery.error
   const contentPaddingBottom = tabBarHeight + spacing.xxxl
 
@@ -127,7 +126,11 @@ export function HomeV7Content() {
     <SafeAreaView className="flex-1 bg-bg-base" edges={['top']}>
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingTop: 22, paddingBottom: contentPaddingBottom }}
+        contentContainerStyle={{
+          paddingHorizontal: spacing.lg,
+          paddingTop: 22,
+          paddingBottom: contentPaddingBottom,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <HeaderMemory />
@@ -193,6 +196,8 @@ export function HomeV7Content() {
           />
         </View>
 
+        <ReportsCard onPress={() => router.push('/(tabs)/relatorios' as Href)} />
+
         <Disclaimer />
       </ScrollView>
     </SafeAreaView>
@@ -232,13 +237,7 @@ function HeaderMemory() {
 }
 
 // Eyebrow row used by the full-width section cards.
-function SectionHeaderRow({
-  label,
-  trailing,
-}: {
-  label: string
-  trailing?: React.ReactNode
-}) {
+function SectionHeaderRow({ label, trailing }: { label: string; trailing?: React.ReactNode }) {
   return (
     <View className="flex-row items-center justify-between mb-sm">
       <Text className="text-text-secondary text-[13px] font-bold leading-[18px] uppercase tracking-[1.4px]">
@@ -287,7 +286,11 @@ function NextDoseHero({
           loadingLabel="Carregando próxima dose."
         />
       ) : nextDose ? (
-        <NextDoseBody nextDose={nextDose} onPressDoses={onPressDoses} onPressRegister={onPressRegister} />
+        <NextDoseBody
+          nextDose={nextDose}
+          onPressDoses={onPressDoses}
+          onPressRegister={onPressRegister}
+        />
       ) : (
         <View>
           <Text className="text-text-secondary text-[16px] leading-[22px] mt-xs mb-md">
@@ -300,9 +303,17 @@ function NextDoseHero({
                 : 'Anote sua primeira dose para iniciar a memória do tratamento.'}
           </Text>
           {hasDoseHistory ? (
-            <HeroCta label="Ver doses" onPress={onPressDoses} accessibilityLabel="Ver histórico de doses" />
+            <HeroCta
+              label="Ver doses"
+              onPress={onPressDoses}
+              accessibilityLabel="Ver histórico de doses"
+            />
           ) : (
-            <HeroCta label="Anotar dose" onPress={onPressRegister} accessibilityLabel="Anotar primeira dose" />
+            <HeroCta
+              label="Anotar dose"
+              onPress={onPressRegister}
+              accessibilityLabel="Anotar primeira dose"
+            />
           )}
         </View>
       )}
@@ -342,7 +353,10 @@ function NextDoseBody({
         {nextDose.medicationName}
       </Text>
       {nextDose.dose !== null && (
-        <Text className="text-[18px] font-bold leading-[24px] mt-xxs" style={{ color: colors.semanticInfo }}>
+        <Text
+          className="text-[18px] font-bold leading-[24px] mt-xxs"
+          style={{ color: colors.semanticInfo }}
+        >
           {/* style prop: dose em azul clínico (info) */}
           {formatNumber(nextDose.dose)} mg
         </Text>
@@ -350,11 +364,19 @@ function NextDoseBody({
       <Text className="text-text-secondary text-[13px] leading-[18px] mt-sm">
         {capitalize(format(nextDose.scheduledDate, "EEEE, d 'de' MMMM", { locale: ptBR }))}
       </Text>
-      <Text className="text-[40px] font-bold leading-[44px] mt-xs" style={{ color: countdownColor }}>
+      <Text
+        className="text-[40px] font-bold leading-[44px] mt-xs"
+        style={{ color: countdownColor }}
+      >
         {/* style prop: cor do countdown por estado — futuro=branco, hoje=mint, atrasado=âmbar (nunca mint) */}
         {capitalize(formatNextDoseValue(nextDose))}
       </Text>
-      <HeroCta label={cta.label} onPress={cta.onPress} variant={cta.variant} accessibilityLabel={cta.label} />
+      <HeroCta
+        label={cta.label}
+        onPress={cta.onPress}
+        variant={cta.variant}
+        accessibilityLabel={cta.label}
+      />
     </View>
   )
 }
@@ -379,7 +401,11 @@ function HeroCta({
       accessibilityLabel={accessibilityLabel}
       accessibilityHint="Abre a área de doses do tratamento."
       className="items-center justify-center rounded-[14px] mt-md py-[14px] active:opacity-70"
-      style={isPrimary ? { backgroundColor: colors.brand } : { borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)' }}
+      style={
+        isPrimary
+          ? { backgroundColor: colors.brand }
+          : { borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)' }
+      }
     >
       {/* style prop: primary = fundo mint (texto escuro); outline = borda neutra sem token */}
       <Text
@@ -439,9 +465,13 @@ function WeightCard({
                     {/* 📐 text-[48px] leading-[54px] light = numberPersonal */}
                     {formatNumber(currentWeight)}
                   </Text>
-                  <Text className="text-text-secondary text-[18px] font-semibold leading-[24px]">kg</Text>
+                  <Text className="text-text-secondary text-[18px] font-semibold leading-[24px]">
+                    kg
+                  </Text>
                 </View>
-                <Text className="text-text-secondary text-[13px] leading-[18px] mt-xxs">peso atual</Text>
+                <Text className="text-text-secondary text-[13px] leading-[18px] mt-xxs">
+                  peso atual
+                </Text>
                 {goalWeight !== null && (
                   <Text className="text-text-tertiary text-[13px] leading-[18px] mt-xxs">
                     Meta: {formatNumber(goalWeight)} kg
@@ -456,7 +486,9 @@ function WeightCard({
                       {/* style prop: cor por SINAL — perda (−) = mint (progresso); ganho/zero = neutro (sem mint) */}
                       {formatDeltaValue(delta)}
                     </Text>
-                    <Text className="text-text-tertiary text-[13px] leading-[18px]">desde o início</Text>
+                    <Text className="text-text-tertiary text-[13px] leading-[18px]">
+                      desde o início
+                    </Text>
                   </View>
                 )}
                 <WeightSparkline logs={logs} />
@@ -467,7 +499,9 @@ function WeightCard({
                 )}
               </>
             ) : (
-              <Text className="text-text-secondary text-[16px] leading-[22px]">Nenhum peso registrado ainda.</Text>
+              <Text className="text-text-secondary text-[16px] leading-[22px]">
+                Nenhum peso registrado ainda.
+              </Text>
             )}
           </View>
           <PanelChevron />
@@ -512,11 +546,20 @@ function QuickActions() {
           accessibilityLabel={`Registrar ${action.label.toLowerCase()}`}
           accessibilityHint={action.accessibilityHint}
           className="flex-1 items-center gap-xs rounded-[14px] py-md bg-bg-elevated active:opacity-70"
-          style={{ borderWidth: action.accent ? 1 : 0.5, borderColor: action.accent ? MINT_BORDER : HAIRLINE }}
+          style={{
+            borderWidth: action.accent ? 1 : 0.5,
+            borderColor: action.accent ? MINT_BORDER : HAIRLINE,
+          }}
         >
           {/* style prop: borda (sem token). accent = Peso, único atalho com toque mint (ícone/borda), fundo escuro */}
-          <SymbolView name={action.icon} size={22} tintColor={action.accent ? colors.brand : colors.textSecondary} />
-          <Text className="text-text-primary text-[13px] font-medium leading-[18px]">{action.label}</Text>
+          <SymbolView
+            name={action.icon}
+            size={22}
+            tintColor={action.accent ? colors.brand : colors.textSecondary}
+          />
+          <Text className="text-text-primary text-[13px] font-medium leading-[18px]">
+            {action.label}
+          </Text>
         </Pressable>
       ))}
     </View>
@@ -540,10 +583,56 @@ function ConsultationCard({ count, onPress }: { count: number; onPress: () => vo
         accessibilityHint="Abre o registro de uma nota para levar à consulta."
         className="self-start justify-center min-h-[44px] mt-xs active:opacity-70"
       >
-        <Text className="text-[15px] font-semibold leading-[20px]" style={{ color: colors.semanticInfo }}>
+        <Text
+          className="text-[15px] font-semibold leading-[20px]"
+          style={{ color: colors.semanticInfo }}
+        >
           {/* style prop: CTA terciária em azul clínico (info) */}
           Anotar dúvida
         </Text>
+      </Pressable>
+    </View>
+  )
+}
+
+// Entry point dos Relatórios (área Premium). O badge deixa claro ANTES do toque
+// que o destino é Premium — a tela de Relatórios mostra o gate de conversão pra
+// usuário free e os gráficos pra premium.
+function ReportsCard({ onPress }: { onPress: () => void }) {
+  return (
+    <View className="bg-bg-surface rounded-[14px] p-lg mb-md">
+      <SectionHeaderRow
+        label="Relatórios"
+        trailing={
+          <View
+            className="rounded-full px-sm py-xxs"
+            style={{ backgroundColor: 'rgba(0,212,170,0.12)' }}
+          >
+            {/* style prop: mint a 12% (brand-fade) */}
+            <Text
+              className="text-[11px] font-semibold leading-[14px]"
+              style={{ color: colors.brand }}
+            >
+              Premium
+            </Text>
+          </View>
+        }
+      />
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel="Abrir relatórios do tratamento"
+        accessibilityHint="Abre os gráficos de peso, adesão às doses e distribuição de sintomas."
+        testID="home-reports-card"
+        className="active:opacity-70"
+      >
+        <Text className="text-text-primary text-[18px] font-semibold leading-[24px] mt-xs">
+          {/* 📐 text-[18px] leading-[24px] = subtitle */}
+          Sua memória organizada para a consulta.
+        </Text>
+        <View className="flex-row justify-end mt-sm">
+          <PanelChevron />
+        </View>
       </Pressable>
     </View>
   )
@@ -596,13 +685,17 @@ function RecentMemoryTimeline({
                       style={{ backgroundColor: SOURCE_COLORS[item.source] }}
                     />
                     {/* style prop: cor por tipo do evento (SOURCE_COLORS); nem toda cor tem token Tailwind */}
-                    {index < items.length - 1 && <View className="bg-bg-elevated flex-1 mt-xs w-[2px]" />}
+                    {index < items.length - 1 && (
+                      <View className="bg-bg-elevated flex-1 mt-xs w-[2px]" />
+                    )}
                   </View>
                   <View className="flex-1 pb-md">
                     <Text className="text-text-secondary text-[13px] font-semibold leading-[18px] mb-xxs">
                       {formatRelativeDay(item.date)}
                     </Text>
-                    <Text className="text-text-primary text-[15px] leading-[24px]">{item.title}</Text>
+                    <Text className="text-text-primary text-[15px] leading-[24px]">
+                      {item.title}
+                    </Text>
                   </View>
                 </View>
               ))}
@@ -636,7 +729,9 @@ function SymptomMiniCard({
       {isLoading ? (
         <ActivityIndicator color={colors.textSecondary} size="small" />
       ) : error ? (
-        <Text className="text-text-secondary text-[13px] leading-[18px]">Não foi possível carregar.</Text>
+        <Text className="text-text-secondary text-[13px] leading-[18px]">
+          Não foi possível carregar.
+        </Text>
       ) : symptom ? (
         <>
           <Text className="text-text-primary text-[20px] font-bold leading-[24px]">
@@ -647,7 +742,9 @@ function SymptomMiniCard({
           </Text>
         </>
       ) : (
-        <Text className="text-text-secondary text-[13px] leading-[18px]">Nenhum sintoma ainda.</Text>
+        <Text className="text-text-secondary text-[13px] leading-[18px]">
+          Nenhum sintoma ainda.
+        </Text>
       )}
     </View>
   )
@@ -693,7 +790,9 @@ function ExpenseMiniCard({
           accessibilityHint="Abre a lista completa de custos."
           className="active:opacity-70"
         >
-          <Text className="text-text-primary text-[22px] font-bold leading-[28px]">{formatCurrency(total)}</Text>
+          <Text className="text-text-primary text-[22px] font-bold leading-[28px]">
+            {formatCurrency(total)}
+          </Text>
           <Text className="text-text-tertiary text-[13px] leading-[18px] mt-xxs">
             {total === 0 ? 'nenhum custo ainda' : 'registrados'}
           </Text>
@@ -740,7 +839,9 @@ function SectionReadState({
         style={{ borderWidth: 0.5, borderColor: colors.semanticMuted }}
       >
         {/* style prop: borderColor semanticMuted não tem token TW */}
-        <Text className="text-text-primary text-[13px] font-semibold leading-[18px]">Tentar novamente</Text>
+        <Text className="text-text-primary text-[13px] font-semibold leading-[18px]">
+          Tentar novamente
+        </Text>
       </Pressable>
     </View>
   )
@@ -758,26 +859,32 @@ function Disclaimer() {
 function buildTimeline(
   doses: DoseRecord[],
   weightLogs: WeightLog[],
-  quickLogs: QuickLogRecord[]
+  quickLogs: QuickLogRecord[],
 ): TimelineItem[] {
-  const doseItems = doses.slice(0, TIMELINE_SOURCE_LIMIT).map((dose): TimelineItem => ({
-    id: `dose-${dose.id}`,
-    date: dose.applicationDate,
-    title: `Dose de ${formatNumber(dose.dose)}mg administrada.`,
-    source: 'dose',
-  }))
-  const weightItems = weightLogs.slice(0, TIMELINE_SOURCE_LIMIT).map((weight): TimelineItem => ({
-    id: `weight-${weight.id}`,
-    date: weight.date,
-    title: `Peso registrado (${formatNumber(weight.weight)} kg).`,
-    source: 'peso',
-  }))
-  const quickLogItems = quickLogs.slice(0, TIMELINE_SOURCE_LIMIT).map((log): TimelineItem => ({
-    id: `quick-${log.id}`,
-    date: log.loggedAt,
-    title: formatQuickLogTitle(log),
-    source: getQuickLogSource(log.logType),
-  }))
+  const doseItems = doses.slice(0, TIMELINE_SOURCE_LIMIT).map(
+    (dose): TimelineItem => ({
+      id: `dose-${dose.id}`,
+      date: dose.applicationDate,
+      title: `Dose de ${formatNumber(dose.dose)}mg administrada.`,
+      source: 'dose',
+    }),
+  )
+  const weightItems = weightLogs.slice(0, TIMELINE_SOURCE_LIMIT).map(
+    (weight): TimelineItem => ({
+      id: `weight-${weight.id}`,
+      date: weight.date,
+      title: `Peso registrado (${formatNumber(weight.weight)} kg).`,
+      source: 'peso',
+    }),
+  )
+  const quickLogItems = quickLogs.slice(0, TIMELINE_SOURCE_LIMIT).map(
+    (log): TimelineItem => ({
+      id: `quick-${log.id}`,
+      date: log.loggedAt,
+      title: formatQuickLogTitle(log),
+      source: getQuickLogSource(log.logType),
+    }),
+  )
 
   return [...doseItems, ...weightItems, ...quickLogItems]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
@@ -790,10 +897,7 @@ function formatQuickLogTitle(log: QuickLogRecord): string {
 }
 
 function formatUnknownSymptomType(type: string): string {
-  const normalized = type
-    .replace(/[_-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
+  const normalized = type.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
 
   return normalized ? capitalize(normalized) : 'Uma observação'
 }
@@ -842,11 +946,9 @@ type SparklinePoint = {
 }
 
 function buildSparklinePoints(
-  logs: WeightLog[]
+  logs: WeightLog[],
 ): { points: string; first: SparklinePoint; last: SparklinePoint } | null {
-  const ordered = [...logs]
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .slice(-8)
+  const ordered = [...logs].sort((a, b) => a.date.getTime() - b.date.getTime()).slice(-8)
 
   if (ordered.length < 2) return null
 
@@ -856,12 +958,11 @@ function buildSparklinePoints(
   const range = max - min || 1
   const lastIndex = ordered.length - 1
 
-  const points = ordered
-    .map((log, index) => {
-      const x = lastIndex === 0 ? 4 : 4 + (index / lastIndex) * 92
-      const y = 42 - ((log.weight - min) / range) * 36
-      return { x, y }
-    })
+  const points = ordered.map((log, index) => {
+    const x = lastIndex === 0 ? 4 : 4 + (index / lastIndex) * 92
+    const y = 42 - ((log.weight - min) / range) * 36
+    return { x, y }
+  })
 
   return {
     points: points.map((point) => `${point.x.toFixed(2)},${point.y.toFixed(2)}`).join(' '),

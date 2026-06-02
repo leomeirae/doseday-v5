@@ -10,16 +10,27 @@ import { SettingsGroup } from '@components/settings/SettingsGroup'
 import { SettingsHeader } from '@components/settings/SettingsHeader'
 import { SettingsRow } from '@components/settings/SettingsRow'
 import { SettingsSectionHeader } from '@components/settings/SettingsSectionHeader'
+import { useEntitlements } from '@contexts/SubscriptionContext'
 import { useSession } from '@hooks/useSession'
 import { signOut } from '@lib/supabase/auth'
+import { setDevEntitlementOverride } from '@lib/subscription/devEntitlementStorage'
 import { colors, spacing, typography } from '@lib/theme/tokens'
 
 export default function ConfiguracoesContaScreen() {
   const router = useRouter()
   const { t } = useTranslation('settings')
   const { session } = useSession()
+  const { isPremium, refresh } = useEntitlements()
   const [loadingSignOut, setLoadingSignOut] = useState(false)
   const email = session?.user.email ?? 'E-mail não disponível'
+
+  // Dev-only: liga/desliga o mock de premium pra validar gating sem compra real.
+  // Em release, resolveEntitlement ignora o override (guard testado em
+  // lib/subscription/__tests__/entitlement.test.ts) e esta linha nem renderiza.
+  async function toggleDevPremium() {
+    await setDevEntitlementOverride(!isPremium)
+    await refresh()
+  }
 
   async function doSignOut() {
     setLoadingSignOut(true)
@@ -76,10 +87,23 @@ export default function ConfiguracoesContaScreen() {
           <SettingsRow
             icon="creditcard"
             label="Sua assinatura"
-            value="Em breve"
-            chevron={false}
+            value={isPremium ? 'Premium' : 'Gratuito'}
+            onPress={() => router.push('/paywall')}
+            accessibilityHint="Abre os detalhes da assinatura Premium."
             testID="settings-account-subscription"
           />
+          {__DEV__ ? (
+            <SettingsRow
+              icon="hammer"
+              label="[DEV] Simular Premium"
+              value={isPremium ? 'Ligado' : 'Desligado'}
+              chevron={false}
+              divider
+              onPress={() => void toggleDevPremium()}
+              accessibilityHint="Alterna o mock de assinatura Premium em desenvolvimento."
+              testID="settings-dev-premium-toggle"
+            />
+          ) : null}
         </SettingsGroup>
 
         <SettingsSectionHeader title="Sessão" />

@@ -10,6 +10,7 @@ import Toast from 'react-native-toast-message'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { colors } from '@lib/theme/tokens'
 import { AuthProvider } from '@contexts/AuthContext'
+import { SubscriptionProvider } from '@contexts/SubscriptionContext'
 import { useSession } from '@hooks/useSession'
 import { useProfile } from '@hooks/useProfile'
 import { SplashView } from '@components/auth/SplashView'
@@ -27,19 +28,16 @@ function NotificationBootstrap() {
   useScheduleDoseNotifications()
 
   useEffect(() => {
-    const cleanup = setupListeners(
-      undefined,
-      (response) => {
-        // Handle tap on notification — deeplink to Doses with optional highlight
-        const data = response.notification.request.content.data as Record<string, unknown>
-        const doseId = typeof data?.dose_id === 'string' ? data.dose_id : undefined
-        if (doseId) {
-          router.push(`/(tabs)/doses?highlight=${doseId}`)
-        } else {
-          router.push('/(tabs)/doses')
-        }
+    const cleanup = setupListeners(undefined, (response) => {
+      // Handle tap on notification — deeplink to Doses with optional highlight
+      const data = response.notification.request.content.data as Record<string, unknown>
+      const doseId = typeof data?.dose_id === 'string' ? data.dose_id : undefined
+      if (doseId) {
+        router.push(`/(tabs)/doses?highlight=${doseId}`)
+      } else {
+        router.push('/(tabs)/doses')
       }
-    )
+    })
     return cleanup
   }, [setupListeners, router])
 
@@ -115,7 +113,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       router.replace('/(auth)/signin')
     } else if (session && !onboardingCompleted && !inOnboardingGroup) {
       router.replace('/(onboarding)' as Href)
-    } else if (session && onboardingCompleted && (inWelcomeGroup || inAuthGroup || inOnboardingGroup)) {
+    } else if (
+      session &&
+      onboardingCompleted &&
+      (inWelcomeGroup || inAuthGroup || inOnboardingGroup)
+    ) {
       router.replace('/(tabs)')
     }
 
@@ -148,127 +150,107 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <StatusBar style="light" />
-          <AuthGuard>
-            <NotificationBootstrap />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: colors.bgBase },
-              }}
-            >
-              <Stack.Screen
-                name="dose/registrar"
-                options={{
-                  presentation: 'formSheet',
+          <SubscriptionProvider>
+            <StatusBar style="light" />
+            <AuthGuard>
+              <NotificationBootstrap />
+              <Stack
+                screenOptions={{
                   headerShown: false,
-                  sheetAllowedDetents: [0.7, 1.0],
-                  sheetGrabberVisible: true,
-                  sheetCornerRadius: 20,
+                  contentStyle: { backgroundColor: colors.bgBase },
                 }}
-              />
-              <Stack.Screen
-                name="peso/historico"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="peso/registrar"
-                options={{
-                  presentation: 'formSheet',
-                  headerShown: false,
-                  sheetAllowedDetents: 'fitToContents',
-                  sheetGrabberVisible: true,
-                  sheetCornerRadius: 20,
-                }}
-              />
-              <Stack.Screen
-                name="diario/checkin"
-                options={{ presentation: 'modal', headerShown: false }}
-              />
-              <Stack.Screen
-                name="diario/quick-log"
-                options={{ presentation: 'modal', headerShown: false }}
-              />
-              <Stack.Screen
-                name="diario/anotar-memoria"
-                options={{
-                  presentation: 'formSheet',
-                  headerShown: false,
-                  sheetAllowedDetents: [0.5, 1.0],
-                  sheetGrabberVisible: true,
-                  sheetCornerRadius: 20,
-                }}
-              />
-              <Stack.Screen
-                name="diario/anotar-sintoma"
-                options={{
-                  presentation: 'formSheet',
-                  headerShown: false,
-                  sheetAllowedDetents: [0.5, 1.0],
-                  sheetGrabberVisible: true,
-                  sheetCornerRadius: 20,
-                }}
-              />
-              <Stack.Screen
-                name="diario/anotar-custo"
-                options={{
-                  presentation: 'formSheet',
-                  headerShown: false,
-                  sheetAllowedDetents: [0.5, 1.0],
-                  sheetGrabberVisible: true,
-                  sheetCornerRadius: 20,
-                }}
-              />
-              <Stack.Screen
-                name="perfil/notificacoes"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="perfil/protocolo"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/index"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/conta"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/tratamento"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/tratamento/peso-meta"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/tratamento/medico"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/lembretes"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/dados"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/privacidade"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/suporte"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="configuracoes/suporte/sobre"
-                options={{ headerShown: false }}
-              />
-            </Stack>
-          </AuthGuard>
+              >
+                <Stack.Screen
+                  name="dose/registrar"
+                  options={{
+                    presentation: 'formSheet',
+                    headerShown: false,
+                    sheetAllowedDetents: [0.7, 1.0],
+                    sheetGrabberVisible: true,
+                    sheetCornerRadius: 20,
+                  }}
+                />
+                <Stack.Screen
+                  name="paywall"
+                  options={{
+                    // 'modal' (pageSheet) e não 'formSheet': o conteúdo do paywall é mais
+                    // alto que a tela e precisa de altura limitada pra ScrollView + footer
+                    // fixo funcionarem. formSheet do RN Screens não limita a altura do
+                    // conteúdo (ele cresce além do detent e é cortado).
+                    presentation: 'modal',
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen name="peso/historico" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="peso/registrar"
+                  options={{
+                    presentation: 'formSheet',
+                    headerShown: false,
+                    sheetAllowedDetents: 'fitToContents',
+                    sheetGrabberVisible: true,
+                    sheetCornerRadius: 20,
+                  }}
+                />
+                <Stack.Screen
+                  name="diario/checkin"
+                  options={{ presentation: 'modal', headerShown: false }}
+                />
+                <Stack.Screen
+                  name="diario/quick-log"
+                  options={{ presentation: 'modal', headerShown: false }}
+                />
+                <Stack.Screen
+                  name="diario/anotar-memoria"
+                  options={{
+                    presentation: 'formSheet',
+                    headerShown: false,
+                    sheetAllowedDetents: [0.5, 1.0],
+                    sheetGrabberVisible: true,
+                    sheetCornerRadius: 20,
+                  }}
+                />
+                <Stack.Screen
+                  name="diario/anotar-sintoma"
+                  options={{
+                    presentation: 'formSheet',
+                    headerShown: false,
+                    sheetAllowedDetents: [0.5, 1.0],
+                    sheetGrabberVisible: true,
+                    sheetCornerRadius: 20,
+                  }}
+                />
+                <Stack.Screen
+                  name="diario/anotar-custo"
+                  options={{
+                    presentation: 'formSheet',
+                    headerShown: false,
+                    sheetAllowedDetents: [0.5, 1.0],
+                    sheetGrabberVisible: true,
+                    sheetCornerRadius: 20,
+                  }}
+                />
+                <Stack.Screen name="perfil/notificacoes" options={{ headerShown: false }} />
+                <Stack.Screen name="perfil/protocolo" options={{ headerShown: false }} />
+                <Stack.Screen name="configuracoes/index" options={{ headerShown: false }} />
+                <Stack.Screen name="configuracoes/conta" options={{ headerShown: false }} />
+                <Stack.Screen name="configuracoes/tratamento" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="configuracoes/tratamento/peso-meta"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="configuracoes/tratamento/medico"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name="configuracoes/lembretes" options={{ headerShown: false }} />
+                <Stack.Screen name="configuracoes/dados" options={{ headerShown: false }} />
+                <Stack.Screen name="configuracoes/privacidade" options={{ headerShown: false }} />
+                <Stack.Screen name="configuracoes/suporte" options={{ headerShown: false }} />
+                <Stack.Screen name="configuracoes/suporte/sobre" options={{ headerShown: false }} />
+              </Stack>
+            </AuthGuard>
+          </SubscriptionProvider>
         </AuthProvider>
       </QueryClientProvider>
       <PortalHost />

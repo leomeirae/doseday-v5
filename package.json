@@ -17,6 +17,19 @@
     "submit:ios": "eas submit --platform ios --latest",
     "supabase:types": "supabase gen types typescript --project-id pjesgdczasumgjzqyzzk > types/database.ts"
   },
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/supabase/",
+      "/.claude/",
+      "/graphify-out/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.claude/",
+      "<rootDir>/graphify-out/"
+    ]
+  },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -80,6 +93,7 @@
     "babel-preset-expo": "~54.0.10",
     "eslint": "^10.3.0",
     "eslint-config-expo": "~10.0.0",
+    "jest": "^29.7.0",
     "prettier": "^3.8.3",
     "typescript": "~5.9.2"
   },
