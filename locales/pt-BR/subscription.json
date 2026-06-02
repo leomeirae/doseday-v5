@@ -69,8 +69,8 @@
   },
   "gate": {
     "reports": {
-      "title": "Prepare sua consulta sem esforço",
-      "description": "Gráficos de peso, adesão às doses e distribuição de sintomas. Sua memória organizada pra levar na consulta, com o Premium.",
+      "title": "Sua memória do tratamento, organizada pela IA",
+      "description": "No Premium, a IA organiza seus registros — dose por dose, sintoma por sintoma — e devolve um resumo claro pra você chegar à consulta com clareza.",
       "cta": "Conhecer o Premium"
     },
     "dailyInsight": {
