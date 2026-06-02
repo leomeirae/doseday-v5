@@ -602,7 +602,7 @@ function ReportsCard({ onPress }: { onPress: () => void }) {
   return (
     <View className="bg-bg-surface rounded-[14px] p-lg mb-md">
       <SectionHeaderRow
-        label="Relatórios"
+        label="Memória do Tratamento"
         trailing={
           <View
             className="rounded-full px-sm py-xxs"
@@ -628,7 +628,7 @@ function ReportsCard({ onPress }: { onPress: () => void }) {
       >
         <Text className="text-text-primary text-[18px] font-semibold leading-[24px] mt-xs">
           {/* 📐 text-[18px] leading-[24px] = subtitle */}
-          Sua memória organizada para a consulta.
+          IA organiza seus dados pra você chegar à consulta com clareza.
         </Text>
         <View className="flex-row justify-end mt-sm">
           <PanelChevron />
@@ -655,7 +655,7 @@ function RecentMemoryTimeline({
 
   return (
     <View className="bg-bg-surface rounded-[14px] p-lg mb-md">
-      <SectionHeaderRow label="Memória recente" />
+      <SectionHeaderRow label="Histórico recente" />
       {isLoading || error ? (
         <SectionReadState
           isLoading={isLoading}

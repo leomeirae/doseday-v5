@@ -145,7 +145,7 @@ export default function TreatmentMemoryScreen() {
         >
           <SymbolView name="chevron.left" size={18} tintColor={colors.textSecondary} />
         </Pressable>
-        <Text style={styles.headerTitle}>Memória do tratamento</Text>
+        <Text style={styles.headerTitle}>Histórico</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -157,7 +157,7 @@ export default function TreatmentMemoryScreen() {
       >
         {/* 2. Subtitle */}
         <Text style={styles.subtitle}>
-          Registre o que aconteceu hoje e veja seu histórico abaixo.
+          Sua linha do tempo de doses, peso e registros.
         </Text>
 
         {/* 3. Seção Protocolo Atual */}
