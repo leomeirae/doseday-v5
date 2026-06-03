@@ -1,5 +1,11 @@
 import { supabase } from '@lib/supabase/client'
-import { onboardingInsightContractSchema, type OnboardingInsightContract } from '../../../types/api'
+import {
+  onboardingInsightContractSchema,
+  type OnboardingInsightContract,
+  memorySummaryContractSchema,
+  type MemorySummaryContract,
+} from '../../../types/api'
+import type { DoseWeek, WeightPoint, SymptomCount } from './reports'
 
 export type { MoodValue } from '@lib/validation/diarioSchemas'
 export { emotionalStateToMood } from '@lib/validation/diarioSchemas'
@@ -80,6 +86,30 @@ export async function getLatestEducationalInsight(
   // P0 containment: first_checkin rows may contain legacy patient-facing AI.
   // Do not surface them from the client while cleanup remains a gated prod task.
   return null
+}
+
+export type MemorySummaryInput = {
+  period_days: number
+  doses: DoseWeek[]
+  weight_points: WeightPoint[]
+  symptom_counts: SymptomCount[]
+  treatment_context: {
+    treatmentWeek: number | null
+    daysSinceLastDose: number | null
+    currentDoseMg: number | null
+    medication_name: string | null
+  }
+}
+
+export async function callMemorySummary(
+  input: MemorySummaryInput,
+): Promise<MemorySummaryContract> {
+  const { data, error } = await supabase.functions.invoke<unknown>('memory-summary', {
+    body: input,
+  })
+  if (error) throw error
+  if (!data) throw new Error('Empty response from memory-summary')
+  return memorySummaryContractSchema.parse(data)
 }
 
 // Lê o contrato completo gerado no onboarding direto do DB (jsonb context.output).
