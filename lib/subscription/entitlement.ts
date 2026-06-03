@@ -9,18 +9,27 @@
 // desenvolvimento. A assinatura da função muda aqui e no provider —
 // nenhum consumidor de useEntitlements() é afetado.
 
-export type EntitlementSource = 'none' | 'mock-dev'
+export type EntitlementSource = 'none' | 'mock-dev' | 'revenuecat'
 
 export type ResolvedEntitlement = {
   isPremium: boolean
   source: EntitlementSource
 }
 
-// Regra de segurança: fora de build dev, o mock NUNCA ativa premium. Sem exceção.
+// Ordem de prioridade:
+//   1. Entitlement real do RevenueCat (vale inclusive em produção) → 'revenuecat'.
+//   2. Fora de build dev, o mock NUNCA ativa premium → 'none'. Sem exceção.
+//   3. Em build dev sem entitlement real, o override de dev vale → 'mock-dev'.
+// O campo entitlementActive é opcional: chamadas legadas (sem ele) mantêm o
+// comportamento da Fase 1 — por isso os 4 testes originais continuam passando.
 export function resolveEntitlement(input: {
   isDevBuild: boolean
   devOverride: boolean
+  entitlementActive?: boolean
 }): ResolvedEntitlement {
+  if (input.entitlementActive) {
+    return { isPremium: true, source: 'revenuecat' }
+  }
   if (!input.isDevBuild) {
     return { isPremium: false, source: 'none' }
   }
