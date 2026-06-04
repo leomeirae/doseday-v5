@@ -16,7 +16,7 @@
     "ios": {
       "bundleIdentifier": "com.doseday.premium",
       "supportsTablet": false,
-      "buildNumber": "1",
+      "buildNumber": "11",
       "infoPlist": {
         "NSHealthShareUsageDescription": "DoseDay lê peso e atividade do Apple Saúde para ajudar a entender seu tratamento.",
         "NSHealthUpdateUsageDescription": "DoseDay pode salvar peso e doses no Apple Saúde se você autorizar.",
