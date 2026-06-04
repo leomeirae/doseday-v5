@@ -640,28 +640,23 @@ git commit -m "feat(revenuecat): paywall usa offering default real (preço Store
 
 ---
 
-## Task 8: Validação no simulador (UI) + EAS dev build (sandbox)
+## Task 8: Validação no simulador (UI) + device via Xcode/TestFlight
 
-- [ ] **Step 1: Simulador — UI com toggle dev**
+- [x] **Step 1: Simulador — UI com toggle dev** ✅ (build local `expo run:ios`)
 
-App no simulador (Expo Go NÃO serve — SDK nativo; usar dev client). No simulador sem StoreKit a offering pode não carregar → paywall mostra `unavailable`/`loadError` (esperado). Validar gates via toggle dev em `configuracoes/conta.tsx`. Screenshots reais.
+Build local de simulador com o módulo nativo (`pod install --repo-update` → `expo run:ios`). Achado: a offering `default` **carregou com preço real** (StoreKit) já no simulador — DoseDay Anual $39.99/ano, Mensal $4.99/mês (storefront US → `$`; vira `R$` com sandbox tester Brasil no device). App boota sem crash; toggle dev em `configuracoes/conta.tsx` desbloqueia os gates. 7 screenshots em `assets/screenshots/revenuecat-sdk-core/`.
 
-> **CHECKPOINT 2 — PARAR ANTES DO PR.** Reportar resultado no simulador + status do dev build.
+> **CHECKPOINT 2 — feito.** Reportado ao Léo; PR aberto após o ok.
 
-- [ ] **Step 2: EAS dev build (precisa de credencial do Léo)**
+- [ ] **Step 2: Build device — Xcode/TestFlight (NÃO EAS)**
 
-Pré-requisito: `app.json > extra.eas.projectId` está `<PREENCHER_COM_EAS_INIT>`. EAS CLI não está disponível no ambiente do Claude Code → entregar a Léo bloco limpo:
+Decisão Léo 2026-06-03: validação device é via **Xcode local → TestFlight**, fluxo já estabelecido dele. **NÃO usar EAS** — não rodar `eas init`; o placeholder `<PREENCHER_COM_EAS_INIT>` em `app.json` fica como está (não bloqueia `expo run:ios` nem Xcode). IAP em TestFlight é **sandbox automático** (sem cobrança, moeda da conta = R$).
 
-```bash
-npm i -g eas-cli
-eas login
-eas init
-eas build --platform ios --profile development-device
-```
+Passos (Léo): Archive no Xcode → distribuir pro TestFlight → instalar no device.
 
-- [ ] **Step 3: Sandbox (device físico + sandbox tester região Brasil)**
+- [ ] **Step 3: Sandbox via TestFlight (pendente, pós-merge)**
 
-Checklist: compra mensal e anual c/ trial 14d · preço/moeda em **R$** vindos do StoreKit · restore · entitlement `premium` ativando gates (Relatórios / Memória do Tratamento) · cancelamento/expiração sandbox · listener reflete sem reabrir o app. Screenshots reais no PR.
+Checklist: compra mensal e anual c/ trial 14d · preço/moeda em **R$** · restore · entitlement `premium` ativando gates (Relatórios / Memória do Tratamento) · cancelamento/expiração sandbox · listener reflete sem reabrir o app.
 
 ---
 
@@ -669,8 +664,8 @@ Checklist: compra mensal e anual c/ trial 14d · preço/moeda em **R$** vindos d
 `react-native-purchases-ui` / Paywall Builder · redesign do paywall · deploy/edição de webhook server-side · Android.
 
 ## Riscos
-- **EAS `projectId` placeholder** → bloqueia dev build/sandbox. Dependência de credencial do Léo (Task 8 Step 2).
-- SDK nativo não roda em Expo Go nem (compra real) no simulador → validação real só em device.
+- **Validação device via Xcode/TestFlight (não EAS)** — decisão Léo 2026-06-03. O placeholder `<PREENCHER_COM_EAS_INIT>` fica como está; não bloqueia Xcode nem `expo run:ios`.
+- SDK nativo não roda em Expo Go nem (compra real) no simulador → transação real só em device/TestFlight (sandbox automático).
 - Nomes de tipos do SDK 10.x (`userCancelled`, `PACKAGE_TYPE`, `LOG_LEVEL`) podem diferir levemente da `.d.ts` instalada → ajustar pelo tipo real, mantendo contratos de retorno.
 - Aviso "SDK 8.11.3+" do dashboard é sobre o **Builder** (fora de escopo); core 10.2.0 cobre offering/purchase/entitlement.
 
