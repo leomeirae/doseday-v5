@@ -1,12 +1,12 @@
 {
   "headline": "Sua memória do tratamento.",
-  "subtitle": "Anote como cada semana foi indo. Leve pra consulta.",
+  "subtitle": "DoseDay ajuda você a registrar seu tratamento e lembrar o que aconteceu entre uma consulta e outra.",
   "actions": {
     "createAccount": "Criar conta",
     "signIn": "Já tenho conta"
   },
   "accessibility": {
-    "intro": "Sua memória do tratamento. Anote como cada semana foi indo. Leve pra consulta.",
+    "intro": "Sua memória do tratamento. DoseDay ajuda você a registrar seu tratamento e lembrar o que aconteceu entre uma consulta e outra.",
     "createAccountHint": "Marca a apresentação como vista e abre o cadastro",
     "signInHint": "Marca a apresentação como vista e abre a tela de entrada"
   }
