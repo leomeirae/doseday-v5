@@ -28,4 +28,22 @@ describe('resolveEntitlement', () => {
       source: 'none',
     })
   })
+
+  it('retorna premium quando o entitlement do RevenueCat está ativo, MESMO em produção', () => {
+    expect(
+      resolveEntitlement({ isDevBuild: false, devOverride: false, entitlementActive: true }),
+    ).toEqual({ isPremium: true, source: 'revenuecat' })
+  })
+
+  it('entitlement real tem prioridade sobre o mock dev', () => {
+    expect(
+      resolveEntitlement({ isDevBuild: true, devOverride: false, entitlementActive: true }),
+    ).toEqual({ isPremium: true, source: 'revenuecat' })
+  })
+
+  it('sem entitlement real em produção continua free (sem premium indevido)', () => {
+    expect(
+      resolveEntitlement({ isDevBuild: false, devOverride: true, entitlementActive: false }),
+    ).toEqual({ isPremium: false, source: 'none' })
+  })
 })

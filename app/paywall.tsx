@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ActivityIndicator, Linking, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -7,11 +7,8 @@ import { SymbolView } from 'expo-symbols'
 import { PaywallFeatureRow } from '@components/paywall/PaywallFeatureRow'
 import { PaywallPlanCard } from '@components/paywall/PaywallPlanCard'
 import { useEntitlements } from '@contexts/SubscriptionContext'
-import {
-  getDevEntitlementOverride,
-  setDevEntitlementOverride,
-} from '@lib/subscription/devEntitlementStorage'
-import { MOCK_PLANS, type PaywallPlanId } from '@lib/subscription/mockOfferings'
+import { purchase, restore } from '@lib/revenuecat/offerings'
+import { usePaywallPlans, type PaywallPlanId } from '@lib/revenuecat/usePaywallPlans'
 import { colors, spacing } from '@lib/theme/tokens'
 
 // URLs publicadas (architecture.md §8 — LGPD checklist).
@@ -23,20 +20,24 @@ const PRIVACY_URL = 'https://getdoseday.com/privacy'
 // em hooks/useOnboardingInsight.ts).
 const FORCE_LOAD_ERROR = false
 
-// Mock: atraso artificial pra tornar o estado 'processing' visível em QA.
-// Some na Fase 2 — o tempo real passa a ser o da transação StoreKit.
-const MOCK_PROCESSING_DELAY_MS = 600
-
 type PaywallStatus = 'idle' | 'processing' | 'success' | 'restored' | 'unavailable' | 'loadError'
 
 export default function PaywallScreen() {
   const { t } = useTranslation('subscription')
   const router = useRouter()
   const { isPremium, refresh } = useEntitlements()
-  const [status, setStatus] = useState<PaywallStatus>(FORCE_LOAD_ERROR ? 'loadError' : 'idle')
+  const { plans, loading: plansLoading, error: plansError, available, reload } = usePaywallPlans()
+  const [status, setStatus] = useState<PaywallStatus>('idle')
   const [selectedPlan, setSelectedPlan] = useState<PaywallPlanId>('yearly')
   const [purchaseError, setPurchaseError] = useState(false)
   const [restoreNotFound, setRestoreNotFound] = useState(false)
+
+  // Se a offering não tiver o plano anual, cai pro primeiro plano disponível.
+  useEffect(() => {
+    if (plans.length > 0 && !plans.some((p) => p.id === selectedPlan)) {
+      setSelectedPlan(plans[0].id)
+    }
+  }, [plans, selectedPlan])
 
   function close() {
     router.back()
@@ -46,21 +47,21 @@ export default function PaywallScreen() {
     setPurchaseError(false)
     setRestoreNotFound(false)
 
-    // FASE 1 (sem SDK): em dev o CTA ativa o mock; em produção informa que a
-    // assinatura ainda não está disponível (decisão #2 do plano aprovado).
-    // FASE 2: aqui entra Purchases.purchasePackage(<plano selecionado>).
-    if (!__DEV__) {
+    const plan = plans.find((p) => p.id === selectedPlan)
+    if (!available || !plan) {
       setStatus('unavailable')
       return
     }
 
     setStatus('processing')
-    try {
-      await new Promise((resolve) => setTimeout(resolve, MOCK_PROCESSING_DELAY_MS))
-      await setDevEntitlementOverride(true)
+    const outcome = await purchase(plan.package)
+    if (outcome.status === 'success') {
       await refresh()
       setStatus('success')
-    } catch {
+    } else if (outcome.status === 'cancelled') {
+      // Usuário cancelou na folha do StoreKit → volta ao estado normal, sem erro.
+      setStatus('idle')
+    } else {
       setStatus('idle')
       setPurchaseError(true)
     }
@@ -70,56 +71,27 @@ export default function PaywallScreen() {
     setPurchaseError(false)
     setRestoreNotFound(false)
 
-    // FASE 2: aqui entra Purchases.restorePurchases().
-    if (!__DEV__) {
+    if (!available) {
       setStatus('unavailable')
       return
     }
 
     setStatus('processing')
-    await new Promise((resolve) => setTimeout(resolve, MOCK_PROCESSING_DELAY_MS))
-    const hasPurchase = await getDevEntitlementOverride()
-    if (hasPurchase) {
+    const outcome = await restore()
+    if (outcome.status === 'restored') {
       await refresh()
       setStatus('restored')
-    } else {
+    } else if (outcome.status === 'nothing') {
       setStatus('idle')
       setRestoreNotFound(true)
+    } else {
+      setStatus('idle')
+      setPurchaseError(true)
     }
   }
 
-  // Erro ao carregar planos → fallback amigável com retry (nunca tela quebrada).
-  if (status === 'loadError') {
-    return (
-      <PaywallShell onClose={close} closeLabel={t('paywall.close')}>
-        <View className="flex-1 items-center justify-center gap-md px-lg py-xxl">
-          <SymbolView name="wifi.exclamationmark" size={40} tintColor={colors.textSecondary} />
-          <Text className="text-text-primary text-[22px] font-semibold leading-[28px] text-center">
-            {/* 📐 text-[22px] = title */}
-            {t('paywall.loadError.title')}
-          </Text>
-          <Text className="text-text-secondary text-[16px] leading-[22px] text-center">
-            {t('paywall.loadError.message')}
-          </Text>
-          <Pressable
-            onPress={() => setStatus('idle')}
-            accessibilityRole="button"
-            accessibilityLabel={t('paywall.loadError.retry')}
-            className="min-h-[44px] justify-center px-lg active:opacity-70"
-          >
-            <Text
-              className="text-[16px] font-semibold leading-[20px]"
-              style={{ color: colors.brand }}
-            >
-              {t('paywall.loadError.retry')}
-            </Text>
-          </Pressable>
-        </View>
-      </PaywallShell>
-    )
-  }
-
-  // Premium ativo (compra mock concluída, restore ou usuário já premium).
+  // Premium ativo (compra concluída, restore ou usuário já premium). Tem
+  // prioridade sobre loading/loadError — um pagante nunca vê spinner/erro.
   if (status === 'success' || status === 'restored' || (isPremium && status === 'idle')) {
     const title =
       status === 'restored'
@@ -159,6 +131,52 @@ export default function PaywallScreen() {
           >
             <Text className="text-text-inverse text-[16px] font-semibold leading-[20px]">
               {t('paywall.success.startButton')}
+            </Text>
+          </Pressable>
+        </View>
+      </PaywallShell>
+    )
+  }
+
+  // Offering ainda carregando da App Store → spinner (nunca cards vazios).
+  if (plansLoading && status === 'idle') {
+    return (
+      <PaywallShell onClose={close} closeLabel={t('paywall.close')}>
+        <View className="flex-1 items-center justify-center gap-md px-lg py-xxl">
+          <ActivityIndicator size="large" color={colors.brand} />
+          <Text className="text-text-secondary text-[15px] leading-[24px] text-center">
+            {t('paywall.subtitle')}
+          </Text>
+        </View>
+      </PaywallShell>
+    )
+  }
+
+  // Erro ao carregar a offering → fallback amigável com retry (nunca tela
+  // quebrada). retry re-busca a offering via reload() do hook.
+  if ((FORCE_LOAD_ERROR || plansError) && status === 'idle') {
+    return (
+      <PaywallShell onClose={close} closeLabel={t('paywall.close')}>
+        <View className="flex-1 items-center justify-center gap-md px-lg py-xxl">
+          <SymbolView name="wifi.exclamationmark" size={40} tintColor={colors.textSecondary} />
+          <Text className="text-text-primary text-[22px] font-semibold leading-[28px] text-center">
+            {/* 📐 text-[22px] = title */}
+            {t('paywall.loadError.title')}
+          </Text>
+          <Text className="text-text-secondary text-[16px] leading-[22px] text-center">
+            {t('paywall.loadError.message')}
+          </Text>
+          <Pressable
+            onPress={reload}
+            accessibilityRole="button"
+            accessibilityLabel={t('paywall.loadError.retry')}
+            className="min-h-[44px] justify-center px-lg active:opacity-70"
+          >
+            <Text
+              className="text-[16px] font-semibold leading-[20px]"
+              style={{ color: colors.brand }}
+            >
+              {t('paywall.loadError.retry')}
             </Text>
           </Pressable>
         </View>
@@ -212,24 +230,26 @@ export default function PaywallScreen() {
           />
         </View>
 
-        {/* Planos (Fase 1: sem número de preço; valor real virá da App Store na Fase 2) */}
-        <View className="gap-sm">
-          {MOCK_PLANS.map((plan) => (
-            <PaywallPlanCard
-              key={plan.id}
-              title={t(plan.titleKey)}
-              priceNote={t('paywall.pricing.viaAppStore')}
-              periodLabel={t(plan.periodKey)}
-              selected={selectedPlan === plan.id}
-              onPress={() => setSelectedPlan(plan.id)}
-              testID={`paywall-plan-${plan.id}`}
-            />
-          ))}
-          <Text className="text-text-tertiary text-[13px] leading-[18px]">
-            {/* 📐 caption */}
-            {t('paywall.pricing.fromStore')}
-          </Text>
-        </View>
+        {/* Planos — preço real vindo do StoreKit (priceString), nunca hardcoded */}
+        {plans.length > 0 ? (
+          <View className="gap-sm">
+            {plans.map((plan) => (
+              <PaywallPlanCard
+                key={plan.id}
+                title={t(plan.id === 'yearly' ? 'paywall.plans.yearly' : 'paywall.plans.monthly')}
+                priceNote={plan.priceString}
+                periodLabel={t(plan.id === 'yearly' ? 'paywall.plans.perYear' : 'paywall.plans.perMonth')}
+                selected={selectedPlan === plan.id}
+                onPress={() => setSelectedPlan(plan.id)}
+                testID={`paywall-plan-${plan.id}`}
+              />
+            ))}
+            <Text className="text-text-tertiary text-[13px] leading-[18px]">
+              {/* 📐 caption */}
+              {t('paywall.pricing.fromStore')}
+            </Text>
+          </View>
+        ) : null}
       </ScrollView>
 
       {/* Footer FIXO: CTA + restore + legal sempre alcançáveis sem scroll.
@@ -240,7 +260,7 @@ export default function PaywallScreen() {
         style={{ borderTopWidth: 0.5, borderTopColor: 'rgba(255,255,255,0.06)' }}
       >
         {/* Feedback das ações do footer — renderiza AQUI (visível), nunca no fim do scroll */}
-        {status === 'unavailable' ? (
+        {!available || status === 'unavailable' ? (
           <View
             className="rounded-[14px] p-md gap-xxs"
             style={{ backgroundColor: 'rgba(91,168,217,0.12)' }}
