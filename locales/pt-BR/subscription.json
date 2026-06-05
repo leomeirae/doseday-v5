@@ -1,19 +1,19 @@
 {
   "paywall": {
-    "hero": "Premium é onde a IA trabalha pra você",
-    "subtitle": "Seus registros viram resumos, padrões e um relatório claro pra levar na consulta.",
+    "hero": "Clareza do seu tratamento, com IA",
+    "subtitle": "DoseDay Premium transforma seus registros em uma memória clara para acompanhar seu tratamento e chegar à consulta mais preparado.",
     "features": {
       "ai": {
-        "title": "Padrões reais dos seus registros",
-        "description": "A IA organiza o que você anota e identifica padrões entre sintomas, hábitos e doses, semana após semana."
+        "title": "Memória do Tratamento",
+        "description": "A IA organiza doses, peso, sintomas e rotina em um resumo simples do período."
       },
       "report": {
-        "title": "Relatório claro pra quem te acompanha",
-        "description": "Frequência de sintomas, evolução de peso e adesão às doses, organizados pra sua consulta. Sem depender da memória."
+        "title": "Clareza para a consulta",
+        "description": "Veja os principais pontos registrados para conversar com quem acompanha seu tratamento."
       },
       "goal": {
-        "title": "Acompanhamento de progresso, não promessas",
-        "description": "Visualize sua evolução baseada em dados reais, no seu ritmo."
+        "title": "Histórico sem esforço",
+        "description": "Você registra no dia a dia. O Premium conecta as informações e devolve uma visão mais clara."
       }
     },
     "comparison": {
@@ -22,7 +22,9 @@
     },
     "plans": {
       "yearly": "DoseDay Anual",
+      "yearlyBadge": "Melhor oferta",
       "monthly": "DoseDay Mensal",
+      "monthlyNote": "Flexível, cancele quando quiser",
       "perMonth": "por mês",
       "perYear": "por ano"
     },
@@ -32,7 +34,7 @@
     },
     "cta": {
       "startTrial": "Começar 14 dias grátis",
-      "trialNote": "14 dias grátis. Cancele quando quiser.",
+      "trialNote": "14 dias grátis. Depois, renovação pela App Store. Cancele quando quiser.",
       "cancelAnytime": "Cancele quando quiser",
       "restorePurchases": "Restaurar compras",
       "processing": "Ativando..."

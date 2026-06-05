@@ -237,6 +237,8 @@ export default function PaywallScreen() {
               <PaywallPlanCard
                 key={plan.id}
                 title={t(plan.id === 'yearly' ? 'paywall.plans.yearly' : 'paywall.plans.monthly')}
+                badge={plan.id === 'yearly' ? t('paywall.plans.yearlyBadge') : undefined}
+                note={plan.id === 'monthly' ? t('paywall.plans.monthlyNote') : undefined}
                 priceNote={plan.priceString}
                 periodLabel={t(plan.id === 'yearly' ? 'paywall.plans.perYear' : 'paywall.plans.perMonth')}
                 selected={selectedPlan === plan.id}

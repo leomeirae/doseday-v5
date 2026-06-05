@@ -14,6 +14,10 @@ type Props = {
   selected: boolean
   onPress: () => void
   testID?: string
+  // Aditivos opcionais (copy release): badge = selo curto ao lado do título
+  // (ex.: "Melhor oferta"); note = linha de apoio sob o título (ex.: "Flexível…").
+  badge?: string | undefined
+  note?: string | undefined
 }
 
 export function PaywallPlanCard({
@@ -23,6 +27,8 @@ export function PaywallPlanCard({
   selected,
   onPress,
   testID,
+  badge,
+  note,
 }: Props) {
   return (
     <Pressable
@@ -41,10 +47,29 @@ export function PaywallPlanCard({
       {/* style prop: borda condicional por seleção (brand vs hairline) */}
       <View className="flex-row items-center justify-between">
         <View className="flex-1">
-          <Text className="text-text-primary text-[18px] font-semibold leading-[24px]">
-            {/* 📐 text-[18px] leading-[24px] = subtitle — o plano é o destaque, não o preço */}
-            {title}
-          </Text>
+          <View className="flex-row items-center gap-xs">
+            <Text className="text-text-primary text-[18px] font-semibold leading-[24px]">
+              {/* 📐 text-[18px] leading-[24px] = subtitle — o plano é o destaque, não o preço */}
+              {title}
+            </Text>
+            {badge ? (
+              <View
+                className="rounded-full px-xs py-[2px]"
+                style={{ backgroundColor: colors.brand }}
+              >
+                {/* style prop: selo brand sólido — destaca a melhor oferta */}
+                <Text className="text-text-inverse text-[11px] font-semibold leading-[14px]">
+                  {badge}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+          {note ? (
+            <Text className="text-text-secondary text-[13px] leading-[18px] mt-xxs">
+              {/* 📐 caption */}
+              {note}
+            </Text>
+          ) : null}
           <Text className="text-text-tertiary text-[13px] leading-[18px] mt-xxs">
             {/* 📐 caption */}
             {priceNote} {periodLabel}
