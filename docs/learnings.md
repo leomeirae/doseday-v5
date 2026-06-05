@@ -404,3 +404,13 @@ Registrado em 2026-06-02 após instalação e teste com a API real da Apple.
 **Achado.** O Claude Code tem acesso direto (ferramentas `mcp__app-store-connect__*`) a: apps e bundle IDs, builds, TestFlight (grupos beta, testers, feedback com screenshots), App Store versions/localizations, analytics/vendas e dispositivos. Teste real listou os 4 apps da conta, incluindo o DoseDay V5 (`com.doseday.premium`, App ID 6756668672). Descoberta bônus: o webhook server-to-server Apple → RevenueCat (V2, produção e sandbox) **já está configurado** no App Store Connect do DoseDay V5 — integração de notificação de assinatura pronta antes mesmo do SDK nativo entrar no app.
 
 **Princípio.** Operações de App Store Connect (verificar produtos IAP, status de revisão, criar grupo beta, adicionar testers, conferir feedback do TestFlight) devem ser feitas via MCP direto pelo Claude Code/Cowork — sem pedir pro Léo abrir o site da Apple (regra 29). Antes de qualquer tarefa de release ou Fase 2, lembrar que essa ferramenta existe e usá-la.
+
+## 14.32 Aprendizado 64 — CHECK constraint em `trigger_source` bloqueou upsert silenciosamente por dias
+
+Registrado em 2026-06-04 durante o polish do prompt da memory-summary (PR de release).
+
+**Contexto.** A feature de Memória do Tratamento introduziu o valor `'memory_summary'` na coluna `trigger_source` de `educational_insights`. A coluna tinha um CHECK constraint que só aceitava os valores antigos (`'onboarding'`, etc.). O upsert do resumo era envolvido em `try/catch` com tratamento **não-fatal** (a função retornava o resumo pro app mesmo se a persistência falhasse). Resultado: o resumo aparecia na UI, mas **nenhuma linha era gravada** — a violação de CHECK (`new row for relation violates check constraint`) era engolida pelo catch e ninguém percebeu por dias. O sintoma só apareceu quando se foi conferir a trilha de auditoria e ela estava vazia.
+
+**Solução.** Cowork aplicou migration via MCP `apply_migration` ampliando o CHECK pra aceitar `'memory_summary'`. O primeiro teste real do upsert pós-migration vira critério de validação explícito do redeploy: confirmar que a linha PERSISTIU com `trigger_source='memory_summary'`.
+
+**Princípio.** **Upsert com catch não-fatal mascara violação de constraint.** Ao introduzir um valor novo em qualquer coluna com CHECK (ou FK, ou enum), verificar `pg_constraint` ANTES de fazer o deploy do código que grava esse valor — `SELECT conname, pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid = 'tabela'::regclass`. E quando a persistência é "best-effort" por design, logar a falha de forma observável (não só `catch` mudo), senão a ausência de dados passa por sucesso.

@@ -16,7 +16,23 @@ import {
 import { requireAuthenticatedRequest } from "../_shared/auth.ts";
 
 const SCHEMA_VERSION = "memory_summary_v1";
-const PROMPT_VERSION = "memory-summary-contract-v1";
+const PROMPT_VERSION = "memory-summary-contract-v2";
+
+// Rótulos PT determinísticos p/ tipos de sintoma (espelha QUICK_LOG_LABELS de
+// lib/validation/diarioSchemas.ts — a edge function Deno não importa @lib/*).
+// 'other' vira "Outros registros" no contexto do resumo. Fallback = key cru.
+const SYMPTOM_LABELS_PT = {
+  nausea: "Náusea",
+  headache: "Dor de cabeça",
+  fatigue: "Cansaço",
+  diarrhea: "Diarreia",
+  constipation: "Constipação",
+  heartburn: "Azia",
+  injection_pain: "Dor na injeção",
+  alcohol: "Bebi álcool",
+  feeling_good: "Bem hoje",
+  other: "Outros registros",
+};
 const MODEL_ENV_KEY = "MEMORY_SUMMARY_MODEL";
 
 // ── Fallback determinístico (específico e positivo) ───────────────────────────
@@ -126,19 +142,33 @@ function buildUserPrompt(ctx) {
     .map((d) => `  Semana de ${String(d.weekStart).slice(0, 10)}: ${d.applied} dose(s)`)
     .join("\n");
 
-  const weightStr =
-    ctx.weight_points.length > 0
-      ? ctx.weight_points
-          .slice(-6)
-          .map((w) => `  ${String(w.date).slice(0, 10)}: ${w.weight}kg`)
-          .join("\n")
-      : "  Nenhum peso registrado";
+  let weightStr;
+  if (ctx.weight_points.length > 0) {
+    const pts = ctx.weight_points;
+    const first = pts[0];
+    const last = pts[pts.length - 1];
+    const delta = last.weight - first.weight;
+    const deltaStr = `${delta > 0 ? "+" : ""}${delta.toFixed(1).replace(".", ",")} kg`;
+    // Início e fim do PERÍODO COMPLETO + variação real (evita o viés de só
+    // mandar os últimos pontos, que escondia a perda total do tratamento).
+    const overview =
+      `  Início do período (${String(first.date).slice(0, 10)}): ${first.weight}kg\n` +
+      `  Último registro (${String(last.date).slice(0, 10)}): ${last.weight}kg\n` +
+      `  Variação no período: ${deltaStr}`;
+    const recent = pts
+      .slice(-6)
+      .map((w) => `  ${String(w.date).slice(0, 10)}: ${w.weight}kg`)
+      .join("\n");
+    weightStr = `${overview}\n  Pontos recentes:\n${recent}`;
+  } else {
+    weightStr = "  Nenhum peso registrado";
+  }
 
   const symptomsStr =
     ctx.symptom_counts.length > 0
       ? ctx.symptom_counts
           .slice(0, 5)
-          .map((s) => `  ${s.type}: ${s.count}x`)
+          .map((s) => `  ${SYMPTOM_LABELS_PT[s.type] ?? s.type}: ${s.count}x`)
           .join("\n")
       : "  Nenhum sintoma registrado";
 
@@ -150,7 +180,7 @@ Medicamento: ${med} ${dose} | ${week} | última dose: ${lastDose}
 Doses aplicadas (por semana, últimas 8 semanas):
 ${dosesStr}
 
-Histórico de peso (últimos registros):
+Histórico de peso (período completo — início, fim e variação):
 ${weightStr}
 
 Sintomas mais frequentes (últimos 30 dias):
