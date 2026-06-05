@@ -16,7 +16,7 @@ import {
 import { requireAuthenticatedRequest } from "../_shared/auth.ts";
 
 const SCHEMA_VERSION = "memory_summary_v1";
-const PROMPT_VERSION = "memory-summary-contract-v2";
+const PROMPT_VERSION = "memory-summary-contract-v3";
 
 // Rótulos PT determinísticos p/ tipos de sintoma (espelha QUICK_LOG_LABELS de
 // lib/validation/diarioSchemas.ts — a edge function Deno não importa @lib/*).
@@ -149,12 +149,13 @@ function buildUserPrompt(ctx) {
     const last = pts[pts.length - 1];
     const delta = last.weight - first.weight;
     const deltaStr = `${delta > 0 ? "+" : ""}${delta.toFixed(1).replace(".", ",")} kg`;
-    // Início e fim do PERÍODO COMPLETO + variação real (evita o viés de só
-    // mandar os últimos pontos, que escondia a perda total do tratamento).
+    // Primeiro e último registro do HISTÓRICO COMPLETO + variação real (evita o
+    // viés de só mandar os últimos pontos, que escondia a perda total do
+    // tratamento). Rótulos sem "período" pra não conflitar com "últimos 30 dias".
     const overview =
-      `  Início do período (${String(first.date).slice(0, 10)}): ${first.weight}kg\n` +
+      `  Primeiro registro (${String(first.date).slice(0, 10)}): ${first.weight}kg\n` +
       `  Último registro (${String(last.date).slice(0, 10)}): ${last.weight}kg\n` +
-      `  Variação no período: ${deltaStr}`;
+      `  Variação total (primeiro→último): ${deltaStr}`;
     const recent = pts
       .slice(-6)
       .map((w) => `  ${String(w.date).slice(0, 10)}: ${w.weight}kg`)
@@ -180,8 +181,9 @@ Medicamento: ${med} ${dose} | ${week} | última dose: ${lastDose}
 Doses aplicadas (por semana, últimas 8 semanas):
 ${dosesStr}
 
-Histórico de peso (período completo — início, fim e variação):
+Evolução de peso (registro completo — independe do período de 30 dias):
 ${weightStr}
+IMPORTANTE: Na variação de peso, reporte SEMPRE a variação TOTAL entre o primeiro e o último registro (com as datas), não apenas a dos últimos 30 dias.
 
 Sintomas mais frequentes (últimos 30 dias):
 ${symptomsStr}
