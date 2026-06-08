@@ -31,8 +31,8 @@ export const SYMPTOM_PATTERNS: readonly {
 ]
 
 const INTENSITY_PATTERNS: readonly { value: SymptomIntensity; regex: RegExp }[] = [
-  { value: 3, regex: /\b(forte|severo|intens[ao]|muito|grave|insuport[aá]vel)/i },
-  { value: 1, regex: /\b(leve|fraco|fraqu[ií]nho|pouco|sutil)/i },
+  { value: 3, regex: /\b(forte|sever[ao]|intens[ao]|muito|grave|insuport[aá]vel)/i },
+  { value: 1, regex: /\b(leve|frac[oa]|fraqu[ií]nho|pouco|sutil)/i },
   { value: 2, regex: /\bmoderad[ao]/i },
 ]
 
