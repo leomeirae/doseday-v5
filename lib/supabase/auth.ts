@@ -1,4 +1,5 @@
 import { supabase } from './client'
+import { signOutGoogle } from '@lib/auth/oauth'
 import type { AuthError, Session, User } from '@supabase/supabase-js'
 
 export type AuthResult = {
@@ -27,6 +28,10 @@ export async function signUp(
 
 export async function signOut(): Promise<{ error: AuthError | null }> {
   const { error } = await supabase.auth.signOut()
+  // Encerra também a sessão nativa do Google (best-effort; no-op se não logou via Google).
+  if (!error) {
+    await signOutGoogle()
+  }
   return { error }
 }
 

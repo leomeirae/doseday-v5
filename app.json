@@ -16,7 +16,8 @@
     "ios": {
       "bundleIdentifier": "com.doseday.premium",
       "supportsTablet": false,
-      "buildNumber": "12",
+      "buildNumber": "14",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "NSHealthShareUsageDescription": "DoseDay lê peso e atividade do Apple Saúde para ajudar a entender seu tratamento.",
         "NSHealthUpdateUsageDescription": "DoseDay pode salvar peso e doses no Apple Saúde se você autorizar.",
@@ -37,7 +38,14 @@
       ],
       "expo-font",
       "@react-native-community/datetimepicker",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.553630899758-j2n0e39169d0tuvoncjd4131gtoq3qd5"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
