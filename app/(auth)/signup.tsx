@@ -1,12 +1,5 @@
 import { useState } from 'react'
-import {
-  View,
-  Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from 'react-native'
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { colors, typography, spacing } from '@lib/theme/tokens'
@@ -14,6 +7,7 @@ import { AuthHeader } from '@components/ui/AuthHeader'
 import { TextField } from '@components/ui/TextField'
 import { AuthButton } from '@components/ui/AuthButton'
 import { AuthLink } from '@components/ui/AuthLink'
+import { SocialLoginButtons } from '@components/auth/SocialLoginButtons'
 import { signUp } from '@lib/supabase/auth'
 import { signUpSchema } from '@lib/validation/authSchemas'
 
@@ -60,7 +54,9 @@ export default function SignUpScreen() {
 
     setLoading(true)
     try {
-      const { session, error } = await signUp(email, password, { full_name: name })
+      const { session, error } = await signUp(result.data.email, result.data.password, {
+        full_name: result.data.name,
+      })
       if (error) {
         setGeneralError(mapSignUpError(error.message))
         return
@@ -96,7 +92,10 @@ export default function SignUpScreen() {
             <TextField
               label="Nome"
               value={name}
-              onChangeText={(v) => { setName(v); if (nameError) setNameError('') }}
+              onChangeText={(v) => {
+                setName(v)
+                if (nameError) setNameError('')
+              }}
               autoCapitalize="words"
               textContentType="name"
               returnKeyType="next"
@@ -109,7 +108,10 @@ export default function SignUpScreen() {
             <TextField
               label="Email"
               value={email}
-              onChangeText={(v) => { setEmail(v); if (emailError) setEmailError('') }}
+              onChangeText={(v) => {
+                setEmail(v)
+                if (emailError) setEmailError('')
+              }}
               keyboardType="email-address"
               autoCapitalize="none"
               textContentType="emailAddress"
@@ -123,7 +125,10 @@ export default function SignUpScreen() {
             <TextField
               label="Senha"
               value={password}
-              onChangeText={(v) => { setPassword(v); if (passwordError) setPasswordError('') }}
+              onChangeText={(v) => {
+                setPassword(v)
+                if (passwordError) setPasswordError('')
+              }}
               secureTextEntry
               textContentType="newPassword"
               returnKeyType="go"
@@ -145,9 +150,9 @@ export default function SignUpScreen() {
               testID="signup-button"
             />
 
-            {!!generalError && (
-              <Text style={styles.generalError}>{generalError}</Text>
-            )}
+            {!!generalError && <Text style={styles.generalError}>{generalError}</Text>}
+
+            <SocialLoginButtons onError={setGeneralError} disabled={loading} />
 
             <AuthLink
               label="Já tem conta? Entrar"

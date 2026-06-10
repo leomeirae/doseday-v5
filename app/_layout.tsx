@@ -19,6 +19,7 @@ import { useNotifications } from '@hooks/useNotifications'
 import { usePushTokenRegistration } from '@hooks/usePushTokenRegistration'
 import { useScheduleDoseNotifications } from '@hooks/useScheduleDoseNotifications'
 import { hasSeenWelcome } from '@lib/utils/welcomeStorage'
+import { configureGoogleSignIn } from '@lib/auth/oauth'
 
 function NotificationBootstrap() {
   const router = useRouter()
@@ -149,6 +150,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
+  // Configura o Google Sign In uma vez, após o mount — módulo nativo precisa do
+  // runtime pronto (chamar no escopo do módulo quebra a New Arch: "MessageQueue").
+  useEffect(() => {
+    configureGoogleSignIn()
+  }, [])
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>

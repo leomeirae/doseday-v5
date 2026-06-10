@@ -1,12 +1,5 @@
 import { useState } from 'react'
-import {
-  View,
-  Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from 'react-native'
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { colors, typography, spacing } from '@lib/theme/tokens'
@@ -14,6 +7,7 @@ import { AuthHeader } from '@components/ui/AuthHeader'
 import { TextField } from '@components/ui/TextField'
 import { AuthButton } from '@components/ui/AuthButton'
 import { AuthLink } from '@components/ui/AuthLink'
+import { SocialLoginButtons } from '@components/auth/SocialLoginButtons'
 import { signIn } from '@lib/supabase/auth'
 import { signInSchema } from '@lib/validation/authSchemas'
 
@@ -54,7 +48,7 @@ export default function SignInScreen() {
 
     setLoading(true)
     try {
-      const { error } = await signIn(email, password)
+      const { error } = await signIn(result.data.email, result.data.password)
       if (error) {
         setGeneralError(mapSignInError(error.message))
         return
@@ -86,7 +80,10 @@ export default function SignInScreen() {
             <TextField
               label="Email"
               value={email}
-              onChangeText={(v) => { setEmail(v); if (emailError) setEmailError('') }}
+              onChangeText={(v) => {
+                setEmail(v)
+                if (emailError) setEmailError('')
+              }}
               keyboardType="email-address"
               autoCapitalize="none"
               textContentType="emailAddress"
@@ -100,7 +97,10 @@ export default function SignInScreen() {
             <TextField
               label="Senha"
               value={password}
-              onChangeText={(v) => { setPassword(v); if (passwordError) setPasswordError('') }}
+              onChangeText={(v) => {
+                setPassword(v)
+                if (passwordError) setPasswordError('')
+              }}
               secureTextEntry
               textContentType="password"
               returnKeyType="go"
@@ -121,9 +121,9 @@ export default function SignInScreen() {
               testID="signin-button"
             />
 
-            {!!generalError && (
-              <Text style={styles.generalError}>{generalError}</Text>
-            )}
+            {!!generalError && <Text style={styles.generalError}>{generalError}</Text>}
+
+            <SocialLoginButtons onError={setGeneralError} disabled={loading} />
 
             <AuthLink
               label="Esqueci minha senha"
